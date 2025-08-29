@@ -1,7 +1,7 @@
 {
-  "name": "travelops-ai",
+  "name": "voygen",
   "version": "1.0.0",
-  "description": "LLM-Agnostic AI Travel Planning Platform",
+  "description": "Voygen - AI-Powered Travel Assistant with LibreChat Integration",
   "main": "src/index.ts",
   "scripts": {
     "dev": "vite",
@@ -27,7 +27,7 @@
     "continue-dev",
     "travel-planning"
   ],
-  "author": "TravelOps.ai Team",
+  "author": "Voygen Team",
   "license": "MIT",
   "dependencies": {
     "@continue/cli": "^0.9.0",
@@ -66,10 +66,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/travelops-ai/travelops-ai.git"
+    "url": "https://github.com/voygen/voygen.git"
   },
   "bugs": {
-    "url": "https://github.com/travelops-ai/travelops-ai/issues"
+    "url": "https://github.com/voygen/voygen/issues"
   },
-  "homepage": "https://travelops.ai"
+  "homepage": "https://voygen.app"
 }

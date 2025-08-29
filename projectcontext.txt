@@ -1,0 +1,33 @@
+  I'm continuing work on a LibreChat-based travel agent system called TravelOps.ai. Here's the current state:
+
+  ## Project Location & Status
+  - Working directory: /home/neil/dev/travelops.ai/librechat-source
+  - LibreChat frontend: Running on localhost:3090 ✅
+  - LibreChat backend: Running on localhost:3080 ✅
+  - MCP servers: 33 tools connected (d1-database + prompt-instructions) ✅
+  - Authentication: Anthropic API key configured ✅
+
+  ## Key Files & Documentation
+  - Main project docs: /home/neil/dev/travelops.ai/.project/
+  - LibreChat config: /home/neil/dev/travelops.ai/librechat-source/librechat.yaml
+  - Environment: /home/neil/dev/travelops.ai/librechat-source/.env
+  - Parent project docs: /home/neil/dev/claude-travel-agent-v2/CLAUDE.md (original CTA system)
+  - Test conversation: /home/neil/dev/travelops.ai/testing/librechat/New_Chat.json
+
+  ## Current Issues to Address
+  1. Tool selection problem: `/continue` command uses wrong MCP tool (continue_trip vs get_anything)
+  2. Database query complexity: "LIKE or GLOB pattern too complex" errors on workflow instructions
+  3. Need better tool descriptions/mappings for LibreChat's AI to select correct tools
+
+  ## Architecture
+  - LibreChat handles UI/auth/chat (MongoDB for conversations)
+  - MCP servers provide travel functionality:
+    - d1-database: Cloudflare D1 with client/trip data (22 tools)
+    - prompt-instructions: Travel workflows (11 tools)
+
+  ## Working Features
+  - travel_agent_start works correctly
+  - get_anything finds trips but has database errors on complex queries
+  - Multi-model setup (Haiku $0.25/1M, Sonnet $3.00/1M, GPT-4 $10.00/1M)
+
+  The system is functional but needs refinement of tool selection logic and database query optimization.

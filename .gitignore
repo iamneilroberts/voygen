@@ -121,6 +121,16 @@ public/
 mcp-logs/
 mcp-cache/
 
+# MCP Chrome specific
+mcp-local-servers/mcp-chrome/app/chrome-extension/.output/
+mcp-local-servers/mcp-chrome/app/native-server/dist/
+mcp-local-servers/mcp-chrome/node_modules/
+
+# LibreChat specific
+librechat-source/logs/
+librechat-source/data/
+librechat-source/.env
+
 # AI model cache
 model-cache/
 embeddings-cache/
@@ -137,3 +147,4 @@ wrangler.toml.backup
 # Local development overrides
 docker-compose.override.yml
 .env.override
+.vercel
