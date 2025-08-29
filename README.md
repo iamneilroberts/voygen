@@ -2,7 +2,7 @@
 
 **LLM-Agnostic AI Travel Planning Platform**
 
-TravelOps.ai is a professional travel planning system built on Continue.dev with Model Context Protocol (MCP) integration, designed to provide travel agents with a flexible, multi-model AI assistant that can switch between different LLMs for optimal cost and performance.
+TravelOps.ai is a professional travel planning system built on **LibreChat** with Model Context Protocol (MCP) integration, designed to provide travel agents with a familiar chat interface and flexible, multi-model AI assistant that can switch between different LLMs for optimal cost and performance.
 
 ## 🎯 Vision
 
@@ -16,27 +16,28 @@ Create the world's first truly LLM-agnostic professional travel planning platfor
 
 - **Multi-Model Support**: Seamlessly switch between Claude Haiku 3.5, Sonnet, GPT-4, Gemini, and local models
 - **Cost Optimization**: Use cheaper models for routine tasks, premium models for complex planning
-- **Professional Interface**: Travel agent-focused UI with itinerary management, cost tracking, and document generation
+- **Professional Chat Interface**: Travel agent-focused chat UI with itinerary management, cost tracking, and document generation
 - **MCP Integration**: Compatible with existing 12-server MCP architecture from Claude Travel Agent
 - **Workflow Management**: Structured 12-step travel planning process with state persistence
 - **Enterprise Security**: Secure credential management and access controls
 
 ## 🏗️ Architecture
 
-Built on top of Continue.dev's LLM-agnostic framework with:
-- **Core Engine**: Continue.dev MCP client with custom travel agent extensions
-- **Model Abstraction Layer**: Unified interface for multiple AI providers
-- **Professional UI**: Custom React/Vue.js interface for travel professionals
-- **MCP Server Integration**: Direct compatibility with existing travel planning tools
-- **Database Layer**: Cost tracking, workflow state, and client management
+Built on top of LibreChat's enterprise-ready chat platform with:
+- **Core Engine**: LibreChat with custom travel agent configurations and MCP integration
+- **Model Abstraction Layer**: Native multi-provider support with intelligent cost optimization
+- **Professional Chat UI**: Familiar ChatGPT-style interface customized for travel professionals  
+- **MCP Server Integration**: Native 2024 MCP protocol support for existing travel planning tools
+- **Database Layer**: MongoDB for chat history, cost tracking, workflow state, and client management
 
 ## 📋 Project Status
 
 **Current Phase**: Evaluation and Architecture Design
 
-- [x] Research MCP-compatible platforms
-- [x] Analyze Continue.dev feasibility 
-- [ ] Set up development environment
+- [x] Research MCP-compatible platforms  
+- [x] Analyze Continue.dev vs LibreChat feasibility
+- [x] **Strategic Decision: LibreChat Foundation** (multi-AI expert consensus)
+- [ ] Set up LibreChat development environment
 - [ ] Create proof-of-concept integration
 - [ ] Develop professional UI mockups
 - [ ] Implement model switching logic
@@ -60,13 +61,13 @@ Built on top of Continue.dev's LLM-agnostic framework with:
 
 ## 🛠️ Technology Stack
 
-- **Base Platform**: Continue.dev
-- **AI Models**: Anthropic Claude, OpenAI GPT, Google Gemini, Local models
-- **Protocol**: Model Context Protocol (MCP)
-- **Frontend**: React/Vue.js (TBD)
-- **Backend**: Node.js with MCP server integration
-- **Database**: Compatible with existing travel_assistant D1 database
-- **Deployment**: Cloudflare Workers, local development support
+- **Base Platform**: LibreChat (open-source ChatGPT alternative)
+- **AI Models**: Anthropic Claude, OpenAI GPT, Google Gemini, Local models  
+- **Protocol**: Model Context Protocol (MCP) - Native 2024 support
+- **Frontend**: React with Tailwind CSS (LibreChat's proven stack)
+- **Backend**: Node.js with native MCP server integration
+- **Database**: MongoDB (chat history) + D1 (travel data) + Redis (caching)
+- **Deployment**: Docker containers, Cloudflare Workers for MCP servers
 
 ## 📂 Project Structure
 
@@ -81,9 +82,9 @@ travelops.ai/
 │   └── plans/           # Implementation roadmaps
 ├── src/
 │   ├── core/           # Core platform integration
-│   ├── ui/             # User interface components
-│   ├── extensions/     # Continue.dev extensions
-│   └── agents/         # Custom AI agents
+│   ├── ui/             # Custom React components for travel
+│   ├── librechat/      # LibreChat customizations and configs
+│   └── agents/         # Custom AI agent configurations
 ├── docs/               # User and developer documentation
 ├── tests/              # Test suites
 ├── config/             # Configuration files
@@ -112,8 +113,8 @@ This project is in early development. Contribution guidelines will be establishe
 
 ## 🔗 Related Projects
 
-- **Claude Travel Agent**: Original Claude Desktop-based system
-- **Continue.dev**: Base platform for LLM-agnostic development
+- **Claude Travel Agent**: Original Claude Desktop-based system (CTA)
+- **LibreChat**: Open-source ChatGPT alternative with enterprise features
 - **Model Context Protocol**: Standard for AI tool integration
 
 ---
