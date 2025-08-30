@@ -1,0 +1,11 @@
+name = "d1-database-improved"
+main = "src/index.ts"
+compatibility_date = "2025-01-20"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "travel_assistant"
+database_id = "e6723f99-1d99-45bb-a941-e7600a56abe9"
+
+[env.production]
+vars = { MCP_AUTH_KEY = "your-secret-auth-key" }

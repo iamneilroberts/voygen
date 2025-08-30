@@ -1,0 +1,127 @@
+{{#if enhancedTransportation}}
+<section class="card enhanced-transportation-section">
+  <h2 class="section-title">🚌 Transportation Details</h2>
+  
+  {{#if enhancedTransportation.localTransport}}
+  <div class="transport-category">
+    <h3>🚇 Local Transportation</h3>
+    <div class="transport-grid">
+      {{#each enhancedTransportation.localTransport}}
+      <div class="transport-card">
+        <div class="transport-header">
+          <h4>{{type}}</h4>
+          {{#if apps}}
+          <span class="transport-apps">📱 {{join apps ", "}}</span>
+          {{/if}}
+        </div>
+        <div class="transport-details">
+          {{#if description}}
+          <p>{{description}}</p>
+          {{/if}}
+          {{#if cost}}
+          <p class="transport-cost">💰 {{cost}}</p>
+          {{/if}}
+          {{#if tips}}
+          <p class="transport-tips">💡 {{tips}}</p>
+          {{/if}}
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if enhancedTransportation.intercityTransport}}
+  <div class="transport-category">
+    <h3>🚆 Inter-city Transportation</h3>
+    <div class="intercity-details">
+      {{#each enhancedTransportation.intercityTransport}}
+      <div class="intercity-card">
+        <div class="route-info">
+          <h4>{{from}} → {{to}}</h4>
+          <span class="transport-method">{{method}}</span>
+        </div>
+        <div class="journey-details">
+          <div class="departure-info">
+            <strong>Departure:</strong>
+            <p>{{formatDate departureDate}} at {{departureTime}}</p>
+            <p>{{departureLocation}}</p>
+          </div>
+          <div class="arrival-info">
+            <strong>Arrival:</strong>
+            <p>{{formatDate arrivalDate}} at {{arrivalTime}}</p>
+            <p>{{arrivalLocation}}</p>
+          </div>
+          <div class="journey-meta">
+            <span class="duration">⏱️ {{duration}}</span>
+            {{#if confirmationNumber}}
+            <span class="confirmation">🎫 {{confirmationNumber}}</span>
+            {{/if}}
+          </div>
+        </div>
+        {{#if checkInRequirements}}
+        <div class="check-in-info">
+          <h5>Check-in Requirements</h5>
+          <p>{{checkInRequirements}}</p>
+        </div>
+        {{/if}}
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if enhancedTransportation.luggageInfo}}
+  <div class="transport-category">
+    <h3>🧳 Luggage Information</h3>
+    <div class="luggage-info">
+      {{#each enhancedTransportation.luggageInfo}}
+      <div class="luggage-card">
+        <h4>{{transportType}}</h4>
+        <div class="luggage-details">
+          {{#if carryOn}}
+          <div class="luggage-item">
+            <strong>Carry-on:</strong> {{carryOn}}
+          </div>
+          {{/if}}
+          {{#if checked}}
+          <div class="luggage-item">
+            <strong>Checked:</strong> {{checked}}
+          </div>
+          {{/if}}
+          {{#if restrictions}}
+          <div class="luggage-restrictions">
+            <strong>Restrictions:</strong>
+            <ul>
+              {{#each restrictions}}
+              <li>{{this}}</li>
+              {{/each}}
+            </ul>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if enhancedTransportation.transportationTips}}
+  <div class="transport-category">
+    <h3>💡 Transportation Tips</h3>
+    <div class="tips-grid">
+      {{#each enhancedTransportation.transportationTips}}
+      <div class="tip-card">
+        <h4>{{category}}</h4>
+        <ul>
+          {{#each tips}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+</section>
+{{/if}}

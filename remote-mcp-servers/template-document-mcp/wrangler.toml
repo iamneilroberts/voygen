@@ -1,0 +1,16 @@
+name = "template-document-mcp"
+main = "dist/index.js"
+compatibility_date = "2024-12-01"
+
+[build]
+command = "npm run build"
+
+[[d1_databases]]
+binding = "TRAVEL_ASSISTANT"
+database_name = "travel_assistant"
+database_id = "e6723f99-1d99-45bb-a941-e7600a56abe9"
+
+[vars]
+NODE_ENV = "production"
+SERVER_NAME = "template-document-mcp"
+VERSION = "1.0.0"

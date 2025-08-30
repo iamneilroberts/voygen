@@ -9,10 +9,16 @@
     "start": "cd librechat-source && npm start",
     "preview": "cd librechat-source && npm run frontend && npm start",
     "test": "cd librechat-source && npm test",
+    "test:mcp": "cd mcp-local-servers/mcp-chrome && npm test",
+    "test:unit": "npm run test:mcp",
+    "test:integration": "echo 'Integration tests not implemented yet'",
+    "test:e2e": "echo 'E2E tests not implemented yet'",
     "lint": "cd librechat-source && npm run lint",
     "lint:fix": "cd librechat-source && npm run lint:fix",
     "format": "cd librechat-source && npm run format",
-    "install-deps": "cd librechat-source && npm install && cd ../mcp-local-servers/mcp-chrome && pnpm install && pnpm build"
+    "install-deps": "cd librechat-source && npm install && cd ../mcp-local-servers/mcp-chrome && npm install && npm run build",
+    "setup": "./scripts/setup.sh",
+    "deploy:mcp": "cd remote-mcp-servers/d1-database-improved && npm run deploy && cd ../prompt-instructions-d1-mcp && npm run deploy && cd ../github-mcp-cta && npm run deploy"
   },
   "keywords": [
     "ai",

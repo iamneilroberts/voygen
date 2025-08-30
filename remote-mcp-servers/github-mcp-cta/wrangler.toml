@@ -1,0 +1,25 @@
+name = "github-mcp-cta"
+main = "src/index.ts"
+compatibility_date = "2024-01-15"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+GITHUB_OWNER = "iamneilroberts"
+GITHUB_REPO = "trip-summary"
+
+# Development environment
+[env.development]
+name = "github-mcp-cta-dev"
+vars = { ENVIRONMENT = "development", GITHUB_OWNER = "iamneilroberts", GITHUB_REPO = "trip-summary" }
+
+# Production environment  
+[env.production]
+name = "github-mcp-cta"
+vars = { ENVIRONMENT = "production", GITHUB_OWNER = "iamneilroberts", GITHUB_REPO = "trip-summary" }
+
+# Secrets (set via wrangler secret put)
+# GITHUB_TOKEN - Personal Access Token with repo permissions
+
+[observability.logs]
+enabled = true

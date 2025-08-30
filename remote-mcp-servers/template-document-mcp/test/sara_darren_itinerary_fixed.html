@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sara & Darren Jones 25th Anniversary - Bristol & Bath</title>
+    <style>
+
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --text-color: #333;
+  --bg-color: #f5f5f7;
+  --card-bg: #ffffff;
+  --shadow: 0 2px 10px rgba(0,0,0,0.1);
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+header {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+  border-radius: var(--border-radius);
+  margin-bottom: 3rem;
+  box-shadow: var(--shadow);
+}
+
+h1 { 
+  font-size: 3rem; 
+  margin-bottom: 1rem; 
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.subtitle { 
+  font-size: 1.4rem; 
+  opacity: 0.9; 
+  margin-bottom: 1rem; 
+}
+
+.trip-overview {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.trip-overview span {
+  background: rgba(255,255,255,0.2);
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.section-title {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--accent-color);
+  border-radius: 2px;
+}
+
+.day-section {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+  border-left: 5px solid var(--secondary-color);
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.day-header h3 {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+.date {
+  color: var(--secondary-color);
+  font-weight: 500;
+}
+
+.accommodation-card, .activity-card {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--secondary-color);
+}
+
+.activity-card.kim-gem {
+  border-left-color: #ffd700;
+  background: linear-gradient(to right, rgba(255,215,0,0.1), #f8f9fa);
+}
+
+.gem-badge {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #333;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  display: inline-block;
+  margin-left: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.price {
+  color: var(--accent-color);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.price-breakdown {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+footer {
+  text-align: center;
+  padding: 3rem 0;
+  color: #666;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 3rem;
+}
+
+@media (max-width: 768px) {
+  .container { padding: 1rem; }
+  h1 { font-size: 2rem; }
+  .card, .day-section { padding: 1.5rem; }
+  .day-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+}
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Sara &amp; Darren Jones 25th Anniversary - Bristol &amp; Bath</h1>
+    <p class="subtitle">October 5, 2025 - October 15, 2025</p>
+    <div class="trip-overview">
+      <span>10 Days</span>
+      <span>Sara &amp; Darren Jones</span>
+    </div>
+  </header>
+  
+  <section class="card">
+    <h2 class="section-title">Your Travel Agent</h2>
+    <p><strong>Kim Henderson</strong></p>
+    <p>251-508-6921 | kim@somotravel.com</p>
+    <p>Somo Travel - Making Your Travel Dreams Reality</p>
+  </section>
+  
+  <section>
+    <h2 class="section-title">Daily Itinerary</h2>
+    
+    <div class="day-section">
+      <div class="day-header">
+        <h3>Day 1: Arrival</h3>
+        <span class="date">October 4, 2025</span>
+      </div>
+      
+      <div class="accommodation-info">
+        <h4>🏨 Accommodation</h4>
+        <div class="accommodation-card">
+          <h5>Travel Day</h5>
+          <p>Arrive Bristol Airport</p>
+        </div>
+      </div>
+      
+    </div>
+    <div class="day-section">
+      <div class="day-header">
+        <h3>Day 2: Bath Discovery</h3>
+        <span class="date">October 5, 2025</span>
+      </div>
+      
+      <div class="accommodation-info">
+        <h4>🏨 Accommodation</h4>
+        <div class="accommodation-card">
+          <h5>The Kennard, Bath</h5>
+          <p>King bed upgrade requested</p>
+        </div>
+      </div>
+      
+      <div class="activities">
+        <h4>📅 Activities</h4>
+        <div class="activity-card kim-gem">
+          <div class="activity-time">3:00 PM</div>
+          <div class="activity-content">
+            <h5>Bath City Highlights Walk<span class="gem-badge">Kim's Gem ✨</span></h5>
+            <p>Private walking tour with Guide Susan Swainbank</p>
+            <p class="location">📍 Historic Bath</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="day-section">
+      <div class="day-header">
+        <h3>Day 3: Stonehenge &amp; Winchester</h3>
+        <span class="date">October 8, 2025</span>
+      </div>
+      
+      <div class="accommodation-info">
+        <h4>🏨 Accommodation</h4>
+        <div class="accommodation-card">
+          <h5>The Old Granary, Winchester Area</h5>
+          <p>Booking #26114515, £839.44, Finest Retreats</p>
+        </div>
+      </div>
+      
+      <div class="activities">
+        <h4>📅 Activities</h4>
+        <div class="activity-card kim-gem">
+          <div class="activity-time">Morning</div>
+          <div class="activity-content">
+            <h5>Stonehenge Private Tour<span class="gem-badge">Kim's Gem ✨</span></h5>
+            <p>Private tour of the ancient stone circle</p>
+            <p class="location">📍 Stonehenge</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="day-section">
+      <div class="day-header">
+        <h3>Day 4: London Adventure</h3>
+        <span class="date">October 10, 2025</span>
+      </div>
+      
+      
+      <div class="activities">
+        <h4>📅 Activities</h4>
+        <div class="activity-card">
+          <div class="activity-time">9:30 AM</div>
+          <div class="activity-content">
+            <h5>Tower of London &amp; Thames Cruise</h5>
+            <p>Historic tower visit plus scenic Thames cruise</p>
+            <p class="location">📍 London</p>
+          </div>
+        </div>
+        <div class="activity-card">
+          <div class="activity-time">2:00 PM</div>
+          <div class="activity-content">
+            <h5>London Black Taxi Private Tour</h5>
+            <p>Private sightseeing tour in iconic London taxi</p>
+            <p class="location">📍 London</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="day-section">
+      <div class="day-header">
+        <h3>Day 5: Departure</h3>
+        <span class="date">October 14, 2025</span>
+      </div>
+      
+      <div class="accommodation-info">
+        <h4>🏨 Accommodation</h4>
+        <div class="accommodation-card">
+          <h5>Berwick Lodge, Bristol</h5>
+          <p>Reservation E8W223AX, $340.50, 5-star</p>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+  
+  <section class="card">
+    <h2 class="section-title">Trip Investment</h2>
+    <div class="price-breakdown">
+      <p>Total Cost: <span class="price">$2,571.99</span></p>
+    </div>
+  </section>
+  
+  <footer>
+    <p>Prepared by Kim Henderson | kim@somotravel.com | 251-508-6921</p>
+    <p>© 2025 Somo Travel - Creating Unforgettable Travel Experiences</p>
+  </footer>
+</div>
+
+</body>
+</html>

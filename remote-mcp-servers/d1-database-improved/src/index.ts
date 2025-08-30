@@ -1,0 +1,602 @@
+/**
+ * D1 Travel Database MCP Server - Proper MCP SDK Implementation
+ * Based on MCP Development Guide patterns
+ */
+
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { 
+  ListToolsRequestSchema, 
+  CallToolRequestSchema 
+} from '@modelcontextprotocol/sdk/types.js';
+import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
+import { Env } from './types';
+import { DatabaseManager } from './database/manager';
+import { ErrorLogger } from './database/errors';
+import { llmOptimizedTools } from './tools/llm-optimized-tools';
+
+// Create server instance with tools capability
+const server = new Server({
+  name: 'D1 Travel Database',
+  version: '4.2.0',
+  description: 'D1 Travel Database MCP for trip and client management'
+}, {
+  capabilities: {
+    tools: {}
+  }
+});
+
+// Global environment reference
+let globalEnv: Env;
+
+// Tool definitions - Database management tools + LLM-optimized tools
+const tools = [
+  {
+    name: 'health_check',
+    description: 'Check database health and status',
+    inputSchema: zodToJsonSchema(z.object({})) as any
+  },
+  {
+    name: 'update_activitylog_clients',
+    description: 'Update ActivityLog entries to populate client_id from trip_id',
+    inputSchema: zodToJsonSchema(z.object({})) as any
+  },
+  {
+    name: 'reset_activitylog_from_trips',
+    description: 'Clear ActivityLog and repopulate from Trips table updated_at column',
+    inputSchema: zodToJsonSchema(z.object({})) as any
+  },
+  {
+    name: 'explore_database',
+    description: 'Show all tables and their structure in the database',
+    inputSchema: zodToJsonSchema(z.object({})) as any
+  },
+  // Add LLM-optimized tools
+  ...llmOptimizedTools.map(tool => ({
+    name: tool.name,
+    description: tool.description,
+    inputSchema: zodToJsonSchema(tool.inputSchema) as any
+  }))
+];
+
+// List tools handler
+server.setRequestHandler(ListToolsRequestSchema, async () => ({
+  tools
+}));
+
+// Call tool handler
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  const { name, arguments: args } = request.params;
+  
+  const dbManager = new DatabaseManager(globalEnv);
+  const errorLogger = new ErrorLogger(globalEnv);
+  
+  try {
+    switch (name) {
+      case 'health_check':
+        return await handleHealthCheck(dbManager);
+        
+      case 'update_activitylog_clients':
+        return await handleUpdateActivityLogClients(dbManager, errorLogger);
+        
+      case 'reset_activitylog_from_trips':
+        return await handleResetActivityLogFromTrips(dbManager, errorLogger);
+        
+      case 'explore_database':
+        return await handleExploreDatabase(dbManager, errorLogger);
+        
+      default:
+        // Handle all LLM-optimized tools dynamically
+        const llmTool = llmOptimizedTools.find(t => t.name === name);
+        if (llmTool) {
+          // Apply schema validation and defaults
+          const validatedInput = llmTool.inputSchema.parse(args || {});
+          const result = await llmTool.handler(validatedInput, globalEnv.DB);
+          return {
+            content: [{
+              type: 'text',
+              text: typeof result === 'string' ? result : JSON.stringify(result, null, 2)
+            }]
+          };
+        }
+        
+        throw new Error(`Unknown tool: ${name}`);
+    }
+  } catch (error: any) {
+    await errorLogger.logToolError(name, error, `Failed to execute ${name}`);
+    return {
+      content: [{
+        type: 'text',
+        text: `Error executing ${name}: ${error.message}`
+      }]
+    };
+  }
+});
+
+// Tool implementations
+async function handleHealthCheck(dbManager: DatabaseManager) {
+  const initialized = await dbManager.ensureInitialized();
+  
+  return {
+    content: [{
+      type: 'text',
+      text: `Database Status: ${initialized ? '✅ Healthy' : '❌ Not Initialized'}\nVersion: 4.2.0\nDatabase management tools available`
+    }]
+  };
+}
+
+async function handleUpdateActivityLogClients(dbManager: DatabaseManager, errorLogger: ErrorLogger) {
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    return dbManager.createInitFailedResponse();
+  }
+
+  try {
+    // First, check how many records need updating
+    const countCheck = await globalEnv.DB.prepare(`
+      SELECT COUNT(*) as count 
+      FROM ActivityLog 
+      WHERE client_id IS NULL AND trip_id IS NOT NULL
+    `).first();
+
+    const recordsToUpdate = countCheck?.count || 0;
+
+    if (recordsToUpdate === 0) {
+      return {
+        content: [{
+          type: 'text',
+          text: "✅ No ActivityLog records need client_id updates. All records already have client_id populated or don't have trip_id."
+        }]
+      };
+    }
+
+    // Update ActivityLog entries by setting client_id based on trip_id
+    // Use the first client from TripParticipants for each trip
+    const updateResult = await globalEnv.DB.prepare(`
+      UPDATE ActivityLog 
+      SET client_id = (
+        SELECT tp.client_id 
+        FROM TripParticipants tp 
+        WHERE tp.trip_id = ActivityLog.trip_id 
+        LIMIT 1
+      )
+      WHERE client_id IS NULL 
+        AND trip_id IS NOT NULL
+        AND trip_id IN (SELECT DISTINCT trip_id FROM TripParticipants)
+    `).run();
+
+    // Check how many were actually updated
+    const afterCount = await globalEnv.DB.prepare(`
+      SELECT COUNT(*) as count 
+      FROM ActivityLog 
+      WHERE client_id IS NULL AND trip_id IS NOT NULL
+    `).first();
+
+    const remainingNull = afterCount?.count || 0;
+    const updatedCount = recordsToUpdate - remainingNull;
+
+    let resultMessage = `✅ **ActivityLog Client ID Update Complete**
+
+📊 **Results:**
+- Records that needed updating: ${recordsToUpdate}
+- Successfully updated: ${updatedCount}
+- Remaining with NULL client_id: ${remainingNull}
+
+🔧 **What was done:**
+- Populated client_id for ActivityLog entries using trip_id
+- Used first client from TripParticipants for each trip
+- Only updated records where trip_id has associated participants`;
+
+    if (remainingNull > 0) {
+      resultMessage += `\n\n⚠️ **Note:** ${remainingNull} records still have NULL client_id. These trips may not have participants in TripParticipants table.`;
+    }
+
+    return {
+      content: [{
+        type: 'text',
+        text: resultMessage
+      }]
+    };
+
+  } catch (error: any) {
+    await errorLogger.logToolError("update_activitylog_clients", error, "Failed to update ActivityLog client_id values");
+    return {
+      content: [{
+        type: 'text',
+        text: `❌ Error updating ActivityLog client_id values: ${error.message}`
+      }]
+    };
+  }
+}
+
+async function handleResetActivityLogFromTrips(dbManager: DatabaseManager, errorLogger: ErrorLogger) {
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    return dbManager.createInitFailedResponse();
+  }
+
+  try {
+    // Get current counts
+    const beforeActivityCount = await globalEnv.DB.prepare(`SELECT COUNT(*) as count FROM ActivityLog`).first();
+    const tripsCount = await globalEnv.DB.prepare(`SELECT COUNT(*) as count FROM Trips`).first();
+
+    const currentActivityRecords = beforeActivityCount?.count || 0;
+    const availableTrips = tripsCount?.count || 0;
+
+    // Clear existing ActivityLog
+    await globalEnv.DB.prepare(`DELETE FROM ActivityLog`).run();
+
+    if (availableTrips === 0) {
+      return {
+        content: [{
+          type: 'text',
+          text: `⚠️ **No Trips Found**\n\nCleared ${currentActivityRecords} old ActivityLog records, but no Trips available to repopulate from.\n\nCreate some trips first, then run this tool again.`
+        }]
+      };
+    }
+
+    // Get all trips and create ActivityLog entries
+    const trips = await globalEnv.DB.prepare(`
+      SELECT 
+        trip_id,
+        trip_name,
+        start_date,
+        end_date,
+        created_at,
+        updated_at
+      FROM Trips
+      ORDER BY updated_at DESC
+    `).all();
+
+    let insertedCount = 0;
+    const sessionId = `Session-${new Date().toISOString().slice(0, 10)}-DataMigration`;
+
+    // Create activity entries for each trip
+    for (const trip of trips.results) {
+      const tripData = trip as any;
+      
+      // Create initial "CreateTrip" activity based on created_at
+      await globalEnv.DB.prepare(`
+        INSERT INTO ActivityLog (
+          session_id, 
+          client_id, 
+          trip_id, 
+          activity_type, 
+          activity_timestamp, 
+          details
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `).bind(
+        sessionId,
+        null, // Will populate client_id later if needed
+        tripData.trip_id,
+        'CreateTrip',
+        tripData.created_at,
+        `Created trip: ${tripData.trip_name || 'Untitled'} (${tripData.start_date || 'No date'} to ${tripData.end_date || 'No date'})`
+      ).run();
+      insertedCount++;
+
+      // If updated_at is different from created_at, create an "EditTrip" activity
+      if (tripData.updated_at !== tripData.created_at) {
+        await globalEnv.DB.prepare(`
+          INSERT INTO ActivityLog (
+            session_id, 
+            client_id, 
+            trip_id, 
+            activity_type, 
+            activity_timestamp, 
+            details
+          ) VALUES (?, ?, ?, ?, ?, ?)
+        `).bind(
+          sessionId,
+          null, // Will populate client_id later if needed
+          tripData.trip_id,
+          'EditTrip',
+          tripData.updated_at,
+          `Updated trip: ${tripData.trip_name || 'Untitled'} (${tripData.start_date || 'No date'} to ${tripData.end_date || 'No date'})`
+        ).run();
+        insertedCount++;
+      }
+    }
+
+    const afterCount = await globalEnv.DB.prepare(`SELECT COUNT(*) as count FROM ActivityLog`).first();
+    const finalCount = afterCount?.count || 0;
+
+    const resultMessage = `✅ **ActivityLog Reset Complete**
+
+📊 **Migration Results:**
+- Cleared old ActivityLog records: ${currentActivityRecords}
+- Trips processed: ${availableTrips}
+- New ActivityLog entries created: ${insertedCount}
+- Final ActivityLog record count: ${finalCount}
+
+🔧 **What was done:**
+- Cleared all existing ActivityLog entries
+- Created "CreateTrip" activity for each trip using created_at timestamp
+- Created "EditTrip" activity for trips where updated_at differs from created_at
+- Used session ID: ${sessionId}
+
+💡 **Result:** travel_agent_start should now show recent trip activity based on actual trip data.`;
+
+    return {
+      content: [{
+        type: 'text',
+        text: resultMessage
+      }]
+    };
+
+  } catch (error: any) {
+    await errorLogger.logToolError("reset_activitylog_from_trips", error, "Failed to reset ActivityLog from Trips");
+    return {
+      content: [{
+        type: 'text',
+        text: `❌ Error resetting ActivityLog: ${error.message}`
+      }]
+    };
+  }
+}
+
+async function handleExploreDatabase(dbManager: DatabaseManager, errorLogger: ErrorLogger) {
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    return dbManager.createInitFailedResponse();
+  }
+
+  try {
+    // List all tables
+    const tables = await globalEnv.DB.prepare(`
+      SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
+    `).all();
+
+    let result = "📊 **Database Structure**\n\n";
+    
+    if (tables.results.length === 0) {
+      result += "No tables found in database.\n";
+    } else {
+      result += `Found ${tables.results.length} tables:\n\n`;
+      
+      for (const table of tables.results) {
+        const tableName = (table as any).name;
+        result += `### ${tableName}\n`;
+        
+        try {
+          // Get table schema
+          const schema = await globalEnv.DB.prepare(`PRAGMA table_info(${tableName})`).all();
+          
+          if (schema.results.length > 0) {
+            result += "**Columns:**\n";
+            for (const col of schema.results) {
+              const column = col as any;
+              result += `- ${column.name} (${column.type})${column.pk ? ' PRIMARY KEY' : ''}${column.notnull ? ' NOT NULL' : ''}\n`;
+            }
+          }
+          
+          // Get row count
+          const count = await globalEnv.DB.prepare(`SELECT COUNT(*) as count FROM ${tableName}`).first();
+          result += `**Row count:** ${(count as any)?.count || 0}\n\n`;
+          
+        } catch (e) {
+          result += `Error querying table: ${e}\n\n`;
+        }
+      }
+    }
+
+    return {
+      content: [{
+        type: 'text',
+        text: result
+      }]
+    };
+
+  } catch (error: any) {
+    await errorLogger.logToolError("explore_database", error, "Failed to explore database");
+    return {
+      content: [{
+        type: 'text',
+        text: `❌ Error exploring database: ${error.message}`
+      }]
+    };
+  }
+}
+
+// Cloudflare Worker export using proper MCP pattern
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    globalEnv = env; // Store environment for tool handlers
+    
+    const url = new URL(request.url);
+    
+    // Handle CORS preflight
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type'
+        }
+      });
+    }
+    
+    // Handle SSE endpoint - direct JSON-RPC handling
+    if (url.pathname === '/sse') {
+      if (request.method === 'POST') {
+        try {
+          const body = await request.json();
+          console.log("Received MCP message:", JSON.stringify(body));
+
+          let response;
+
+          // Handle different MCP methods directly
+          switch (body.method) {
+            case "initialize":
+              response = {
+                jsonrpc: "2.0",
+                id: body.id,
+                result: {
+                  protocolVersion: "2025-06-18",
+                  capabilities: {
+                    tools: {}
+                  },
+                  serverInfo: {
+                    name: "D1 Travel Database (Enhanced)",
+                    version: "4.1.0"
+                  }
+                }
+              };
+              break;
+
+            case "tools/list":
+              response = {
+                jsonrpc: "2.0",
+                id: body.id,
+                result: {
+                  tools
+                }
+              };
+              break;
+
+            case "tools/call":
+              const toolName = body.params.name;
+              const toolArgs = body.params.arguments || {};
+              
+              try {
+                const dbManager = new DatabaseManager(globalEnv);
+                const errorLogger = new ErrorLogger(globalEnv);
+                
+                let result;
+                switch (toolName) {
+                  case 'health_check':
+                    result = await handleHealthCheck(dbManager);
+                    break;
+                    
+                  case 'update_activitylog_clients':
+                    result = await handleUpdateActivityLogClients(dbManager, errorLogger);
+                    break;
+                    
+                  case 'reset_activitylog_from_trips':
+                    result = await handleResetActivityLogFromTrips(dbManager, errorLogger);
+                    break;
+                    
+                  case 'explore_database':
+                    result = await handleExploreDatabase(dbManager, errorLogger);
+                    break;
+                    
+                  default:
+                    // Handle all LLM-optimized tools dynamically
+                    const llmTool = llmOptimizedTools.find(t => t.name === toolName);
+                    if (llmTool) {
+                      const toolResult = await llmTool.handler(toolArgs, globalEnv.DB);
+                      result = {
+                        content: [{
+                          type: 'text',
+                          text: typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult, null, 2)
+                        }]
+                      };
+                    } else {
+                      throw new Error(`Unknown tool: ${toolName}`);
+                    }
+                    break;
+                }
+                
+                response = {
+                  jsonrpc: "2.0",
+                  id: body.id,
+                  result: result
+                };
+              } catch (error: any) {
+                response = {
+                  jsonrpc: "2.0",
+                  id: body.id,
+                  error: {
+                    code: -32002,
+                    message: error.message || "Tool execution failed"
+                  }
+                };
+              }
+              break;
+
+            default:
+              response = {
+                jsonrpc: "2.0",
+                id: body.id,
+                error: {
+                  code: -32601,
+                  message: `Method not found: ${body.method}`
+                }
+              };
+          }
+
+          console.log("Sending response:", JSON.stringify(response));
+
+          return new Response(JSON.stringify(response), {
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+              "Access-Control-Allow-Headers": "Content-Type",
+            }
+          });
+          
+        } catch (error: any) {
+          console.error("Error handling request:", error);
+          return new Response(JSON.stringify({
+            jsonrpc: "2.0",
+            id: null,
+            error: {
+              code: -32700,
+              message: "Parse error",
+              data: error.message
+            }
+          }), {
+            status: 400,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+            }
+          });
+        }
+      }
+      
+      // For GET requests (SSE connections), return simple SSE stream
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(': ping\n\n'));
+          // Keep alive ping every 30 seconds
+          const interval = setInterval(() => {
+            try {
+              controller.enqueue(encoder.encode(': ping\n\n'));
+            } catch (e) {
+              clearInterval(interval);
+            }
+          }, 30000);
+        }
+      });
+      
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type'
+        }
+      });
+    }
+    
+    // Handle health endpoint
+    if (url.pathname === '/health') {
+      return new Response(JSON.stringify({
+        status: "healthy",
+        service: "D1 Travel Database MCP v4.2",
+        features: ["database-management", "trip-tracking", "client-management", "activity-logging"],
+        timestamp: new Date().toISOString()
+      }), {
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+    
+    return new Response('Not found', { status: 404 });
+  }
+};

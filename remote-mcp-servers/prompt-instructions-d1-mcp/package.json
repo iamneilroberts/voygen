@@ -1,0 +1,26 @@
+{
+  "name": "prompt-instructions-d1-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for dynamic travel instruction management using Cloudflare D1 database",
+  "main": "src/index.ts",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "test": "npm run build && node test-local.js",
+    "build": "tsc",
+    "tail": "wrangler tail"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240925.0",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.78.12"
+  },
+  "keywords": ["mcp", "travel", "instructions", "d1", "cloudflare"],
+  "author": "Claude Travel Agent",
+  "license": "MIT"
+}

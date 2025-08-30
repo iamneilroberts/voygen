@@ -1,0 +1,64 @@
+{{#if travelInformation}}
+<section class="card travel-info-section">
+  <h2 class="section-title">ℹ️ Important Travel Information</h2>
+  <div class="travel-info-grid">
+    {{#if travelInformation.emergencyContacts}}
+    <div class="info-card emergency-contacts">
+      <h4>🆘 Emergency Contacts</h4>
+      {{#each travelInformation.emergencyContacts}}
+      <div class="contact-item">
+        <strong>{{name}}</strong>
+        <p>{{phone}}</p>
+        <span class="contact-type">{{type}}</span>
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+    
+    {{#if travelInformation.timeZone}}
+    <div class="info-card timezone-info">
+      <h4>🕐 Time Zone Information</h4>
+      <p><strong>Local Time:</strong> {{travelInformation.timeZone}}</p>
+      <p><strong>Time Difference:</strong> {{travelInformation.timeDifference}}</p>
+      {{#if travelInformation.jetLagTips}}
+      <p><strong>Jet Lag Tips:</strong> {{travelInformation.jetLagTips}}</p>
+      {{/if}}
+    </div>
+    {{/if}}
+    
+    {{#if travelInformation.weather}}
+    <div class="info-card weather-info">
+      <h4>🌤️ Weather & Climate</h4>
+      <p><strong>Expected Weather:</strong> {{travelInformation.weather.conditions}}</p>
+      <p><strong>Temperature Range:</strong> {{travelInformation.weather.temperature}}</p>
+      {{#if travelInformation.weather.recommendations}}
+      <p><strong>Clothing Recommendations:</strong> {{travelInformation.weather.recommendations}}</p>
+      {{/if}}
+    </div>
+    {{/if}}
+    
+    {{#if travelInformation.culturalGuidelines}}
+    <div class="info-card cultural-guidelines">
+      <h4>🌍 Cultural Guidelines</h4>
+      {{#each travelInformation.culturalGuidelines}}
+      <div class="guideline-item">
+        <strong>{{topic}}:</strong> {{description}}
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if travelInformation.languageBasics}}
+    <div class="info-card language-basics">
+      <h4>🗣️ Language Basics</h4>
+      {{#each travelInformation.languageBasics}}
+      <div class="phrase-item">
+        <span class="phrase-english">{{english}}</span>
+        <span class="phrase-local">{{local}}</span>
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+  </div>
+</section>
+{{/if}}

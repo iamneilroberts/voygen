@@ -1,0 +1,105 @@
+version: 1.0.0
+cache: true
+
+# Minimal Travel Agent Configuration for Voygen
+endpoints:
+  custom:
+    # Haiku for cost-effective operations  
+    - name: "Claude Haiku (Cost Effective)"
+      apiKey: "${ANTHROPIC_API_KEY}"
+      baseURL: "https://api.anthropic.com/v1"
+      models:
+        default: ["claude-3-5-haiku-20241022"]
+      modelDisplayLabel: "💰 Haiku - Economical ($0.25/1M tokens)"
+      titleConvo: true
+      titleModel: "claude-3-5-haiku-20241022"
+      
+    # Sonnet for complex planning
+    - name: "Claude Sonnet (Premium)"
+      apiKey: "${ANTHROPIC_API_KEY}"
+      baseURL: "https://api.anthropic.com/v1" 
+      models:
+        default: ["claude-3-5-sonnet-20241022"]
+      modelDisplayLabel: "⭐ Sonnet - Premium Planning ($3.00/1M tokens)"
+      titleConvo: true
+      titleModel: "claude-3-5-sonnet-20241022"
+
+# Minimal MCP Server Configuration
+mcpServers:
+  mcp-chrome:
+    command: "node"
+    args: ["./mcp-local-servers/mcp-chrome/app/native-server/dist/index.js"]
+    timeout: 30000
+    env: {}
+    description: "Browser automation and web content extraction"
+    serverInstructions: |
+      Browser automation capabilities:
+      - Use this server for real-time web interaction and content extraction:
+        • Navigate to travel websites and extract live pricing data
+        • Take screenshots for visual confirmation
+        • Fill forms and interact with booking interfaces
+        • Monitor network requests for API data
+      - Ideal for dynamic content that requires JavaScript execution
+      - Best for real-time price verification and availability checks
+
+  d1-database:
+    command: "npx"
+    args: 
+      - "-y"
+      - "mcp-remote" 
+      - "https://d1-database-improved.somotravel.workers.dev/sse"
+    timeout: 30000
+    env: {}
+    description: "Access to client and trip database with comprehensive travel data"
+    serverInstructions: |
+      Tool selection guidance:
+      - Use this server for data lookups and persistence:
+        • get_anything: broad search for clients, trips, bookings
+        • find_* and list_*: targeted DB queries
+      - Do not use this server to drive conversational workflow progression.
+      - If both servers expose a tool named `continue_trip`, prefer `continue_trip` from `prompt-instructions` for resuming trip context; this server's tools should not be chosen for `/continue` intents.
+      - Prefer identifiers over names: when both are available, pass `trip_id` instead of long textual identifiers (e.g., `trip_identifier`, `trip_name`).
+    
+  prompt-instructions:
+    command: "npx"
+    args:
+      - "-y" 
+      - "mcp-remote"
+      - "https://prompt-instructions-d1-mcp.somotravel.workers.dev/sse"
+    timeout: 30000
+    env: {}
+    description: "Travel planning workflows, instructions, and structured processes"
+    serverInstructions: |
+      Tool selection guidance:
+      - Use this server to manage workflow state and conversation flow.
+        • travel_agent_start: initialize startup-core instructions
+        • continue_trip: resume work on an existing trip (/continue ...)
+      - Do not use this server for database-wide queries; instead, call `get_anything` on `d1-database`.
+      - When the user types `/continue ...`, select `continue_trip` from `prompt-instructions`.
+      - When referencing specific trips, include `trip_id` when available (IDs reduce ambiguity and extra DB lookups).
+
+  github-mcp:
+    command: "npx"
+    args:
+      - "-y"
+      - "mcp-remote"
+      - "https://github-mcp-cta.somotravel.workers.dev/sse"
+    timeout: 30000
+    env: {}
+    description: "GitHub repository management and document publishing"
+    serverInstructions: |
+      GitHub integration capabilities:
+      - Use this server for document publishing and repository management:
+        • publish_travel_document: Publish HTML documents to GitHub Pages
+        • create_file: Create new files in the repository
+        • update_file: Update existing files
+        • list_files: Browse repository contents
+      - Publishes to somotravel.us and voygen.app websites
+      - Use for creating client proposals and travel documents
+
+# Interface customization for travel agents
+interface:
+  privacyPolicy:
+    externalUrl: "https://voygen.app/privacy"
+  termsOfService:
+    externalUrl: "https://voygen.app/terms"

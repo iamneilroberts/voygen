@@ -1,0 +1,100 @@
+{{#if diningRecommendations}}
+<section class="card dining-section">
+  <h2 class="section-title">🍽️ Dining Recommendations</h2>
+  <div class="dining-grid">
+    {{#each diningRecommendations}}
+    <div class="restaurant-card">
+      <div class="restaurant-header">
+        <h4>{{name}}</h4>
+        <span class="cuisine-type">{{cuisine}}</span>
+        {{#if rating}}
+        <span class="restaurant-rating">⭐ {{rating}}</span>
+        {{/if}}
+      </div>
+      <div class="restaurant-details">
+        {{#if specialty}}
+        <p class="specialty"><strong>Specialty:</strong> {{specialty}}</p>
+        {{/if}}
+        {{#if description}}
+        <p class="restaurant-description">{{description}}</p>
+        {{/if}}
+        {{#if address}}
+        <p class="address">📍 {{address}}</p>
+        {{/if}}
+        {{#if hours}}
+        <p class="hours">🕒 {{hours}}</p>
+        {{/if}}
+        {{#if bookingInfo}}
+        <p class="booking-info">📞 {{bookingInfo}}</p>
+        {{/if}}
+        {{#if priceRange}}
+        <p class="price-range">💰 {{priceRange}}</p>
+        {{/if}}
+        {{#if mustTryDishes}}
+        <div class="must-try-dishes">
+          <strong>Must-try dishes:</strong>
+          <ul>
+            {{#each mustTryDishes}}
+            <li>{{this}}</li>
+            {{/each}}
+          </ul>
+        </div>
+        {{/if}}
+        {{#if dietaryAccommodations}}
+        <div class="dietary-accommodations">
+          <strong>Dietary Options:</strong>
+          <span class="dietary-tags">
+            {{#each dietaryAccommodations}}
+            <span class="dietary-tag">{{this}}</span>
+            {{/each}}
+          </span>
+        </div>
+        {{/if}}
+        {{#if tips}}
+        <p class="restaurant-tips">💡 <em>{{tips}}</em></p>
+        {{/if}}
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  
+  {{#if localFoodExperiences}}
+  <div class="food-experiences">
+    <h3>🌟 Local Food Experiences</h3>
+    <div class="experiences-grid">
+      {{#each localFoodExperiences}}
+      <div class="experience-card">
+        <h4>{{name}}</h4>
+        <p>{{description}}</p>
+        {{#if location}}
+        <p class="experience-location">📍 {{location}}</p>
+        {{/if}}
+        {{#if duration}}
+        <p class="experience-duration">⏱️ {{duration}}</p>
+        {{/if}}
+        {{#if cost}}
+        <p class="experience-cost">💰 {{cost}}</p>
+        {{/if}}
+        {{#if bookingRequired}}
+        <p class="booking-required">📝 Advance booking required</p>
+        {{/if}}
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+  
+  {{#if diningTips}}
+  <div class="dining-tips">
+    <h3>🍴 Dining Tips & Etiquette</h3>
+    <div class="tips-list">
+      {{#each diningTips}}
+      <div class="tip-item">
+        <strong>{{category}}:</strong> {{tip}}
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+</section>
+{{/if}}

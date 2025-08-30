@@ -1,0 +1,157 @@
+{{#if investmentBreakdown}}
+<section class="card investment-section">
+  <h2 class="section-title">💰 Trip Investment Breakdown</h2>
+  <div class="investment-details">
+    {{#if investmentBreakdown.categories}}
+    <div class="cost-breakdown">
+      <h4>Cost Categories</h4>
+      <div class="cost-table">
+        {{#each investmentBreakdown.categories}}
+        <div class="cost-item">
+          <span class="cost-category">{{category}}</span>
+          <span class="cost-amount">{{formatCurrency amount}}</span>
+          {{#if description}}
+          <span class="cost-description">{{description}}</span>
+          {{/if}}
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    {{/if}}
+    
+    <div class="total-cost">
+      <div class="total-line">
+        <strong>Total Trip Investment: {{formatCurrency investmentBreakdown.total}}</strong>
+      </div>
+      {{#if investmentBreakdown.perPerson}}
+      <div class="per-person">
+        Per Person: {{formatCurrency investmentBreakdown.perPerson}}
+      </div>
+      {{/if}}
+      {{#if investmentBreakdown.travelers}}
+      <div class="travelers-count">
+        For {{investmentBreakdown.travelers}} travelers
+      </div>
+      {{/if}}
+    </div>
+    
+    <div class="investment-breakdown-grid">
+      {{#if investmentBreakdown.included}}
+      <div class="inclusions">
+        <h4>✅ What's Included</h4>
+        <ul>
+          {{#each investmentBreakdown.included}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      
+      {{#if investmentBreakdown.excluded}}
+      <div class="exclusions">
+        <h4>❌ Not Included</h4>
+        <ul>
+          {{#each investmentBreakdown.excluded}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+    </div>
+    
+    {{#if investmentBreakdown.paymentSchedule}}
+    <div class="payment-schedule">
+      <h4>💳 Payment Schedule</h4>
+      <div class="payment-timeline">
+        {{#each investmentBreakdown.paymentSchedule}}
+        <div class="payment-milestone">
+          <div class="payment-date">
+            <strong>{{date}}</strong>
+          </div>
+          <div class="payment-details">
+            <span class="payment-description">{{description}}</span>
+            <span class="payment-amount">{{formatCurrency amount}}</span>
+          </div>
+          {{#if notes}}
+          <div class="payment-notes">{{notes}}</div>
+          {{/if}}
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    {{/if}}
+    
+    {{#if investmentBreakdown.paymentTerms}}
+    <div class="payment-terms">
+      <h4>📋 Payment Terms & Conditions</h4>
+      <div class="terms-content">
+        {{#each investmentBreakdown.paymentTerms}}
+        <p>{{this}}</p>
+        {{/each}}
+      </div>
+    </div>
+    {{/if}}
+    
+    {{#if investmentBreakdown.cancellationPolicy}}
+    <div class="cancellation-policy">
+      <h4>🚫 Cancellation Policy</h4>
+      <div class="policy-tiers">
+        {{#each investmentBreakdown.cancellationPolicy}}
+        <div class="policy-tier">
+          <strong>{{timeframe}}</strong>
+          <span class="penalty">{{penalty}}</span>
+          {{#if details}}
+          <p class="policy-details">{{details}}</p>
+          {{/if}}
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    {{/if}}
+    
+    {{#if investmentBreakdown.travelInsurance}}
+    <div class="travel-insurance">
+      <h4>🛡️ Travel Insurance</h4>
+      <div class="insurance-details">
+        {{#if investmentBreakdown.travelInsurance.recommended}}
+        <p class="insurance-recommendation">
+          <strong>✅ Travel insurance is highly recommended for this trip</strong>
+        </p>
+        {{/if}}
+        {{#if investmentBreakdown.travelInsurance.cost}}
+        <p class="insurance-cost">
+          Estimated Cost: {{formatCurrency investmentBreakdown.travelInsurance.cost}}
+        </p>
+        {{/if}}
+        {{#if investmentBreakdown.travelInsurance.coverage}}
+        <div class="insurance-coverage">
+          <strong>Recommended Coverage:</strong>
+          <ul>
+            {{#each investmentBreakdown.travelInsurance.coverage}}
+            <li>{{this}}</li>
+            {{/each}}
+          </ul>
+        </div>
+        {{/if}}
+        {{#if investmentBreakdown.travelInsurance.provider}}
+        <p class="insurance-provider">
+          Recommended Provider: {{investmentBreakdown.travelInsurance.provider}}
+        </p>
+        {{/if}}
+      </div>
+    </div>
+    {{/if}}
+    
+    {{#if investmentBreakdown.additionalNotes}}
+    <div class="additional-notes">
+      <h4>📝 Additional Notes</h4>
+      <div class="notes-content">
+        {{#each investmentBreakdown.additionalNotes}}
+        <p>{{this}}</p>
+        {{/each}}
+      </div>
+    </div>
+    {{/if}}
+  </div>
+</section>
+{{/if}}

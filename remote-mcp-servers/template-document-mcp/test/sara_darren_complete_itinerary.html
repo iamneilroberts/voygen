@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sara & Darren Jones 25th Anniversary - Bristol & Bath</title>
+    <style>
+
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --text-color: #333;
+  --bg-color: #f5f5f7;
+  --card-bg: #ffffff;
+  --shadow: 0 2px 10px rgba(0,0,0,0.1);
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+  --flight-color: #2980b9;
+  --rental-color: #27ae60;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+header {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+  border-radius: var(--border-radius);
+  margin-bottom: 3rem;
+  box-shadow: var(--shadow);
+}
+
+h1 { 
+  font-size: 3rem; 
+  margin-bottom: 1rem; 
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.subtitle { 
+  font-size: 1.4rem; 
+  opacity: 0.9; 
+  margin-bottom: 1rem; 
+}
+
+.trip-overview {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.trip-overview span {
+  background: rgba(255,255,255,0.2);
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.section-title {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--accent-color);
+  border-radius: 2px;
+}
+
+/* Flight Card Styling */
+.flight-card {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 5px solid var(--flight-color);
+}
+
+.flight-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.flight-header h4 {
+  color: var(--flight-color);
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.flight-number {
+  background: var(--flight-color);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.flight-details {
+  margin-top: 1rem;
+}
+
+.flight-leg {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.departure, .arrival {
+  flex: 1;
+  text-align: center;
+}
+
+.departure h5, .arrival h5 {
+  color: var(--flight-color);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.airport {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.2rem;
+}
+
+.city {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.datetime {
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
+.flight-arrow {
+  font-size: 2rem;
+  color: var(--flight-color);
+  font-weight: bold;
+}
+
+.flight-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+  font-size: 0.9rem;
+}
+
+.duration {
+  color: #666;
+}
+
+.confirmation {
+  font-weight: bold;
+  color: var(--flight-color);
+}
+
+/* Rental Car Styling */
+.rental-card {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.5rem;
+  border-left: 5px solid var(--rental-color);
+}
+
+.rental-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.rental-header h4 {
+  color: var(--rental-color);
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.vehicle-type {
+  background: var(--rental-color);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.rental-details {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.rental-pickup, .rental-dropoff {
+  flex: 1;
+  text-align: center;
+}
+
+.rental-pickup h5, .rental-dropoff h5 {
+  color: var(--rental-color);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.location {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+}
+
+.rental-arrow {
+  font-size: 2rem;
+  color: var(--rental-color);
+  font-weight: bold;
+}
+
+.rental-meta {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.rental-cost {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.daily-rate {
+  color: #666;
+}
+
+.total-cost {
+  color: var(--rental-color);
+  font-weight: bold;
+}
+
+.rental-features {
+  margin-bottom: 1rem;
+}
+
+.rental-features ul {
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+}
+
+.rental-features li {
+  margin-bottom: 0.3rem;
+  color: #666;
+}
+
+/* Day Section Styling */
+.day-section {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+  border-left: 5px solid var(--secondary-color);
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.day-header h3 {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+.date {
+  color: var(--secondary-color);
+  font-weight: 500;
+}
+
+.accommodation-card, .activity-card {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--secondary-color);
+}
+
+.activity-card.kim-gem {
+  border-left-color: #ffd700;
+  background: linear-gradient(to right, rgba(255,215,0,0.1), #f8f9fa);
+}
+
+.gem-badge {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #333;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  display: inline-block;
+  margin-left: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.price {
+  color: var(--accent-color);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.price-breakdown {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.cost-note {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+footer {
+  text-align: center;
+  padding: 3rem 0;
+  color: #666;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 3rem;
+}
+
+@media (max-width: 768px) {
+  .container { padding: 1rem; }
+  h1 { font-size: 2rem; }
+  .card, .day-section { padding: 1.5rem; }
+  .day-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .flight-leg, .rental-details { flex-direction: column; gap: 1rem; }
+  .flight-arrow, .rental-arrow { transform: rotate(90deg); }
+  .rental-cost { flex-direction: column; gap: 0.5rem; }
+}
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Sara &amp; Darren Jones 25th Anniversary - Bristol &amp; Bath</h1>
+    <p class="subtitle">October 5, 2025 - October 15, 2025</p>
+    <div class="trip-overview">
+      <span>10 Days</span>
+      <span>Sara &amp; Darren Jones</span>
+    </div>
+  </header>
+  
+  <section class="card">
+    <h2 class="section-title">Your Travel Agent</h2>
+    <p><strong>Kim Henderson</strong></p>
+    <p>251-508-6921 | kim@somotravel.com</p>
+    <p>Somo Travel - Making Your Travel Dreams Reality</p>
+  </section>
+  
+  <section class="card">
+    <h2 class="section-title">Trip Overview</h2>
+    <p>Celebrate 25 years of marriage with a romantic journey through England&#x27;s most charming historic cities. Experience luxury accommodations, private tours, and unforgettable moments in Bristol, Bath, Winchester, and London.</p>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title">✈️ Flight Information</h2>
+    <div class="flight-card">
+      <div class="flight-header">
+        <h4>Outbound Flight</h4>
+        <span class="flight-number">British Airways BA218</span>
+      </div>
+      <div class="flight-details">
+        <div class="flight-leg">
+          <div class="departure">
+            <h5>Departure</h5>
+            <p class="airport">Mobile Regional (MOB)</p>
+            <p class="city">Mobile, AL</p>
+            <p class="datetime">October 3, 2025 at 14:30</p>
+          </div>
+          <div class="flight-arrow">→</div>
+          <div class="arrival">
+            <h5>Arrival</h5>
+            <p class="airport">Bristol Airport (BRS)</p>
+            <p class="city">Bristol, UK</p>
+            <p class="datetime">October 4, 2025 at 08:15+1</p>
+          </div>
+        </div>
+        <div class="flight-meta">
+          <span class="duration">Duration: 9h 45m (1 stop)</span>
+          <span class="confirmation">Confirmation: GVXP4K</span>
+        </div>
+      </div>
+    </div>
+    <div class="flight-card">
+      <div class="flight-header">
+        <h4>Return Flight</h4>
+        <span class="flight-number">British Airways BA219</span>
+      </div>
+      <div class="flight-details">
+        <div class="flight-leg">
+          <div class="departure">
+            <h5>Departure</h5>
+            <p class="airport">Bristol Airport (BRS)</p>
+            <p class="city">Bristol, UK</p>
+            <p class="datetime">October 14, 2025 at 10:45</p>
+          </div>
+          <div class="flight-arrow">→</div>
+          <div class="arrival">
+            <h5>Arrival</h5>
+            <p class="airport">Mobile Regional (MOB)</p>
+            <p class="city">Mobile, AL</p>
+            <p class="datetime">October 14, 2025 at 18:30</p>
+          </div>
+        </div>
+        <div class="flight-meta">
+          <span class="duration">Duration: 10h 45m (1 stop)</span>
+          <span class="confirmation">Confirmation: GVXP4K</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title">🚗 Rental Car</h2>
+    <div class="rental-card">
+      <div class="rental-header">
+        <h4>Enterprise Rent-A-Car</h4>
+        <span class="vehicle-type">Premium SUV or similar (BMW X3)</span>
+      </div>
+      <div class="rental-details">
+        <div class="rental-pickup">
+          <h5>Pick-up</h5>
+          <p class="location">Bristol Airport</p>
+          <p class="datetime">October 4, 2025 at 10:00</p>
+        </div>
+        <div class="rental-arrow">→</div>
+        <div class="rental-dropoff">
+          <h5>Drop-off</h5>
+          <p class="location">Bristol Airport</p>
+          <p class="datetime">October 14, 2025 at 08:00</p>
+        </div>
+      </div>
+      <div class="rental-meta">
+        <div class="rental-cost">
+          <span class="daily-rate">Daily Rate: £68.50</span>
+          <span class="total-cost">Total Cost: £685.00</span>
+        </div>
+        <div class="rental-features">
+          <p><strong>Included Features:</strong></p>
+          <ul>
+            <li>Automatic transmission</li>
+            <li>GPS navigation</li>
+            <li>Full insurance coverage</li>
+          </ul>
+        </div>
+        <p class="confirmation">Confirmation Number: <strong>74829503</strong></p>
+      </div>
+    </div>
+  </section>
+  
+  <section>
+    <h2 class="section-title">Daily Itinerary</h2>
+    
+    <div class="day-section">
+      <div class="day-header">
+        <h3>Day 1: Arrival &amp; Car Pickup</h3>
+        <span class="date">October 4, 2025</span>
+      </div>
+      
+      <div class="accommodation-info">
+        <h4>🏨 Accommodation</h4>
+        <div class="accommodation-card">
+          <h5>Travel Day</h5>
+          <p>Arrive Bristol Airport 8:15 AM, pickup rental car at 10:00 AM</p>
+        </div>
+      </div>
+      
+    </div>
+    <div class="day-section">
+      <div class="day-header">
+        <h3>Day 2: Bath Discovery</h3>
+        <span class="date">October 5, 2025</span>
+      </div>
+      
+      <div class="accommodation-info">
+        <h4>🏨 Accommodation</h4>
+        <div class="accommodation-card">
+          <h5>The Kennard, Bath</h5>
+          <p>King bed upgrade requested</p>
+        </div>
+      </div>
+      
+      <div class="activities">
+        <h4>📅 Activities</h4>
+        <div class="activity-card kim-gem">
+          <div class="activity-time">3:00 PM</div>
+          <div class="activity-content">
+            <h5>Bath City Highlights Walk<span class="gem-badge">Kim's Gem ✨</span></h5>
+            <p>Private walking tour with Guide Susan Swainbank</p>
+            <p class="location">📍 Historic Bath</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="day-section">
+      <div class="day-header">
+        <h3>Day 3: Stonehenge &amp; Winchester</h3>
+        <span class="date">October 8, 2025</span>
+      </div>
+      
+      <div class="accommodation-info">
+        <h4>🏨 Accommodation</h4>
+        <div class="accommodation-card">
+          <h5>The Old Granary, Winchester Area</h5>
+          <p>Booking #26114515, £839.44, Finest Retreats</p>
+        </div>
+      </div>
+      
+      <div class="activities">
+        <h4>📅 Activities</h4>
+        <div class="activity-card kim-gem">
+          <div class="activity-time">Morning</div>
+          <div class="activity-content">
+            <h5>Stonehenge Private Tour<span class="gem-badge">Kim's Gem ✨</span></h5>
+            <p>Private tour of the ancient stone circle</p>
+            <p class="location">📍 Stonehenge</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="day-section">
+      <div class="day-header">
+        <h3>Day 4: London Adventure</h3>
+        <span class="date">October 10, 2025</span>
+      </div>
+      
+      
+      <div class="activities">
+        <h4>📅 Activities</h4>
+        <div class="activity-card">
+          <div class="activity-time">9:30 AM</div>
+          <div class="activity-content">
+            <h5>Tower of London &amp; Thames Cruise</h5>
+            <p>Historic tower visit plus scenic Thames cruise</p>
+            <p class="location">📍 London</p>
+          </div>
+        </div>
+        <div class="activity-card">
+          <div class="activity-time">2:00 PM</div>
+          <div class="activity-content">
+            <h5>London Black Taxi Private Tour</h5>
+            <p>Private sightseeing tour in iconic London taxi</p>
+            <p class="location">📍 London</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="day-section">
+      <div class="day-header">
+        <h3>Day 5: Departure</h3>
+        <span class="date">October 14, 2025</span>
+      </div>
+      
+      <div class="accommodation-info">
+        <h4>🏨 Accommodation</h4>
+        <div class="accommodation-card">
+          <h5>Berwick Lodge, Bristol</h5>
+          <p>Reservation E8W223AX, $340.50, 5-star. Car return 8:00 AM, flight departure 10:45 AM</p>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+  
+  <!-- Enhanced Standard Sections Test -->
+  <section class="card checklist-section">
+    <h2 class="section-title">✅ Pre-Departure Checklist</h2>
+    <div class="checklist-grid">
+      <div class="checklist-category">
+        <h4>Travel Documents</h4>
+        <ul class="checklist-items">
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-0-0">
+            <label for="checklist-0-0">Valid passports (expiring after April 2026)</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-0-1">
+            <label for="checklist-0-1">Travel insurance documents</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-0-2">
+            <label for="checklist-0-2">Flight confirmation emails printed</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-0-3">
+            <label for="checklist-0-3">Rental car reservation confirmation</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-0-4">
+            <label for="checklist-0-4">Hotel booking confirmations</label>
+          </li>
+        </ul>
+      </div>
+      <div class="checklist-category">
+        <h4>Health &amp; Safety</h4>
+        <ul class="checklist-items">
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-1-0">
+            <label for="checklist-1-0">Prescription medications (30-day supply)</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-1-1">
+            <label for="checklist-1-1">Emergency contact information</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-1-2">
+            <label for="checklist-1-2">Travel first aid kit</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-1-3">
+            <label for="checklist-1-3">Any required vaccinations up to date</label>
+          </li>
+        </ul>
+      </div>
+      <div class="checklist-category">
+        <h4>Packing Essentials</h4>
+        <ul class="checklist-items">
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-2-0">
+            <label for="checklist-2-0">Weather-appropriate clothing for fall</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-2-1">
+            <label for="checklist-2-1">Comfortable walking shoes</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-2-2">
+            <label for="checklist-2-2">Universal power adapters (Type G for UK)</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-2-3">
+            <label for="checklist-2-3">Phone chargers and backup battery</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-2-4">
+            <label for="checklist-2-4">Umbrella or light rain jacket</label>
+          </li>
+        </ul>
+      </div>
+      <div class="checklist-category">
+        <h4>Financial Preparation</h4>
+        <ul class="checklist-items">
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-3-0">
+            <label for="checklist-3-0">Notify banks of travel dates</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-3-1">
+            <label for="checklist-3-1">Exchange some USD to British Pounds</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-3-2">
+            <label for="checklist-3-2">Backup payment methods (multiple cards)</label>
+          </li>
+          <li class="checklist-item">
+            <input type="checkbox" id="checklist-3-3">
+            <label for="checklist-3-3">Emergency cash fund</label>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  
+  <section class="card travel-info-section">
+    <h2 class="section-title">ℹ️ Important Travel Information</h2>
+    <div class="travel-info-grid">
+      <div class="info-card emergency-contacts">
+        <h4>🆘 Emergency Contacts</h4>
+        <div class="contact-item">
+          <strong>Kim Henderson (Travel Agent)</strong>
+          <p>+1-251-508-6921</p>
+          <span class="contact-type">agent</span>
+        </div>
+        <div class="contact-item">
+          <strong>U.S. Embassy London</strong>
+          <p>+44-20-7499-9000</p>
+          <span class="contact-type">embassy</span>
+        </div>
+        <div class="contact-item">
+          <strong>Emergency Services UK</strong>
+          <p>999</p>
+          <span class="contact-type">local</span>
+        </div>
+      </div>
+      
+      <div class="info-card timezone-info">
+        <h4>🕐 Time Zone Information</h4>
+        <p><strong>Local Time:</strong> GMT (Greenwich Mean Time)</p>
+        <p><strong>Time Difference:</strong> 6 hours ahead of Central Time</p>
+        <p><strong>Jet Lag Tips:</strong> Start adjusting sleep schedule 3 days before departure. Stay hydrated during flight and get sunlight exposure upon arrival.</p>
+      </div>
+      
+      <div class="info-card weather-info">
+        <h4>🌤️ Weather & Climate</h4>
+        <p><strong>Expected Weather:</strong> Mild and wet autumn weather</p>
+        <p><strong>Temperature Range:</strong> 10-16°C (50-61°F) with frequent rain</p>
+        <p><strong>Clothing Recommendations:</strong> Layers, waterproof jacket, comfortable walking shoes with good grip</p>
+      </div>
+      
+      <div class="info-card cultural-guidelines">
+        <h4>🌍 Cultural Guidelines</h4>
+        <div class="guideline-item">
+          <strong>Tipping:</strong> 10-15% in restaurants if service charge not included. Round up taxi fares. £1-2 per bag for hotel porters.
+        </div>
+        <div class="guideline-item">
+          <strong>Pub Etiquette:</strong> Order at the bar, don&#x27;t wait for table service. It&#x27;s customary to buy rounds for your group.
+        </div>
+        <div class="guideline-item">
+          <strong>Queueing:</strong> Always queue politely and wait your turn. Queue jumping is considered very rude.
+        </div>
+        <div class="guideline-item">
+          <strong>Greetings:</strong> A simple &#x27;hello&#x27; or &#x27;good morning&#x27; is appropriate. Handshakes for introductions.
+        </div>
+      </div>
+
+      <div class="info-card language-basics">
+        <h4>🗣️ Language Basics</h4>
+        <div class="phrase-item">
+          <span class="phrase-english">Thank you</span>
+          <span class="phrase-local">Cheers (informal) / Thank you (formal)</span>
+        </div>
+        <div class="phrase-item">
+          <span class="phrase-english">Excuse me</span>
+          <span class="phrase-local">Sorry / Excuse me</span>
+        </div>
+        <div class="phrase-item">
+          <span class="phrase-english">Where is the bathroom?</span>
+          <span class="phrase-local">Where&#x27;s the loo? / Where are the toilets?</span>
+        </div>
+        <div class="phrase-item">
+          <span class="phrase-english">How much does this cost?</span>
+          <span class="phrase-local">How much is this? / What&#x27;s the price?</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="card dining-section">
+    <h2 class="section-title">🍽️ Dining Recommendations</h2>
+    <div class="dining-grid">
+      <div class="restaurant-card">
+        <div class="restaurant-header">
+          <h4>The Scallop Shell</h4>
+          <span class="cuisine-type">Traditional British Seafood</span>
+          <span class="restaurant-rating">⭐ 4.5</span>
+        </div>
+        <div class="restaurant-details">
+          <p class="specialty"><strong>Specialty:</strong> Fresh fish and chips, local seafood</p>
+          <p class="restaurant-description">Award-winning fish and chips restaurant with locally sourced ingredients</p>
+          <p class="address">📍 22 Monmouth St, Bath BA1 2BW</p>
+          <p class="hours">🕒 12:00 PM - 9:00 PM</p>
+          <p class="booking-info">📞 Walk-ins welcome, reservations for parties of 6+</p>
+          <p class="price-range">💰 £12-25 per person</p>
+          <div class="must-try-dishes">
+            <strong>Must-try dishes:</strong>
+            <ul>
+              <li>Beer-battered cod with chips</li>
+              <li>Local crab cakes</li>
+              <li>Mushy peas</li>
+            </ul>
+          </div>
+          <div class="dietary-accommodations">
+            <strong>Dietary Options:</strong>
+            <span class="dietary-tags">
+              <span class="dietary-tag">Vegetarian</span>
+              <span class="dietary-tag">Gluten-free options</span>
+            </span>
+          </div>
+          <p class="restaurant-tips">💡 <em>Try the curry sauce with your chips - it&#x27;s a local favorite!</em></p>
+        </div>
+      </div>
+      <div class="restaurant-card">
+        <div class="restaurant-header">
+          <h4>Sally Lunn&#x27;s Historic Eating House</h4>
+          <span class="cuisine-type">Traditional British Tea House</span>
+          <span class="restaurant-rating">⭐ 4.3</span>
+        </div>
+        <div class="restaurant-details">
+          <p class="specialty"><strong>Specialty:</strong> Original Sally Lunn Bun and traditional afternoon tea</p>
+          <p class="restaurant-description">Historic bakery dating from 1680, home of the original Sally Lunn bun</p>
+          <p class="address">📍 4 N Parade Passage, Bath BA1 1NX</p>
+          <p class="hours">🕒 10:00 AM - 6:00 PM</p>
+          <p class="booking-info">📞 01225 461634 for afternoon tea reservations</p>
+          <p class="price-range">💰 £15-35 per person</p>
+          <div class="must-try-dishes">
+            <strong>Must-try dishes:</strong>
+            <ul>
+              <li>Sally Lunn Bun with cinnamon butter</li>
+              <li>Traditional afternoon tea</li>
+              <li>Bath Bun</li>
+            </ul>
+          </div>
+          <div class="dietary-accommodations">
+            <strong>Dietary Options:</strong>
+            <span class="dietary-tags">
+              <span class="dietary-tag">Vegetarian</span>
+              <span class="dietary-tag">Vegan options available</span>
+            </span>
+          </div>
+          <p class="restaurant-tips">💡 <em>Visit the small museum in the basement to see Roman foundations</em></p>
+        </div>
+      </div>
+      <div class="restaurant-card">
+        <div class="restaurant-header">
+          <h4>The Rabbit Hole</h4>
+          <span class="cuisine-type">Modern British Gastropub</span>
+          <span class="restaurant-rating">⭐ 4.4</span>
+        </div>
+        <div class="restaurant-details">
+          <p class="specialty"><strong>Specialty:</strong> Seasonal ingredients, craft cocktails</p>
+          <p class="restaurant-description">Alice in Wonderland themed gastropub with creative seasonal menu</p>
+          <p class="address">📍 1-2 Bartlett St, Bath BA1 2QZ</p>
+          <p class="hours">🕒 5:00 PM - 11:00 PM (Closed Mondays)</p>
+          <p class="booking-info">📞 Reservations recommended: 01225 789069</p>
+          <p class="price-range">💰 £18-32 per person</p>
+          <div class="must-try-dishes">
+            <strong>Must-try dishes:</strong>
+            <ul>
+              <li>Mad Hatter&#x27;s fish pie</li>
+              <li>Queen of Hearts beef Wellington</li>
+              <li>Cheshire Cat cocktail</li>
+            </ul>
+          </div>
+          <div class="dietary-accommodations">
+            <strong>Dietary Options:</strong>
+            <span class="dietary-tags">
+              <span class="dietary-tag">Vegetarian</span>
+              <span class="dietary-tag">Vegan</span>
+              <span class="dietary-tag">Gluten-free</span>
+            </span>
+          </div>
+          <p class="restaurant-tips">💡 <em>Ask about the secret menu items - they change with the chef&#x27;s whims</em></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="food-experiences">
+      <h3>🌟 Local Food Experiences</h3>
+      <div class="experiences-grid">
+        <div class="experience-card">
+          <h4>Bath Food Tour</h4>
+          <p>Guided walking tour visiting local markets, bakeries, and specialty shops</p>
+          <p class="experience-location">📍 Bath City Center</p>
+          <p class="experience-duration">⏱️ 3 hours</p>
+          <p class="experience-cost">💰 £45 per person</p>
+          <p class="booking-required">📝 Advance booking required</p>
+        </div>
+        <div class="experience-card">
+          <h4>Traditional Pub Lunch Experience</h4>
+          <p>Authentic pub meal with local ales in a 16th-century inn</p>
+          <p class="experience-location">📍 The George Inn, Norton St Philip</p>
+          <p class="experience-duration">⏱️ 2 hours</p>
+          <p class="experience-cost">💰 £25-35 per person</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="dining-tips">
+      <h3>🍴 Dining Tips & Etiquette</h3>
+      <div class="tips-list">
+        <div class="tip-item">
+          <strong>Meal Times:</strong> Lunch is typically 12:00-2:00 PM, dinner 6:00-9:00 PM. Many kitchens close between services.
+        </div>
+        <div class="tip-item">
+          <strong>Payment:</strong> Most places accept cards, but some smaller pubs are cash only. Service charge may be included.
+        </div>
+        <div class="tip-item">
+          <strong>Reservations:</strong> Always book for dinner, especially weekends. Lunch reservations recommended for popular spots.
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="card investment-section">
+    <h2 class="section-title">💰 Trip Investment Breakdown</h2>
+    <div class="investment-details">
+      <div class="cost-breakdown">
+        <h4>Cost Categories</h4>
+        <div class="cost-table">
+          <div class="cost-item">
+            <span class="cost-category">Flights</span>
+            <span class="cost-amount">$1,850.00</span>
+            <span class="cost-description">Round-trip flights Mobile to Bristol via connecting city</span>
+          </div>
+          <div class="cost-item">
+            <span class="cost-category">Accommodation</span>
+            <span class="cost-amount">$1,456.99</span>
+            <span class="cost-description">10 nights across Bath, Winchester, and Bristol hotels</span>
+          </div>
+          <div class="cost-item">
+            <span class="cost-category">Transportation</span>
+            <span class="cost-amount">$685.00</span>
+            <span class="cost-description">Premium SUV rental for entire trip with full coverage</span>
+          </div>
+          <div class="cost-item">
+            <span class="cost-category">Activities &amp; Tours</span>
+            <span class="cost-amount">$265.00</span>
+            <span class="cost-description">Private walking tours, Stonehenge visit, London experiences</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="total-cost">
+        <div class="total-line">
+          <strong>Total Trip Investment: $4,256.99</strong>
+        </div>
+        <div class="per-person">
+          Per Person: $2,128.50
+        </div>
+        <div class="travelers-count">
+          For 2 travelers
+        </div>
+      </div>
+      
+      <div class="investment-breakdown-grid">
+        <div class="inclusions">
+          <h4>✅ What's Included</h4>
+          <ul>
+            <li>Round-trip flights with one checked bag each</li>
+            <li>10 nights accommodation (all rooms confirmed)</li>
+            <li>Premium rental car with full insurance</li>
+            <li>GPS navigation and breakdown coverage</li>
+            <li>Private walking tour in Bath</li>
+            <li>Stonehenge private access tour</li>
+            <li>London Black Taxi tour</li>
+            <li>24/7 travel agent support</li>
+            <li>Detailed daily itinerary and recommendations</li>
+          </ul>
+        </div>
+        
+        <div class="exclusions">
+          <h4>❌ Not Included</h4>
+          <ul>
+            <li>Meals and beverages (budget £60-80/day for two)</li>
+            <li>Fuel for rental car (estimated £80-100)</li>
+            <li>Parking fees in city centers</li>
+            <li>Travel insurance (highly recommended)</li>
+            <li>Personal shopping and souvenirs</li>
+            <li>Optional activities and tours not listed</li>
+            <li>Tips and gratuities</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="payment-schedule">
+        <h4>💳 Payment Schedule</h4>
+        <div class="payment-timeline">
+          <div class="payment-milestone">
+            <div class="payment-date">
+              <strong>Upon booking confirmation</strong>
+            </div>
+            <div class="payment-details">
+              <span class="payment-description">Deposit to secure reservations</span>
+              <span class="payment-amount">$1,500.00</span>
+            </div>
+            <div class="payment-notes">Confirms flights, hotels, and rental car</div>
+          </div>
+          <div class="payment-milestone">
+            <div class="payment-date">
+              <strong>August 1, 2025</strong>
+            </div>
+            <div class="payment-details">
+              <span class="payment-description">Second payment</span>
+              <span class="payment-amount">$1,500.00</span>
+            </div>
+            <div class="payment-notes">60 days before departure</div>
+          </div>
+          <div class="payment-milestone">
+            <div class="payment-date">
+              <strong>September 5, 2025</strong>
+            </div>
+            <div class="payment-details">
+              <span class="payment-description">Final payment</span>
+              <span class="payment-amount">$1,256.99</span>
+            </div>
+            <div class="payment-notes">30 days before departure</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cancellation-policy">
+        <h4>🚫 Cancellation Policy</h4>
+        <div class="policy-tiers">
+          <div class="policy-tier">
+            <strong>90+ days before travel</strong>
+            <span class="penalty">50% refund of total cost</span>
+            <p class="policy-details">Flights and hotels may have separate cancellation fees</p>
+          </div>
+          <div class="policy-tier">
+            <strong>60-89 days before travel</strong>
+            <span class="penalty">25% refund of total cost</span>
+            <p class="policy-details">Most reservations become non-refundable</p>
+          </div>
+          <div class="policy-tier">
+            <strong>30-59 days before travel</strong>
+            <span class="penalty">10% refund of total cost</span>
+            <p class="policy-details">Only refundable if resold to another traveler</p>
+          </div>
+          <div class="policy-tier">
+            <strong>Less than 30 days</strong>
+            <span class="penalty">No refund</span>
+            <p class="policy-details">Travel insurance may provide coverage</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="travel-insurance">
+        <h4>🛡️ Travel Insurance</h4>
+        <div class="insurance-details">
+          <p class="insurance-recommendation">
+            <strong>✅ Travel insurance is highly recommended for this trip</strong>
+          </p>
+          <p class="insurance-cost">
+            Estimated Cost: $285.00
+          </p>
+          <div class="insurance-coverage">
+            <strong>Recommended Coverage:</strong>
+            <ul>
+              <li>Trip cancellation and interruption</li>
+              <li>Medical expenses and emergency evacuation</li>
+              <li>Baggage loss and delay protection</li>
+              <li>Flight delay and missed connections</li>
+            </ul>
+          </div>
+          <p class="insurance-provider">
+            Recommended Provider: Travel Guard or Allianz Travel
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="card">
+    <h2 class="section-title">Trip Investment</h2>
+    <div class="price-breakdown">
+      <p>Total Cost: <span class="price">$4,256.99</span></p>
+      <p class="cost-note">*Includes flights, rental car, accommodations, and activities</p>
+    </div>
+  </section>
+  
+  <footer>
+    <p>Prepared by Kim Henderson | kim@somotravel.com | 251-508-6921</p>
+    <p>© 2025 Somo Travel - Creating Unforgettable Travel Experiences</p>
+  </footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+{{#if preDepartureChecklist}}
+<section class="card checklist-section">
+  <h2 class="section-title">✅ Pre-Departure Checklist</h2>
+  <div class="checklist-grid">
+    {{#each preDepartureChecklist}}
+    <div class="checklist-category">
+      <h4>{{category}}</h4>
+      <ul class="checklist-items">
+        {{#each items}}
+        <li class="checklist-item">
+          <input type="checkbox" id="checklist-{{@../index}}-{{@index}}">
+          <label for="checklist-{{@../index}}-{{@index}}">{{this}}</label>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/each}}
+  </div>
+</section>
+{{/if}}

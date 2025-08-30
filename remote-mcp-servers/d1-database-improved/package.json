@@ -1,0 +1,20 @@
+{
+  "name": "d1-database-improved",
+  "version": "3.0.0",
+  "description": "Improved D1 Database MCP with automatic initialization and better error handling",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node test-local.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.24.1",
+    "zod-to-json-schema": "^3.24.6"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
+    "wrangler": "^3.101.1"
+  }
+}
