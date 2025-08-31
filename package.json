@@ -4,10 +4,10 @@
   "description": "Voygen - AI-Powered Travel Assistant with LibreChat Integration",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "cd librechat-source && npm run dev",
+    "dev": "cd librechat-source && npm run frontend:dev",
     "build": "cd librechat-source && npm run frontend",
-    "start": "cd librechat-source && npm start",
-    "preview": "cd librechat-source && npm run frontend && npm start",
+    "start": "cd librechat-source && npm run backend",
+    "preview": "cd librechat-source && npm run frontend && npm run backend",
     "test": "cd librechat-source && npm test",
     "test:mcp": "cd mcp-local-servers/mcp-chrome && npm test",
     "test:unit": "npm run test:mcp",

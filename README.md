@@ -25,7 +25,7 @@ Voygen is a complete travel planning system built on LibreChat with Model Contex
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/voygen.git
+   git clone https://github.com/iamneilroberts/voygen.git
    cd voygen
    ```
 
@@ -285,15 +285,15 @@ npx mcp-remote https://d1-database-improved.somotravel.workers.dev/sse
 
 ### Getting Help
 
-- [GitHub Issues](https://github.com/yourusername/voygen/issues)
+- [GitHub Issues](https://github.com/iamneilroberts/voygen/issues)
 - [Documentation](docs/)
 - [Discord Community](https://discord.gg/voygen)
 
 ## 🔗 Related Projects
 
 - **[LibreChat](https://github.com/danny-avila/LibreChat)** - Base platform
-- **[Claude Travel Agent](https://github.com/yourusername/claude-travel-agent-v2)** - Original Claude Desktop version
-- **[MCP-Chrome](https://github.com/yourusername/mcp-chrome)** - Browser automation server
+- **[Claude Travel Agent](https://github.com/iamneilroberts/claude-travel-agent-v2)** - Original Claude Desktop version
+- **[MCP-Chrome](https://github.com/hangwin/mcp-chrome)** - Browser automation server
 
 ## 📄 License
 

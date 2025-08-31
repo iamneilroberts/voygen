@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "mcp-chrome": {
+      "command": "node",
+      "args": ["mcp-local-servers/mcp-chrome/app/native-server/dist/index.js"],
+      "env": {
+        "CHROME_PATH": "${CHROME_PATH:-/usr/bin/google-chrome}"
+      }
+    }
+  }
+}
