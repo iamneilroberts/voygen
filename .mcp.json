@@ -6,6 +6,47 @@
       "env": {
         "CHROME_PATH": "${CHROME_PATH:-/usr/bin/google-chrome}"
       }
+    },
+    "d1-database": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://d1-database-improved.somotravel.workers.dev/sse"
+      ]
+    },
+    "prompt-instructions-d1": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://prompt-instructions-d1-mcp.somotravel.workers.dev/sse"
+      ]
+    },
+    "template-document": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://template-document-qhubvccp6-neil-roberts-projects.vercel.app/api/mcp"
+      ]
+    },
+    "github-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://github-mcp-cta.somotravel.workers.dev/sse"
+      ]
+    },
+    "zen": {
+      "command": "zen-mcp-server/zen-mcp-server",
+      "args": [],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "GROQ_API_KEY": "${GROQ_API_KEY}"
+      }
     }
   }
 }
