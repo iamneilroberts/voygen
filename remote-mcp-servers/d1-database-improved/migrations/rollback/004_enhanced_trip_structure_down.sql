@@ -1,0 +1,5 @@
+BEGIN TRANSACTION;
+DROP TABLE IF EXISTS trip_activities_enhanced;
+DROP TABLE IF EXISTS trip_legs;
+COMMIT;
+

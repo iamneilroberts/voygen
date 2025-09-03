@@ -1,0 +1,22 @@
+diff --git a/codex-rs/tui/src/height_manager.rs b/codex-rs/tui/src/height_manager.rs
+index abc1234..def5678 100644
+--- a/codex-rs/tui/src/height_manager.rs
++++ b/codex-rs/tui/src/height_manager.rs
+@@ -183,9 +183,14 @@ impl HeightManager {
+             ]).split(padded_area)[1];
+             let inner_cols = right.width.saturating_sub(2);
+             let (cw, ch) = font_cell;
+-            let number = (inner_cols as u32) * 3 * (cw as u32);
+-            let denom = 4 * (ch as u32);
+-            let mut target = ((number / denom) as u16).saturating_add(2); // add borders
++            
++            // Original calculation: 3:4 ratio (0.75) creates a large screenshot
++            // let number = (inner_cols as u32) * 3 * (cw as u32);
++            // let denom = 4 * (ch as u32);
++            // New calculation: 1:3 ratio (0.33) creates a smaller screenshot
++            let number = (inner_cols as u32) * 1 * (cw as u32);
++            let denom = 3 * (ch as u32);
++            let mut target = ((number / denom) as u16).saturating_add(2); // add borders
+             target = target.saturating_sub(1); // tighten by one line as in current code
+ 
+             // Keep within budget: reserve space for status + bottom + >=1 row history.

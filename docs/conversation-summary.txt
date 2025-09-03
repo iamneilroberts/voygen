@@ -1,0 +1,41 @@
+Overview
+- Acted as a local assistant to draft and send emails, extract pricing from somotravel.us pages, and generate repo docs. Operated under read-only FS (with approved writes), restricted network, and on-request approvals.
+
+Environment & Constraints
+- Read-only by default; file edits via approved patches.
+- Network restricted; relied on DOM automation and local shell grep.
+- Browser automation preferred selectors over coordinates; some actions require manual file picker (attachments) or account policy (read receipts).
+
+Automation Approach (Text‑First)
+- DOM queries by role/label/text; scrollIntoView; element-centered click.
+- Stability checks: wait for element presence/visibility; verify outcomes (e.g., Gmail “Sent” toast or composer closed).
+- Time-boxed retries (≤8–9s) to avoid hanging.
+
+Gmail Workflow (Technical)
+- Compose: div[gh="cm"], .T-I.T-I-KE.L3, or [aria-label*="Compose"].
+- Fields: To → textarea[name="to"]; Subject → input[name="subjectbox"]; Body → [aria-label="Message Body"][contenteditable].
+- Address chip: set value, dispatch input/change, press Enter to create chip.
+- Send: [aria-label^="Send"] or [data-tooltip^="Send"]; confirm via .bAq toast or compose disappearance.
+- Read receipts: requested via compose options when Workspace policy allows (not guaranteed).
+
+Modal/Overlay Handling
+- Closed Google feedback dialogs ([role="dialog"] containing “Send feedback”) via Close/Escape.
+- Resolved “Please specify at least one recipient” by re-entering To and enforcing chip creation before retrying Send.
+
+Attachments (Security Limitation + Workaround)
+- Browsers block programmatic disk access; cannot auto-pick ~/Downloads files.
+- When content is provided, created a synthetic File and attached via DataTransfer → input[type=file] → change event. Otherwise, user must pick the file manually.
+
+Local Discovery (Kim’s Email)
+- Shell search in ~/dev (read-only): found kim.henderson@cruiseplanners.com in multiple files, including database-maintenance-work/.env.
+
+Web Data Extraction (SoMo Travel)
+- Parsed document.body.innerText and matched currency with regex; extracted surrounding context to compute/confirm totals (e.g., Breckenridge “Total Estimated Cost: $9,600–$11,100”).
+
+Chastain 2026 Email Cliff Notes
+- No-cost upgrades: optimize Westminster loop; free views (Sky Garden; Trocadéro/Galeries Lafayette); free museums first; smarter transit (London caps; Paris Navigo Easy + carnet); Elizabeth Line/RER B; book-ahead freebies (Ceremony of the Keys; Sky Garden); re-sequence Paris (sunset walk vs dinner cruise); leaner Champagne day (one courtyard visit); picnics; hotel soft-upgrade asks.
+- Estimated savings: ≈ $200–$350 per person (≈ $400–$700 total). Range impact: $8,132–$13,316 → ≈ $7,432–$12,916.
+
+Limits & Privacy
+- Delivery receipts not guaranteed; read receipts policy-dependent.
+- Sensitive data (emails, itineraries) handled locally; no external paid APIs were used for the email content.

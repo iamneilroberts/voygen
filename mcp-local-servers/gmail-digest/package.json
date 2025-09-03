@@ -1,0 +1,28 @@
+{
+  "name": "gmail-digest-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "ts-node src/index.ts",
+    "once": "ts-node src/index.ts --once",
+    "auth": "ts-node src/gmail.ts auth",
+    "query": "ts-node src/cli.ts",
+    "mcp": "ts-node src/mcp-server.ts"
+  },
+  "dependencies": {
+    "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "googleapis": "^131.0.0",
+    "html-to-text": "^9.0.5",
+    "node-cron": "^3.0.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^0.1.0",
+    "@types/node": "^22.5.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
+}

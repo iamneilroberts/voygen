@@ -1,0 +1,5 @@
+BEGIN TRANSACTION;
+DROP TABLE IF EXISTS proposal_images;
+DROP TABLE IF EXISTS proposals_enhanced;
+COMMIT;
+

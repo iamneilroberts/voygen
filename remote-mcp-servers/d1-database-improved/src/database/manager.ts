@@ -4,14 +4,17 @@
 
 import { Env, DatabaseError, ToolResponse } from '../types';
 import { SchemaInitializer } from './schema';
+import { MigrationRunner } from './migrations';
 
 export class DatabaseManager {
 	private isInitialized = false;
 	private initializationPromise: Promise<boolean> | null = null;
 	private schemaInitializer: SchemaInitializer;
+  private migrationRunner: MigrationRunner;
 
 	constructor(private env: Env) {
 		this.schemaInitializer = new SchemaInitializer(env);
+    this.migrationRunner = new MigrationRunner(env);
 	}
 
 	/**
@@ -46,11 +49,23 @@ export class DatabaseManager {
 				console.log("Database already initialized");
 				// Ensure error logging table exists
 				await this.schemaInitializer.createErrorLoggingTable();
+          // Apply pending migrations (idempotent)
+          const res = await this.migrationRunner.applyPending();
+          if (res.applied.length) {
+            console.log('Applied migrations:', res.applied.join(', '));
+          }
 				return true;
 			}
 
 			console.log("Database check failed, initializing schema...");
-			return await this.schemaInitializer.initializeSchema();
+			const ok = await this.schemaInitializer.initializeSchema();
+			if (ok) {
+				const res = await this.migrationRunner.applyPending();
+				if (res.applied.length) {
+					console.log('Applied migrations:', res.applied.join(', '));
+				}
+			}
+			return ok;
 		} catch (error) {
 			console.error("Database initialization check failed:", error);
 			return false;

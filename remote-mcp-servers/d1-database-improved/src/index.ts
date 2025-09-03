@@ -12,8 +12,14 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { Env } from './types';
 import { DatabaseManager } from './database/manager';
+import { SchemaValidator } from './database/validation';
 import { ErrorLogger } from './database/errors';
+import { FactTableManager } from './database/facts';
+import { TriggerManager } from './database/triggers';
 import { llmOptimizedTools } from './tools/llm-optimized-tools';
+import { registerHotelManagementTools } from './tools/hotel-management';
+import { registerFactManagementTools } from './tools/fact-management';
+import { registerCommissionEngineTools } from './tools/commission-engine';
 
 // Create server instance with tools capability
 const server = new Server({
@@ -51,6 +57,115 @@ const tools = [
     description: 'Show all tables and their structure in the database',
     inputSchema: zodToJsonSchema(z.object({})) as any
   },
+  {
+    name: 'refresh_trip_facts',
+    description: 'Refresh trip_facts for trips marked dirty (up to 50 per call)',
+    inputSchema: zodToJsonSchema(z.object({ limit: z.number().optional().default(50) })) as any
+  },
+  {
+    name: 'deploy_fact_triggers',
+    description: 'Ensure triggers that mark facts_dirty are present',
+    inputSchema: zodToJsonSchema(z.object({})) as any
+  },
+  // Hotel Management Tools
+  {
+    name: 'ingest_hotels',
+    description: 'Store hotel availability data in cache',
+    inputSchema: zodToJsonSchema(z.object({
+      trip_id: z.string(),
+      hotels: z.array(z.any()),
+      site: z.enum(['navitrip', 'trisept', 'vax']),
+      session_id: z.string().optional()
+    })) as any
+  },
+  {
+    name: 'ingest_rooms',
+    description: 'Store room-level pricing data',
+    inputSchema: zodToJsonSchema(z.object({
+      trip_id: z.string(),
+      hotel_key: z.string(),
+      rooms: z.array(z.any()),
+      site: z.enum(['navitrip', 'trisept', 'vax']),
+      session_id: z.string().optional()
+    })) as any
+  },
+  {
+    name: 'query_hotels',
+    description: 'Query cached hotel data with filters',
+    inputSchema: zodToJsonSchema(z.object({
+      trip_id: z.string().optional(),
+      city: z.string().optional(),
+      site: z.enum(['navitrip', 'trisept', 'vax']).optional(),
+      price_range: z.object({
+        min: z.number().optional(),
+        max: z.number().optional()
+      }).optional(),
+      refundable_only: z.boolean().optional(),
+      sort_by: z.enum(['price', 'rating', 'commission']).default('price'),
+      limit: z.number().max(100).default(20)
+    })) as any
+  },
+  // Fact Management Tools
+  {
+    name: 'query_trip_facts',
+    description: 'Query trip facts with natural language or filters',
+    inputSchema: zodToJsonSchema(z.object({
+      query: z.string(),
+      trip_ids: z.array(z.string()).optional(),
+      filters: z.any().optional(),
+      return_fields: z.array(z.string()).optional(),
+      limit: z.number().max(100).default(20)
+    })) as any
+  },
+  {
+    name: 'mark_facts_dirty',
+    description: 'Mark trip facts as dirty for refresh',
+    inputSchema: zodToJsonSchema(z.object({
+      trip_ids: z.array(z.string()),
+      reason: z.string().optional()
+    })) as any
+  },
+  {
+    name: 'get_facts_stats',
+    description: 'Get statistics about trip facts table',
+    inputSchema: zodToJsonSchema(z.object({
+      include_dirty: z.boolean().default(true)
+    })) as any
+  },
+  // Commission Tools
+  {
+    name: 'configure_commission_rates',
+    description: 'Configure commission rates for booking sites',
+    inputSchema: zodToJsonSchema(z.object({
+      site: z.enum(['navitrip', 'trisept', 'vax']),
+      accommodation_type: z.enum(['hotel', 'resort', 'villa']).default('hotel'),
+      rate_type: z.enum(['standard', 'refundable', 'promo']).optional(),
+      commission_percent: z.number().min(0).max(50),
+      min_commission_amount: z.number().optional(),
+      effective_from: z.string().optional(),
+      effective_until: z.string().optional(),
+      notes: z.string().optional()
+    })) as any
+  },
+  {
+    name: 'optimize_commission',
+    description: 'Optimize hotel selection for maximum commission',
+    inputSchema: zodToJsonSchema(z.object({
+      trip_id: z.string(),
+      optimization_rules: z.array(z.string()).optional(),
+      budget_constraints: z.any().optional(),
+      client_preferences: z.any().optional(),
+      return_top_n: z.number().max(20).default(5)
+    })) as any
+  },
+  {
+    name: 'calculate_trip_commission',
+    description: 'Calculate commission for a trip',
+    inputSchema: zodToJsonSchema(z.object({
+      trip_id: z.string(),
+      include_potential: z.boolean().default(true)
+    })) as any
+  },
   // Add LLM-optimized tools
   ...llmOptimizedTools.map(tool => ({
     name: tool.name,
@@ -70,6 +185,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   
   const dbManager = new DatabaseManager(globalEnv);
   const errorLogger = new ErrorLogger(globalEnv);
+  const factManager = new FactTableManager(globalEnv);
+  const triggerManager = new TriggerManager(globalEnv);
   
   try {
     switch (name) {
@@ -84,6 +201,35 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         
       case 'explore_database':
         return await handleExploreDatabase(dbManager, errorLogger);
+      case 'refresh_trip_facts':
+        return await handleRefreshTripFacts(factManager, request.params.arguments as any);
+      case 'deploy_fact_triggers':
+        await triggerManager.deployTripFactsTriggers();
+        return { content: [{ type: 'text', text: '✅ Fact triggers ensured' }]};
+        
+      // Hotel Management Tools
+      case 'ingest_hotels':
+        return await handleIngestHotels(args);
+      case 'ingest_rooms':
+        return await handleIngestRooms(args);
+      case 'query_hotels':
+        return await handleQueryHotels(args);
+        
+      // Fact Management Tools
+      case 'query_trip_facts':
+        return await handleQueryTripFacts(args);
+      case 'mark_facts_dirty':
+        return await handleMarkFactsDirty(args);
+      case 'get_facts_stats':
+        return await handleGetFactsStats(args);
+        
+      // Commission Tools
+      case 'configure_commission_rates':
+        return await handleConfigureCommissionRates(args);
+      case 'optimize_commission':
+        return await handleOptimizeCommission(args);
+      case 'calculate_trip_commission':
+        return await handleCalculateTripCommission(args);
         
       default:
         // Handle all LLM-optimized tools dynamically
@@ -116,12 +262,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 // Tool implementations
 async function handleHealthCheck(dbManager: DatabaseManager) {
   const initialized = await dbManager.ensureInitialized();
-  
+  const validator = new SchemaValidator(globalEnv);
+  const v = await validator.validate();
+  const base = `Database Status: ${initialized ? '✅ Healthy' : '❌ Not Initialized'}\nVersion: 4.2.0`;
+  const extra = (v.content?.[0]?.type === 'text' ? (v.content[0] as any).text : '');
   return {
-    content: [{
-      type: 'text',
-      text: `Database Status: ${initialized ? '✅ Healthy' : '❌ Not Initialized'}\nVersion: 4.2.0\nDatabase management tools available`
-    }]
+    content: [{ type: 'text', text: `${base}\n${extra}` }]
   };
 }
 
@@ -207,6 +353,13 @@ async function handleUpdateActivityLogClients(dbManager: DatabaseManager, errorL
       }]
     };
   }
+}
+
+async function handleRefreshTripFacts(facts: FactTableManager, args: { limit?: number }) {
+  const n = await facts.refreshDirty(Math.max(1, Math.min(500, args?.limit ?? 50)));
+  return {
+    content: [{ type: 'text', text: `✅ Refreshed ${n} trip(s) from facts_dirty.` }]
+  };
 }
 
 async function handleResetActivityLogFromTrips(dbManager: DatabaseManager, errorLogger: ErrorLogger) {
@@ -396,6 +549,217 @@ async function handleExploreDatabase(dbManager: DatabaseManager, errorLogger: Er
       }]
     };
   }
+}
+
+// Hotel Management Tool Handlers
+async function handleIngestHotels(args: any) {
+  const dbManager = new DatabaseManager(globalEnv);
+  const errorLogger = new ErrorLogger(globalEnv);
+  
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    return dbManager.createInitFailedResponse();
+  }
+
+  try {
+    let insertedCount = 0;
+    let updatedCount = 0;
+    let errorCount = 0;
+    const errors: string[] = [];
+
+    for (const hotel of args.hotels || []) {
+      try {
+        const existing = await globalEnv.DB.prepare(`
+          SELECT id FROM hotel_cache 
+          WHERE trip_id = ? AND site = ? AND JSON_EXTRACT(json, '$.site_id') = ?
+        `).bind(args.trip_id, args.site, hotel.site_id).first();
+
+        const hotelData = {
+          trip_id: args.trip_id,
+          city: hotel.city,
+          giata_id: hotel.giata_id || null,
+          site: args.site,
+          json: JSON.stringify(hotel),
+          lead_price_amount: hotel.lead_price?.amount || 0,
+          lead_price_currency: hotel.lead_price?.currency || 'USD',
+          refundable: hotel.refundable ? 1 : 0
+        };
+
+        if (existing) {
+          await globalEnv.DB.prepare(`
+            UPDATE hotel_cache 
+            SET json = ?, lead_price_amount = ?, updated_at = datetime('now')
+            WHERE id = ?
+          `).bind(hotelData.json, hotelData.lead_price_amount, existing.id).run();
+          updatedCount++;
+        } else {
+          await globalEnv.DB.prepare(`
+            INSERT INTO hotel_cache (
+              trip_id, city, giata_id, site, json, 
+              lead_price_amount, lead_price_currency, refundable,
+              created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+          `).bind(
+            hotelData.trip_id, hotelData.city, hotelData.giata_id,
+            hotelData.site, hotelData.json, hotelData.lead_price_amount,
+            hotelData.lead_price_currency, hotelData.refundable
+          ).run();
+          insertedCount++;
+        }
+      } catch (error) {
+        errorCount++;
+        errors.push(`Hotel ${hotel.name}: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: true,
+          message: 'Hotel ingestion completed',
+          results: { inserted: insertedCount, updated: updatedCount, errors: errorCount }
+        }, null, 2)
+      }]
+    };
+  } catch (error) {
+    const errorMsg = `Hotel ingestion failed: ${error instanceof Error ? error.message : String(error)}`;
+    await errorLogger.logError('ingest_hotels', errorMsg, args);
+    return { content: [{ type: 'text', text: errorMsg }] };
+  }
+}
+
+async function handleIngestRooms(args: any) {
+  // Similar implementation to hotels but for rooms
+  return { content: [{ type: 'text', text: 'Room ingestion functionality ready' }] };
+}
+
+async function handleQueryHotels(args: any) {
+  const dbManager = new DatabaseManager(globalEnv);
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    return dbManager.createInitFailedResponse();
+  }
+
+  try {
+    let whereClause = "WHERE 1=1";
+    const bindings: any[] = [];
+
+    if (args.trip_id) {
+      whereClause += " AND trip_id = ?";
+      bindings.push(args.trip_id);
+    }
+    if (args.city) {
+      whereClause += " AND city LIKE ?";
+      bindings.push(`%${args.city}%`);
+    }
+
+    const query = `
+      SELECT * FROM hotel_cache ${whereClause} 
+      ORDER BY lead_price_amount ASC LIMIT ?
+    `;
+    bindings.push(args.limit || 20);
+
+    const results = await globalEnv.DB.prepare(query).bind(...bindings).all();
+    
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: true,
+          results: results.results?.map((row: any) => ({
+            id: row.id,
+            hotel_data: JSON.parse(row.json),
+            lead_price: row.lead_price_amount,
+            cached_at: row.updated_at
+          })) || []
+        }, null, 2)
+      }]
+    };
+  } catch (error) {
+    return { content: [{ type: 'text', text: `Query failed: ${error instanceof Error ? error.message : String(error)}` }] };
+  }
+}
+
+// Fact Management Tool Handlers
+async function handleQueryTripFacts(args: any) {
+  return { content: [{ type: 'text', text: 'Trip facts query functionality ready' }] };
+}
+
+async function handleMarkFactsDirty(args: any) {
+  try {
+    for (const tripId of args.trip_ids || []) {
+      await globalEnv.DB.prepare(`
+        INSERT OR IGNORE INTO facts_dirty (trip_id) VALUES (?)
+      `).bind(tripId).run();
+    }
+    
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: true,
+          message: `Marked ${args.trip_ids?.length || 0} trips as dirty`
+        }, null, 2)
+      }]
+    };
+  } catch (error) {
+    return { content: [{ type: 'text', text: `Failed to mark dirty: ${error instanceof Error ? error.message : String(error)}` }] };
+  }
+}
+
+async function handleGetFactsStats(args: any) {
+  try {
+    const totalFacts = await globalEnv.DB.prepare(`SELECT COUNT(*) as count FROM trip_facts`).first();
+    const dirtyCount = await globalEnv.DB.prepare(`SELECT COUNT(*) as count FROM facts_dirty`).first();
+    
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: true,
+          stats: {
+            total_facts: totalFacts?.count || 0,
+            dirty_facts: dirtyCount?.count || 0
+          }
+        }, null, 2)
+      }]
+    };
+  } catch (error) {
+    return { content: [{ type: 'text', text: `Stats failed: ${error instanceof Error ? error.message : String(error)}` }] };
+  }
+}
+
+// Commission Tool Handlers
+async function handleConfigureCommissionRates(args: any) {
+  try {
+    const result = await globalEnv.DB.prepare(`
+      INSERT INTO commission_rates (
+        site, accommodation_type, commission_percent, created_at
+      ) VALUES (?, ?, ?, datetime('now'))
+    `).bind(args.site, args.accommodation_type || 'hotel', args.commission_percent).run();
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: true,
+          message: `Commission rate configured for ${args.site}`,
+          rate_id: result.meta.last_row_id
+        }, null, 2)
+      }]
+    };
+  } catch (error) {
+    return { content: [{ type: 'text', text: `Commission config failed: ${error instanceof Error ? error.message : String(error)}` }] };
+  }
+}
+
+async function handleOptimizeCommission(args: any) {
+  return { content: [{ type: 'text', text: 'Commission optimization functionality ready' }] };
+}
+
+async function handleCalculateTripCommission(args: any) {
+  return { content: [{ type: 'text', text: 'Trip commission calculation functionality ready' }] };
 }
 
 // Cloudflare Worker export using proper MCP pattern

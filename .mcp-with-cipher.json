@@ -1,5 +1,15 @@
 {
   "mcpServers": {
+    "cipher": {
+      "command": "cipher",
+      "args": ["--mode", "mcp"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "MCP_SERVER_MODE": "default",
+        "CIPHER_VERBOSE": "true"
+      }
+    },
     "mcp-chrome": {
       "command": "node",
       "args": ["mcp-local-servers/mcp-chrome/app/native-server/dist/index.js"],
@@ -38,24 +48,6 @@
         "mcp-remote",
         "https://github-mcp-cta.somotravel.workers.dev/sse"
       ]
-    },
-    "zen": {
-      "command": "zen-mcp-server/zen-mcp-server",
-      "args": [],
-      "env": {
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
-        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
-        "GROQ_API_KEY": "${GROQ_API_KEY}"
-      }
-    },
-    "cipher": {
-      "command": "cipher",
-      "args": ["--mode", "mcp"],
-      "env": {
-        "MCP_SERVER_MODE": "aggregator",
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
-        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
-      }
     }
   }
 }

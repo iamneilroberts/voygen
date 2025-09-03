@@ -1,0 +1,5 @@
+BEGIN TRANSACTION;
+DROP TABLE IF EXISTS commission_rules;
+DROP TABLE IF EXISTS commission_rates;
+COMMIT;
+
