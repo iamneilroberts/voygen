@@ -1,0 +1,33 @@
+name = "mcp-anchor-browser"
+main = "src/index.ts"
+compatibility_date = "2025-01-20"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "development"
+VERSION = "1.0.0"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "travel_assistant"
+database_id = "e6723f99-1d99-45bb-a941-e7600a56abe9"
+
+[build]
+command = "npm run build"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "5f5697b8ad8b40edb38409bd9500f4ee"
+preview_id = "df8289f4d33f48a6b6eee4d8f621fa8d"
+
+[env.production]
+vars = { ENVIRONMENT = "production", VERSION = "1.0.0" }
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "travel_assistant"
+database_id = "e6723f99-1d99-45bb-a941-e7600a56abe9"
+
+[[env.production.kv_namespaces]]
+binding = "CACHE"
+id = "5f5697b8ad8b40edb38409bd9500f4ee"

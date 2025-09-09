@@ -51,16 +51,16 @@ export function registerFactManagementTools(server: McpServer, getEnv: () => Env
           if (params.force_refresh) {
             query = `
               SELECT t.trip_id 
-              FROM Trips t 
+              FROM trips_v2 t 
               WHERE t.status != 'cancelled' 
               ORDER BY t.updated_at DESC 
               LIMIT ?
             `;
           } else {
             query = `
-              SELECT DISTINCT fd.trip_id 
+              SELECT DISTINCT CAST(fd.trip_id AS INTEGER) as trip_id
               FROM facts_dirty fd
-              JOIN Trips t ON fd.trip_id = t.trip_id
+              JOIN trips_v2 t ON CAST(fd.trip_id AS INTEGER) = t.trip_id
               WHERE t.status != 'cancelled'
               LIMIT ?
             `;
@@ -70,13 +70,15 @@ export function registerFactManagementTools(server: McpServer, getEnv: () => Env
           
           for (const trip of tripsToRefresh.results || []) {
             try {
-              await factManager.refreshTripFacts(trip.trip_id);
+              // Convert trip_id to string for compatibility with FactTableManager
+              const tripIdStr = String(trip.trip_id);
+              await factManager.refreshTripFacts(tripIdStr);
               refreshedCount++;
               
-              // Remove from dirty list
+              // Remove from dirty list - use string version for facts_dirty query
               await env.DB.prepare(`
                 DELETE FROM facts_dirty WHERE trip_id = ?
-              `).bind(trip.trip_id).run();
+              `).bind(tripIdStr).run();
               
             } catch (error) {
               errorCount++;
@@ -113,7 +115,7 @@ export function registerFactManagementTools(server: McpServer, getEnv: () => Env
   server.tool(
     "query_trip_facts",
     {
-      query: z.string().describe("Natural language query or search terms"),
+      query: z.string().describe("CRITICAL: Extract ONLY 1-2 MOST DISTINCTIVE terms from the user's request. The database WILL ERROR with too many terms. Choose the most unique identifiers (names, locations) and EXCLUDE generic words like 'trip', 'itinerary', 'details'. Example: From 'Sara Jones anniversary trip details', use ONLY 'Sara Jones'."),
       trip_ids: z.array(z.string()).optional().describe("Specific trip IDs to search"),
       filters: z.object({
         destination: z.string().optional(),
@@ -189,9 +191,14 @@ export function registerFactManagementTools(server: McpServer, getEnv: () => Env
           }
         }
 
-        // Handle text search across facts JSON
+        // Handle text search across facts JSON - LIMIT TO 2 TERMS MAX
         if (params.query && !params.trip_ids) {
-          const searchTerms = params.query.toLowerCase().split(' ').filter(term => term.length > 2);
+          const searchTerms = params.query.toLowerCase().split(' ')
+            .filter(term => term.length > 2)
+            .slice(0, 2); // HARD LIMIT: max 2 terms to prevent SQLite complexity errors
+          
+          console.log(`[query_trip_facts] Limited search to ${searchTerms.length} terms: ${searchTerms.join(', ')}`);
+          
           for (const term of searchTerms) {
             whereClause += " AND tf.facts LIKE ?";
             bindings.push(`%${term}%`);
@@ -210,7 +217,7 @@ export function registerFactManagementTools(server: McpServer, getEnv: () => Env
             t.status as trip_status,
             t.created_at as trip_created
           FROM trip_facts tf
-          JOIN Trips t ON tf.trip_id = t.trip_id
+          JOIN trips_v2 t ON tf.trip_id = CAST(t.trip_id AS TEXT)
           ${whereClause}
           ORDER BY tf.updated_at DESC
           LIMIT ?
@@ -221,7 +228,7 @@ export function registerFactManagementTools(server: McpServer, getEnv: () => Env
         const results = await env.DB.prepare(query).bind(...bindings).all();
 
         const trips = results.results?.map((row: any) => {
-          const facts = JSON.parse(row.facts);
+          let facts = JSON.parse(row.facts);
           
           // Filter return fields if specified
           if (params.return_fields && params.return_fields.length > 0) {

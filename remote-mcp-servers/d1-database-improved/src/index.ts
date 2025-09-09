@@ -17,9 +17,19 @@ import { ErrorLogger } from './database/errors';
 import { FactTableManager } from './database/facts';
 import { TriggerManager } from './database/triggers';
 import { llmOptimizedTools } from './tools/llm-optimized-tools';
+import { generateSlugFromTripData, ensureUniqueSlug } from './utils/slug-generator';
 import { registerHotelManagementTools } from './tools/hotel-management';
 import { registerFactManagementTools } from './tools/fact-management';
 import { registerCommissionEngineTools } from './tools/commission-engine';
+import { registerDatabaseRepairTools } from './tools/database-repair';
+import { 
+  generateProposalSchema,
+  previewProposalSchema,
+  listTemplatesSchema,
+  handleGenerateProposal,
+  handlePreviewProposal,
+  handleListTemplates
+} from './tools/proposal-tools';
 
 // Create server instance with tools capability
 const server = new Server({
@@ -67,44 +77,46 @@ const tools = [
     description: 'Ensure triggers that mark facts_dirty are present',
     inputSchema: zodToJsonSchema(z.object({})) as any
   },
-  // Hotel Management Tools
-  {
-    name: 'ingest_hotels',
-    description: 'Store hotel availability data in cache',
-    inputSchema: zodToJsonSchema(z.object({
-      trip_id: z.string(),
-      hotels: z.array(z.any()),
-      site: z.enum(['navitrip', 'trisept', 'vax']),
-      session_id: z.string().optional()
-    })) as any
-  },
-  {
-    name: 'ingest_rooms',
-    description: 'Store room-level pricing data',
-    inputSchema: zodToJsonSchema(z.object({
-      trip_id: z.string(),
-      hotel_key: z.string(),
-      rooms: z.array(z.any()),
-      site: z.enum(['navitrip', 'trisept', 'vax']),
-      session_id: z.string().optional()
-    })) as any
-  },
-  {
-    name: 'query_hotels',
-    description: 'Query cached hotel data with filters',
-    inputSchema: zodToJsonSchema(z.object({
-      trip_id: z.string().optional(),
-      city: z.string().optional(),
-      site: z.enum(['navitrip', 'trisept', 'vax']).optional(),
-      price_range: z.object({
-        min: z.number().optional(),
-        max: z.number().optional()
-      }).optional(),
-      refundable_only: z.boolean().optional(),
-      sort_by: z.enum(['price', 'rating', 'commission']).default('price'),
-      limit: z.number().max(100).default(20)
-    })) as any
-  },
+  // TEMPORARILY DISABLED: Hotel Management Tools (Schema Issues)
+  // NOTE: These tools need schema fixes and handler implementation
+  // See Task 3 in .project/tasks/03-hotel-management-fix.md for details
+  // {
+  //   name: 'ingest_hotels',
+  //   description: 'Store hotel availability data in cache',
+  //   inputSchema: zodToJsonSchema(z.object({
+  //     trip_id: z.string(),
+  //     hotels: z.array(z.any()),
+  //     site: z.enum(['navitrip', 'trisept', 'vax']),
+  //     session_id: z.string().optional()
+  //   })) as any
+  // },
+  // {
+  //   name: 'ingest_rooms',
+  //   description: 'Store room-level pricing data',
+  //   inputSchema: zodToJsonSchema(z.object({
+  //     trip_id: z.string(),
+  //     hotel_key: z.string(),
+  //     rooms: z.array(z.any()),
+  //     site: z.enum(['navitrip', 'trisept', 'vax']),
+  //     session_id: z.string().optional()
+  //   })) as any
+  // },
+  // {
+  //   name: 'query_hotels',
+  //   description: 'Query cached hotel data with filters',
+  //   inputSchema: zodToJsonSchema(z.object({
+  //     trip_id: z.string().optional(),
+  //     city: z.string().optional(),
+  //     site: z.enum(['navitrip', 'trisept', 'vax']).optional(),
+  //     price_range: z.object({
+  //       min: z.number().optional(),
+  //       max: z.number().optional()
+  //     }).optional(),
+  //     refundable_only: z.boolean().optional(),
+  //     sort_by: z.enum(['price', 'rating', 'commission']).default('price'),
+  //     limit: z.number().max(100).default(20)
+  //   })) as any
+  // },
   // Fact Management Tools
   {
     name: 'query_trip_facts',
@@ -132,40 +144,97 @@ const tools = [
       include_dirty: z.boolean().default(true)
     })) as any
   },
-  // Commission Tools
+  // TEMPORARILY DISABLED: Commission Tools (Not Used)
+  // NOTE: No evidence of active use, remove to simplify system
+  // {
+  //   name: 'configure_commission_rates',
+  //   description: 'Configure commission rates for booking sites',
+  //   inputSchema: zodToJsonSchema(z.object({
+  //     site: z.enum(['navitrip', 'trisept', 'vax']),
+  //     accommodation_type: z.enum(['hotel', 'resort', 'villa']).default('hotel'),
+  //     rate_type: z.enum(['standard', 'refundable', 'promo']).optional(),
+  //     commission_percent: z.number().min(0).max(50),
+  //     min_commission_amount: z.number().optional(),
+  //     effective_from: z.string().optional(),
+  //     effective_until: z.string().optional(),
+  //     notes: z.string().optional()
+  //   })) as any
+  // },
+  // {
+  //   name: 'optimize_commission',
+  //   description: 'Optimize hotel selection for maximum commission',
+  //   inputSchema: zodToJsonSchema(z.object({
+  //     trip_id: z.string(),
+  //     optimization_rules: z.array(z.string()).optional(),
+  //     budget_constraints: z.any().optional(),
+  //     client_preferences: z.any().optional(),
+  //     return_top_n: z.number().max(20).default(5)
+  //   })) as any
+  // },
+  // {
+  //   name: 'calculate_trip_commission',
+  //   description: 'Calculate commission for a trip',
+  //   inputSchema: zodToJsonSchema(z.object({
+  //     trip_id: z.string(),
+  //     include_potential: z.boolean().default(true)
+  //   })) as any
+  // },
+  // Proposal Generation Tools
   {
-    name: 'configure_commission_rates',
-    description: 'Configure commission rates for booking sites',
-    inputSchema: zodToJsonSchema(z.object({
-      site: z.enum(['navitrip', 'trisept', 'vax']),
-      accommodation_type: z.enum(['hotel', 'resort', 'villa']).default('hotel'),
-      rate_type: z.enum(['standard', 'refundable', 'promo']).optional(),
-      commission_percent: z.number().min(0).max(50),
-      min_commission_amount: z.number().optional(),
-      effective_from: z.string().optional(),
-      effective_until: z.string().optional(),
-      notes: z.string().optional()
-    })) as any
+    name: 'generate_proposal',
+    description: 'Generate a travel proposal from trip data with HTML rendering and optional PDF',
+    inputSchema: zodToJsonSchema(generateProposalSchema) as any
   },
   {
-    name: 'optimize_commission',
-    description: 'Optimize hotel selection for maximum commission',
-    inputSchema: zodToJsonSchema(z.object({
-      trip_id: z.string(),
-      optimization_rules: z.array(z.string()).optional(),
-      budget_constraints: z.any().optional(),
-      client_preferences: z.any().optional(),
-      return_top_n: z.number().max(20).default(5)
-    })) as any
+    name: 'preview_proposal',
+    description: 'Preview proposal HTML without saving to database',
+    inputSchema: zodToJsonSchema(previewProposalSchema) as any
   },
   {
-    name: 'calculate_trip_commission',
-    description: 'Calculate commission for a trip',
-    inputSchema: zodToJsonSchema(z.object({
-      trip_id: z.string(),
-      include_potential: z.boolean().default(true)
-    })) as any
+    name: 'list_templates',
+    description: 'List available proposal templates and generation capabilities',
+    inputSchema: zodToJsonSchema(listTemplatesSchema) as any
   },
+  // Maintenance tools
+  {
+    name: 'backfill_trip_slugs',
+    description: 'Generate missing trip_slug values for trips_v2 and ensure uniqueness',
+    inputSchema: zodToJsonSchema(z.object({ dry_run: z.boolean().optional().default(false) })) as any
+  },
+  {
+    name: 'rebuild_search_index',
+    description: 'Rebuild normalized search_index entries from trips_v2 and clients_v2',
+    inputSchema: zodToJsonSchema(z.object({})) as any
+  },
+  // REMOVED: Database Repair Tools (No Longer Needed)
+  // NOTE: Root schema issues fixed in Task 1, these repair tools are obsolete
+  // Migration 008 resolved the fundamental schema problems they were designed to fix
+  // {
+  //   name: 'comprehensive_schema_fix',
+  //   description: 'Fix critical database schema issues including facts_dirty, TripParticipants, and TripDays',
+  //   inputSchema: zodToJsonSchema(z.object({
+  //     dry_run: z.boolean().default(true).describe("If true, only show what would be changed without executing"),
+  //     fix_facts_dirty: z.boolean().default(true).describe("Fix facts_dirty data type and foreign key issues"),
+  //     fix_trip_participants: z.boolean().default(true).describe("Fix TripParticipants foreign key references"),
+  //     fix_trip_days: z.boolean().default(true).describe("Fix TripDays schema alignment"),
+  //     recreate_trip_facts: z.boolean().default(false).describe("Recreate trip_facts table with correct schema"),
+  //     clean_orphaned_data: z.boolean().default(true).describe("Remove orphaned records")
+  //   })) as any
+  // },
+  // {
+  //   name: 'repair_trip_facts_schema',
+  //   description: 'Legacy tool: Fix trip facts schema inconsistencies and foreign key constraint problems',
+  //   inputSchema: zodToJsonSchema(z.object({
+  //     dry_run: z.boolean().default(true).describe("If true, only show what would be changed without executing"),
+  //     fix_data_types: z.boolean().default(true).describe("Fix trip_id data type mismatches"),
+  //     recreate_tables: z.boolean().default(false).describe("Recreate trip_facts and facts_dirty tables with correct schema")
+  //   })) as any
+  // },
+  // {
+  //   name: 'analyze_foreign_key_issues',
+  //   description: 'Analyze database foreign key constraint issues and schema inconsistencies',
+  //   inputSchema: zodToJsonSchema(z.object({})) as any
+  // },
   // Add LLM-optimized tools
   ...llmOptimizedTools.map(tool => ({
     name: tool.name,
@@ -223,13 +292,51 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'get_facts_stats':
         return await handleGetFactsStats(args);
         
-      // Commission Tools
-      case 'configure_commission_rates':
-        return await handleConfigureCommissionRates(args);
-      case 'optimize_commission':
-        return await handleOptimizeCommission(args);
-      case 'calculate_trip_commission':
-        return await handleCalculateTripCommission(args);
+      // Commission Tools - REMOVED (tools disabled)
+      // case 'configure_commission_rates':
+      //   return await handleConfigureCommissionRates(args);
+      // case 'optimize_commission':
+      //   return await handleOptimizeCommission(args);
+      // case 'calculate_trip_commission':
+      //   return await handleCalculateTripCommission(args);
+        
+      // Proposal Generation Tools
+      case 'generate_proposal':
+        const generateResult = await handleGenerateProposal(args, globalEnv.DB);
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify(generateResult, null, 2)
+          }]
+        };
+      case 'preview_proposal':
+        const previewResult = await handlePreviewProposal(args, globalEnv.DB);
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify(previewResult, null, 2)
+          }]
+        };
+      case 'list_templates':
+        const templatesResult = await handleListTemplates();
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify(templatesResult, null, 2)
+          }]
+        };
+      case 'backfill_trip_slugs':
+        return await handleBackfillTripSlugs(globalEnv.DB, (request.params.arguments as any)?.dry_run);
+      case 'rebuild_search_index':
+        return await handleRebuildSearchIndex(globalEnv.DB);
+        
+      // Database Repair Tools - REMOVED (tools disabled, root issues fixed)
+      // case 'comprehensive_schema_fix':
+      //   return await handleComprehensiveSchemaFix(dbManager, errorLogger, args);
+      // case 'repair_trip_facts_schema':
+      //   return await handleRepairTripFactsSchema(dbManager, errorLogger, args);
+      // case 'analyze_foreign_key_issues':
+      //   return await handleAnalyzeForeignKeyIssues(dbManager, errorLogger);
         
       default:
         // Handle all LLM-optimized tools dynamically
@@ -268,6 +375,105 @@ async function handleHealthCheck(dbManager: DatabaseManager) {
   const extra = (v.content?.[0]?.type === 'text' ? (v.content[0] as any).text : '');
   return {
     content: [{ type: 'text', text: `${base}\n${extra}` }]
+  };
+}
+
+// ----------------------------------------------------------------------------
+// Maintenance handlers
+// ----------------------------------------------------------------------------
+
+function normalizeTokens(text: string): string {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/["'()\\/.,]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+async function handleBackfillTripSlugs(db: any, dryRun = false) {
+  const missing = await db.prepare(`
+    SELECT trip_id, trip_name, destinations, start_date, primary_client_email, trip_slug
+    FROM trips_v2
+    WHERE trip_slug IS NULL OR trip_slug = ''
+  `).all();
+
+  const rows = missing.results || [];
+  let updated = 0;
+  const previews: any[] = [];
+
+  for (const row of rows) {
+    const base = generateSlugFromTripData(row);
+    const unique = await ensureUniqueSlug(db, base, row.trip_id);
+    previews.push({ trip_id: row.trip_id, prev: row.trip_slug || null, next: unique });
+    if (!dryRun) {
+      await db.prepare(`UPDATE trips_v2 SET trip_slug = ? WHERE trip_id = ?`).bind(unique, row.trip_id).run();
+      updated++;
+    }
+  }
+
+  return {
+    content: [{
+      type: 'text',
+      text: `Backfill trip slugs: ${dryRun ? 'DRY RUN' : 'APPLIED'}\nChecked: ${rows.length}\nUpdated: ${updated}\nSample: ${JSON.stringify(previews.slice(0, 10), null, 2)}`
+    }]
+  };
+}
+
+async function handleRebuildSearchIndex(db: any) {
+  // Ensure table exists
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS search_index (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      entity_type TEXT NOT NULL CHECK(entity_type IN ('trip','client','activity','destination')),
+      entity_id INTEGER NOT NULL,
+      entity_name TEXT NOT NULL,
+      summary TEXT NOT NULL,
+      search_tokens TEXT NOT NULL,
+      date_context TEXT,
+      location_context TEXT,
+      relevance_score REAL DEFAULT 1.0,
+      access_count INTEGER DEFAULT 0,
+      last_accessed TIMESTAMP,
+      last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(entity_type, entity_id)
+    )
+  `).run();
+
+  await db.prepare(`DELETE FROM search_index`).run();
+
+  // Reindex trips
+  const trips = await db.prepare(`
+    SELECT trip_id, trip_name, destinations, group_name, trip_slug, start_date, end_date
+    FROM trips_v2
+  `).all();
+
+  for (const t of (trips.results || [])) {
+    const tokens = normalizeTokens(`${t.trip_name} ${t.destinations || ''} ${t.group_name || ''} ${t.trip_slug || ''}`);
+    const summary = `${t.trip_name} (${t.start_date} to ${t.end_date}) - ${t.destinations || ''}`;
+    const relevance = t.trip_slug ? 1.5 : 1.0;
+    await db.prepare(`
+      INSERT OR REPLACE INTO search_index (
+        entity_type, entity_id, entity_name, summary, search_tokens, date_context, location_context, relevance_score, access_count, last_updated
+      ) VALUES ('trip', ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP)
+    `).bind(t.trip_id, t.trip_name, summary, tokens, `${t.start_date} to ${t.end_date}`, t.destinations || '', relevance).run();
+  }
+
+  // Reindex clients
+  const clients = await db.prepare(`SELECT client_id, full_name, email FROM clients_v2`).all();
+  for (const c of (clients.results || [])) {
+    const tokens = normalizeTokens(`${c.full_name} ${c.email}`);
+    const summary = `${c.full_name} <${c.email}>`;
+    await db.prepare(`
+      INSERT OR REPLACE INTO search_index (
+        entity_type, entity_id, entity_name, summary, search_tokens, relevance_score, access_count, last_updated
+      ) VALUES ('client', ?, ?, ?, ?, 1.0, 0, CURRENT_TIMESTAMP)
+    `).bind(c.client_id, c.full_name, summary, tokens).run();
+  }
+
+  return {
+    content: [{ type: 'text', text: `Rebuilt search_index: trips=${(trips.results || []).length}, clients=${(clients.results || []).length}` }]
   };
 }
 
@@ -683,36 +889,248 @@ async function handleQueryHotels(args: any) {
 
 // Fact Management Tool Handlers
 async function handleQueryTripFacts(args: any) {
-  return { content: [{ type: 'text', text: 'Trip facts query functionality ready' }] };
-}
+  const dbManager = new DatabaseManager(globalEnv);
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    return dbManager.createInitFailedResponse();
+  }
 
-async function handleMarkFactsDirty(args: any) {
   try {
-    for (const tripId of args.trip_ids || []) {
-      await globalEnv.DB.prepare(`
-        INSERT OR IGNORE INTO facts_dirty (trip_id) VALUES (?)
-      `).bind(tripId).run();
+    let whereClause = "WHERE 1=1";
+    const bindings: any[] = [];
+
+    // Handle specific trip IDs
+    if (args.trip_ids && args.trip_ids.length > 0) {
+      const placeholders = args.trip_ids.map(() => '?').join(', ');
+      whereClause += ` AND tf.trip_id IN (${placeholders})`;
+      bindings.push(...args.trip_ids);
     }
-    
+
+    // Handle structured filters for the actual trip_facts schema
+    if (args.filters) {
+      if (args.filters.price_range?.min) {
+        whereClause += " AND tf.total_cost >= ?";
+        bindings.push(args.filters.price_range.min);
+      }
+
+      if (args.filters.price_range?.max) {
+        whereClause += " AND tf.total_cost <= ?";
+        bindings.push(args.filters.price_range.max);
+      }
+    }
+
+    // For text search, we'll search across trip details from trips_v2 table if available
+    if (args.query && !args.trip_ids) {
+      whereClause += " AND (t2.search_text LIKE ? OR t2.trip_name LIKE ? OR t2.destinations LIKE ?)";
+      const searchTerm = `%${args.query}%`;
+      bindings.push(searchTerm, searchTerm, searchTerm);
+    }
+
+    const query = `
+      SELECT 
+        tf.trip_id,
+        tf.total_nights,
+        tf.total_hotels,
+        tf.total_activities,
+        tf.total_cost,
+        tf.transit_minutes,
+        tf.last_computed,
+        tf.version,
+        t2.trip_name,
+        t2.status as trip_status,
+        t2.destinations,
+        t2.start_date,
+        t2.end_date,
+        t2.created_at as trip_created
+      FROM trip_facts tf
+      LEFT JOIN trips_v2 t2 ON tf.trip_id = CAST(t2.trip_id AS TEXT)
+      ${whereClause}
+      ORDER BY tf.last_computed DESC
+      LIMIT ?
+    `;
+
+    bindings.push(args.limit || 20);
+
+    const results = await globalEnv.DB.prepare(query).bind(...bindings).all();
+
+    const trips = results.results?.map((row: any) => {
+      // Build facts object from the simple schema
+      const facts = {
+        trip_id: row.trip_id,
+        trip_name: row.trip_name,
+        destinations: row.destinations,
+        status: row.trip_status,
+        dates: {
+          start: row.start_date,
+          end: row.end_date
+        },
+        metrics: {
+          total_nights: row.total_nights,
+          total_hotels: row.total_hotels,
+          total_activities: row.total_activities,
+          total_cost: row.total_cost,
+          transit_minutes: row.transit_minutes
+        },
+        computed_at: row.last_computed,
+        version: row.version
+      };
+      
+      // Filter return fields if specified
+      if (args.return_fields && args.return_fields.length > 0) {
+        const filteredFacts: any = {};
+        for (const field of args.return_fields) {
+          if (facts[field as keyof typeof facts] !== undefined) {
+            filteredFacts[field] = facts[field as keyof typeof facts];
+          }
+        }
+        return {
+          trip_id: row.trip_id,
+          facts: filteredFacts,
+          metadata: {
+            trip_created: row.trip_created,
+            facts_version: row.version
+          }
+        };
+      }
+
+      return {
+        trip_id: row.trip_id,
+        facts,
+        metadata: {
+          trip_created: row.trip_created,
+          facts_version: row.version
+        }
+      };
+    }) || [];
+
     return {
       content: [{
         type: 'text',
         text: JSON.stringify({
           success: true,
-          message: `Marked ${args.trip_ids?.length || 0} trips as dirty`
+          results: trips,
+          total_found: trips.length,
+          query_info: {
+            search_query: args.query,
+            filters_applied: args.filters,
+            return_fields: args.return_fields,
+            schema_type: "simple_metrics",
+            execution_time: Date.now()
+          }
         }, null, 2)
       }]
     };
+
   } catch (error) {
-    return { content: [{ type: 'text', text: `Failed to mark dirty: ${error instanceof Error ? error.message : String(error)}` }] };
+    const errorMsg = `Trip facts query failed: ${error instanceof Error ? error.message : String(error)}`;
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: false,
+          error: errorMsg
+        }, null, 2)
+      }]
+    };
+  }
+}
+
+async function handleMarkFactsDirty(args: any) {
+  const dbManager = new DatabaseManager(globalEnv);
+  const errorLogger = new ErrorLogger(globalEnv);
+  
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    return dbManager.createInitFailedResponse();
+  }
+
+  try {
+    let markedCount = 0;
+
+    for (const tripId of args.trip_ids || []) {
+      try {
+        // Insert or ignore (in case already marked dirty)
+        await globalEnv.DB.prepare(`
+          INSERT OR IGNORE INTO facts_dirty (trip_id) VALUES (?)
+        `).bind(tripId).run();
+        markedCount++;
+      } catch (error) {
+        console.error(`Failed to mark trip ${tripId} as dirty:`, error);
+      }
+    }
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: true,
+          message: `Marked ${markedCount} trips as dirty for fact refresh`,
+          results: {
+            marked_count: markedCount,
+            reason: args.reason
+          }
+        }, null, 2)
+      }]
+    };
+
+  } catch (error) {
+    const errorMsg = `Failed to mark trips dirty: ${error instanceof Error ? error.message : String(error)}`;
+    await errorLogger.logError('mark_facts_dirty', errorMsg, { trip_ids: args.trip_ids });
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: false,
+          error: errorMsg
+        }, null, 2)
+      }]
+    };
   }
 }
 
 async function handleGetFactsStats(args: any) {
+  const dbManager = new DatabaseManager(globalEnv);
+  
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    return dbManager.createInitFailedResponse();
+  }
+
   try {
-    const totalFacts = await globalEnv.DB.prepare(`SELECT COUNT(*) as count FROM trip_facts`).first();
-    const dirtyCount = await globalEnv.DB.prepare(`SELECT COUNT(*) as count FROM facts_dirty`).first();
-    
+    // Get total facts count
+    const totalFacts = await globalEnv.DB.prepare(`
+      SELECT COUNT(*) as count FROM trip_facts
+    `).first();
+
+    // Get dirty facts count if requested
+    let dirtyCount = 0;
+    if (args.include_dirty !== false) {
+      const dirty = await globalEnv.DB.prepare(`
+        SELECT COUNT(*) as count FROM facts_dirty
+      `).first();
+      dirtyCount = dirty?.count || 0;
+    }
+
+    // Get recent refresh activity
+    const recentRefreshes = await globalEnv.DB.prepare(`
+      SELECT COUNT(*) as count 
+      FROM trip_facts 
+      WHERE last_computed > datetime('now', '-1 hour')
+    `).first();
+
+    // Get basic statistics about the facts
+    const aggregateStats = await globalEnv.DB.prepare(`
+      SELECT 
+        AVG(total_cost) as avg_cost,
+        MAX(total_cost) as max_cost,
+        AVG(total_nights) as avg_nights,
+        MAX(total_nights) as max_nights,
+        AVG(total_activities) as avg_activities,
+        COUNT(*) as facts_with_activities
+      FROM trip_facts 
+      WHERE total_activities > 0
+    `).first();
+
     return {
       content: [{
         type: 'text',
@@ -720,13 +1138,34 @@ async function handleGetFactsStats(args: any) {
           success: true,
           stats: {
             total_facts: totalFacts?.count || 0,
-            dirty_facts: dirtyCount?.count || 0
+            dirty_facts: dirtyCount,
+            recent_refreshes: recentRefreshes?.count || 0,
+            cost_stats: {
+              avg_cost: aggregateStats?.avg_cost || 0,
+              max_cost: aggregateStats?.max_cost || 0
+            },
+            trip_stats: {
+              avg_nights: aggregateStats?.avg_nights || 0,
+              max_nights: aggregateStats?.max_nights || 0,
+              avg_activities: aggregateStats?.avg_activities || 0,
+              facts_with_activities: aggregateStats?.facts_with_activities || 0
+            }
           }
         }, null, 2)
       }]
     };
+
   } catch (error) {
-    return { content: [{ type: 'text', text: `Stats failed: ${error instanceof Error ? error.message : String(error)}` }] };
+    const errorMsg = `Failed to get facts stats: ${error instanceof Error ? error.message : String(error)}`;
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: false,
+          error: errorMsg
+        }, null, 2)
+      }]
+    };
   }
 }
 
@@ -760,6 +1199,311 @@ async function handleOptimizeCommission(args: any) {
 
 async function handleCalculateTripCommission(args: any) {
   return { content: [{ type: 'text', text: 'Trip commission calculation functionality ready' }] };
+}
+
+// Database Repair Tool Handlers
+async function handleComprehensiveSchemaFix(dbManager: DatabaseManager, errorLogger: ErrorLogger, args: any) {
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    return dbManager.createInitFailedResponse();
+  }
+
+  try {
+    const params = {
+      dry_run: args.dry_run ?? true,
+      fix_facts_dirty: args.fix_facts_dirty ?? true,
+      fix_trip_participants: args.fix_trip_participants ?? true,
+      fix_trip_days: args.fix_trip_days ?? true,
+      recreate_trip_facts: args.recreate_trip_facts ?? false,
+      clean_orphaned_data: args.clean_orphaned_data ?? true
+    };
+
+    const changes: string[] = [];
+    const errors: string[] = [];
+
+    // Import functions from database-repair.ts
+    const { 
+      analyzeSchemaIssues,
+      fixFactsDirtySchema,
+      fixTripParticipantsSchema,
+      fixTripDaysSchema,
+      recreateTripFactsTables,
+      cleanOrphanedData
+    } = await import('./tools/database-repair');
+
+    // Step 1: Analyze current schema issues
+    const schemaAnalysis = await analyzeSchemaIssues(globalEnv);
+    changes.push(`Schema Analysis: ${schemaAnalysis.summary}`);
+
+    // Step 2: Fix facts_dirty table
+    if (params.fix_facts_dirty) {
+      const factsDirtyResult = await fixFactsDirtySchema(globalEnv, params.dry_run);
+      changes.push(`Facts Dirty Fix: ${factsDirtyResult.summary}`);
+      if (factsDirtyResult.errors.length > 0) {
+        errors.push(...factsDirtyResult.errors);
+      }
+    }
+
+    // Step 3: Fix TripParticipants table
+    if (params.fix_trip_participants) {
+      const participantsResult = await fixTripParticipantsSchema(globalEnv, params.dry_run);
+      changes.push(`TripParticipants Fix: ${participantsResult.summary}`);
+      if (participantsResult.errors.length > 0) {
+        errors.push(...participantsResult.errors);
+      }
+    }
+
+    // Step 4: Fix TripDays table
+    if (params.fix_trip_days) {
+      const tripDaysResult = await fixTripDaysSchema(globalEnv, params.dry_run);
+      changes.push(`TripDays Fix: ${tripDaysResult.summary}`);
+      if (tripDaysResult.errors.length > 0) {
+        errors.push(...tripDaysResult.errors);
+      }
+    }
+
+    // Step 5: Recreate trip_facts if requested
+    if (params.recreate_trip_facts && !params.dry_run) {
+      const recreateResult = await recreateTripFactsTables(globalEnv);
+      changes.push(`Table Recreation: ${recreateResult.summary}`);
+      if (recreateResult.errors.length > 0) {
+        errors.push(...recreateResult.errors);
+      }
+    }
+
+    // Step 6: Clean orphaned data
+    if (params.clean_orphaned_data && !params.dry_run) {
+      const cleanupResult = await cleanOrphanedData(globalEnv);
+      changes.push(`Data Cleanup: ${cleanupResult.summary}`);
+      if (cleanupResult.errors.length > 0) {
+        errors.push(...cleanupResult.errors);
+      }
+    }
+
+    const result = {
+      success: true,
+      message: `Comprehensive schema fix ${params.dry_run ? 'analysis' : 'execution'} completed`,
+      results: {
+        changes_made: changes,
+        errors_encountered: errors,
+        dry_run: params.dry_run,
+        schema_analysis: schemaAnalysis
+      }
+    };
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify(result, null, 2)
+      }]
+    };
+
+  } catch (error) {
+    const errorMsg = `Comprehensive schema fix failed: ${error instanceof Error ? error.message : String(error)}`;
+    await errorLogger.logError('comprehensive_schema_fix', errorMsg, args);
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: false,
+          error: errorMsg
+        }, null, 2)
+      }]
+    };
+  }
+}
+
+async function handleRepairTripFactsSchema(dbManager: DatabaseManager, errorLogger: ErrorLogger, args: any) {
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    return dbManager.createInitFailedResponse();
+  }
+
+  try {
+    const params = {
+      dry_run: args.dry_run ?? true,
+      fix_data_types: args.fix_data_types ?? true,
+      recreate_tables: args.recreate_tables ?? false
+    };
+
+    const changes: string[] = [];
+    const errors: string[] = [];
+
+    // Import functions from database-repair.ts
+    const { 
+      analyzeSchemaIssues,
+      fixFactsDirtyDataTypes,
+      recreateTripFactsTables
+    } = await import('./tools/database-repair');
+
+    // Step 1: Analyze current schema issues
+    const schemaAnalysis = await analyzeSchemaIssues(globalEnv);
+    changes.push(`Schema Analysis: ${schemaAnalysis.summary}`);
+
+    // Step 2: Fix facts_dirty data type issues
+    if (params.fix_data_types) {
+      const dataTypeFixResult = await fixFactsDirtyDataTypes(globalEnv, params.dry_run);
+      changes.push(`Data Type Fixes: ${dataTypeFixResult.summary}`);
+      if (dataTypeFixResult.errors.length > 0) {
+        errors.push(...dataTypeFixResult.errors);
+      }
+    }
+
+    // Step 3: Recreate tables if requested
+    if (params.recreate_tables && !params.dry_run) {
+      const recreateResult = await recreateTripFactsTables(globalEnv);
+      changes.push(`Table Recreation: ${recreateResult.summary}`);
+      if (recreateResult.errors.length > 0) {
+        errors.push(...recreateResult.errors);
+      }
+    }
+
+    const result = {
+      success: true,
+      message: `Database repair ${params.dry_run ? 'analysis' : 'execution'} completed`,
+      results: {
+        changes_made: changes,
+        errors_encountered: errors,
+        dry_run: params.dry_run,
+        schema_analysis: schemaAnalysis
+      }
+    };
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify(result, null, 2)
+      }]
+    };
+
+  } catch (error) {
+    const errorMsg = `Database repair failed: ${error instanceof Error ? error.message : String(error)}`;
+    await errorLogger.logError('repair_trip_facts_schema', errorMsg, args);
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: false,
+          error: errorMsg
+        }, null, 2)
+      }]
+    };
+  }
+}
+
+async function handleAnalyzeForeignKeyIssues(dbManager: DatabaseManager, errorLogger: ErrorLogger) {
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    return dbManager.createInitFailedResponse();
+  }
+
+  try {
+    const issues: any[] = [];
+
+    // Check trip_facts foreign key
+    const tripFactsFK = await globalEnv.DB.prepare(`
+      SELECT sql FROM sqlite_master WHERE type='table' AND name='trip_facts'
+    `).first();
+
+    if (tripFactsFK) {
+      const createSql = tripFactsFK.sql;
+      if (createSql.includes('REFERENCES Trips(id)')) {
+        issues.push({
+          table: 'trip_facts',
+          issue: 'Invalid foreign key reference to Trips(id) - should reference trips_v2(trip_id)',
+          severity: 'critical'
+        });
+      }
+      if (createSql.includes('trip_id TEXT')) {
+        issues.push({
+          table: 'trip_facts',
+          issue: 'trip_id should be INTEGER, not TEXT',
+          severity: 'critical'
+        });
+      }
+    }
+
+    // Check facts_dirty data type
+    const factsDirtySchema = await globalEnv.DB.prepare(`
+      SELECT sql FROM sqlite_master WHERE type='table' AND name='facts_dirty'
+    `).first();
+
+    if (factsDirtySchema) {
+      const createSql = factsDirtySchema.sql;
+      if (createSql.includes('trip_id TEXT')) {
+        issues.push({
+          table: 'facts_dirty',
+          issue: 'trip_id should be INTEGER, not TEXT',
+          severity: 'high'
+        });
+      }
+    }
+
+    // Check for orphaned records
+    const orphanedDirtyFacts = await globalEnv.DB.prepare(`
+      SELECT COUNT(*) as count FROM facts_dirty fd
+      WHERE NOT EXISTS (
+        SELECT 1 FROM trips_v2 tv 
+        WHERE CAST(fd.trip_id AS INTEGER) = tv.trip_id
+        AND fd.trip_id GLOB '[0-9]*'
+      )
+    `).first();
+
+    if (orphanedDirtyFacts?.count > 0) {
+      issues.push({
+        table: 'facts_dirty',
+        issue: `${orphanedDirtyFacts.count} orphaned records with non-existent or invalid trip_ids`,
+        severity: 'medium'
+      });
+    }
+
+    // Check data consistency
+    const inconsistentData = await globalEnv.DB.prepare(`
+      SELECT fd.trip_id, fd.reason FROM facts_dirty fd
+      WHERE fd.trip_id NOT GLOB '[0-9]*'
+      LIMIT 5
+    `).all();
+
+    if (inconsistentData.results && inconsistentData.results.length > 0) {
+      issues.push({
+        table: 'facts_dirty',
+        issue: `Non-numeric trip_id values found: ${inconsistentData.results.map((r: any) => r.trip_id).join(', ')}`,
+        severity: 'medium',
+        examples: inconsistentData.results
+      });
+    }
+
+    const result = {
+      success: true,
+      analysis: {
+        total_issues: issues.length,
+        critical_issues: issues.filter(i => i.severity === 'critical').length,
+        high_priority: issues.filter(i => i.severity === 'high').length,
+        medium_priority: issues.filter(i => i.severity === 'medium').length,
+        issues_detail: issues
+      }
+    };
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify(result, null, 2)
+      }]
+    };
+
+  } catch (error) {
+    const errorMsg = `Foreign key analysis failed: ${error instanceof Error ? error.message : String(error)}`;
+    await errorLogger.logError('analyze_foreign_key_issues', errorMsg, {});
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          success: false,
+          error: errorMsg
+        }, null, 2)
+      }]
+    };
+  }
 }
 
 // Cloudflare Worker export using proper MCP pattern
@@ -843,6 +1587,87 @@ export default {
                     
                   case 'explore_database':
                     result = await handleExploreDatabase(dbManager, errorLogger);
+                    break;
+                    
+                  // Fact Management Tools
+                  case 'refresh_trip_facts':
+                    const factManager = new FactTableManager(globalEnv);
+                    result = await handleRefreshTripFacts(factManager, toolArgs);
+                    break;
+                    
+                  case 'query_trip_facts':
+                    result = await handleQueryTripFacts(toolArgs);
+                    break;
+                    
+                  case 'mark_facts_dirty':
+                    result = await handleMarkFactsDirty(toolArgs);
+                    break;
+                    
+                  case 'get_facts_stats':
+                    result = await handleGetFactsStats(toolArgs);
+                    break;
+                    
+                  case 'deploy_fact_triggers':
+                    const triggerManager = new TriggerManager(globalEnv);
+                    await triggerManager.deployTripFactsTriggers();
+                    result = { content: [{ type: 'text', text: '✅ Fact triggers ensured' }]};
+                    break;
+                    
+                  // Hotel Management Tools
+                  case 'ingest_hotels':
+                    result = await handleIngestHotels(toolArgs);
+                    break;
+                    
+                  case 'ingest_rooms':
+                    result = await handleIngestRooms(toolArgs);
+                    break;
+                    
+                  case 'query_hotels':
+                    result = await handleQueryHotels(toolArgs);
+                    break;
+                    
+                  // Commission Tools
+                  case 'configure_commission_rates':
+                    result = await handleConfigureCommissionRates(toolArgs);
+                    break;
+                    
+                  case 'optimize_commission':
+                    result = await handleOptimizeCommission(toolArgs);
+                    break;
+                    
+                  case 'calculate_trip_commission':
+                    result = await handleCalculateTripCommission(toolArgs);
+                    break;
+                    
+                  // Proposal Generation Tools
+                  case 'generate_proposal':
+                    const generateResult = await handleGenerateProposal(toolArgs, globalEnv.DB);
+                    result = {
+                      content: [{
+                        type: 'text',
+                        text: JSON.stringify(generateResult, null, 2)
+                      }]
+                    };
+                    break;
+                    
+                  case 'preview_proposal':
+                    const previewResult = await handlePreviewProposal(toolArgs, globalEnv.DB);
+                    result = {
+                      content: [{
+                        type: 'text',
+                        text: JSON.stringify(previewResult, null, 2)
+                      }]
+                    };
+                    break;
+                    
+                  case 'list_templates':
+                    const templatesResult = await handleListTemplates();
+                    result = {
+                      content: [{
+                        type: 'text',
+                        text: JSON.stringify(templatesResult, null, 2)
+                      }]
+                    };
                     break;
                     
                   default:

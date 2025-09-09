@@ -1,11 +1,12 @@
 {
   "mcpServers": {
     "mcp-chrome": {
-      "command": "node",
-      "args": ["mcp-local-servers/mcp-chrome/app/native-server/dist/index.js"],
-      "env": {
-        "CHROME_PATH": "${CHROME_PATH:-/usr/bin/google-chrome}"
-      }
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "http://127.0.0.1:12306/mcp"
+      ]
     },
     "d1-database": {
       "command": "npx",
@@ -23,14 +24,6 @@
         "https://prompt-instructions-d1-mcp.somotravel.workers.dev/sse"
       ]
     },
-    "template-document": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://template-document-qhubvccp6-neil-roberts-projects.vercel.app/api/mcp"
-      ]
-    },
     "github-mcp": {
       "command": "npx",
       "args": [
@@ -39,20 +32,18 @@
         "https://github-mcp-cta.somotravel.workers.dev/sse"
       ]
     },
+    "mcp-anchor-browser": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp-anchor-browser-production.somotravel.workers.dev/sse"
+      ]
+    },
     "zen": {
       "command": "zen-mcp-server/zen-mcp-server",
       "args": [],
       "env": {
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
-        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
-        "GROQ_API_KEY": "${GROQ_API_KEY}"
-      }
-    },
-    "cipher": {
-      "command": "cipher",
-      "args": ["--mode", "mcp"],
-      "env": {
-        "MCP_SERVER_MODE": "aggregator",
         "OPENAI_API_KEY": "${OPENAI_API_KEY}",
         "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
       }

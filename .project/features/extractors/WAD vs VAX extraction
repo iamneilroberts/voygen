@@ -1,0 +1,69 @@
+Good question — **“VAX” sites** (many tour operators, consolidators, and host agencies expose their inventory through **VAX VacationAccess**) have a very different technical flavor than something like **Delta Vacations / WorldAgent Direct**.
+
+Here’s the main ways they differ for scraping / AI-assistant workflows:
+
+---
+
+## 1. **Underlying platform**
+
+* **Delta Vacations (WAD)** → a *single-supplier* branded portal, with its own booking engine (Delta/Northwest heritage). The data model is customized for Delta’s contracts and packages.
+* **VAX** → a *multi-supplier aggregator platform*. It powers many brands (Funjet, Apple Leisure Group, United Vacations, etc.). Every site is *the same engine*, skinned differently, but the payloads and DOM structure are almost identical.
+
+---
+
+## 2. **Search results structure**
+
+* **WAD** → sometimes a giant HTML result set, sometimes JSON hydration, sometimes XHR to `/trams` or `/search` endpoints. One-off, Delta-specific quirks (e.g., how they represent refundable vs nonrefundable).
+* **VAX** → more standardized:
+
+  * Hotel search results often arrive via **XHR calls** returning **JSON or XML-ish JSON** payloads (property ID, rate plans, room categories).
+  * The HTML cards are hydrated from those responses. The JSON can usually be intercepted/reused (e.g., via `performance.getEntriesByType('resource')`).
+  * They paginate more aggressively than WAD. Instead of a 50k-line HTML blob, you’ll usually see **server-side paging** with query parameters like `page=2&size=25`.
+
+---
+
+## 3. **Detail pages**
+
+* **WAD** detail pages → often require your login session, and the payload may be embedded differently than in results.
+* **VAX** hotel detail → tends to have a predictable JSON blob with room types, amenities, cancellation rules. Sometimes in `window.__INITIAL_STATE__`, sometimes via an API endpoint like `/BookingServices/hotel/detail`.
+
+---
+
+## 4. **Automation needs**
+
+* **WAD** → you often need **mcp-chrome** to act like a human: click through, expand, and then extract, because the portal mixes old server-rendered forms with some modern JS.
+* **VAX** → since many operators white-label it, once you’ve cracked one, you can reuse your extractor across multiple brands. Much easier to standardize an NDJSON schema and adapter.
+
+---
+
+## 5. **Reader / Clean extraction**
+
+* **WAD** → not ideal for Jina Reader on search result pages (too repetitive), better for hotel detail descriptions.
+* **VAX** → the boilerplate is more consistent. Jina Reader could do OK on property descriptions (hotel “about” text), but you’ll still want raw JSON for prices, rates, and cancellation rules.
+
+---
+
+## 6. **Practical differences for your AI assistant**
+
+* **For Delta Vacations/WAD**:
+
+  * Custom scraper/adapter.
+  * Expect occasional full-page DOM parsing fallback.
+  * Always respect your logged-in session (no public API).
+* **For VAX**:
+
+  * Build one **reusable extractor** (hydration blob + API endpoint sniffing).
+  * Works across many brands, which is a huge multiplier for your assistant.
+  * Less reliance on DOM scraping, more reliable JSON→NDJSON conversion.
+
+---
+
+✅ **Bottom line:**
+
+* **WAD** = idiosyncratic, Delta-only, sometimes giant HTML → lean on mcp-chrome automation, fall back to batched DOM if no JSON.
+* **VAX** = standardized across many brands, JSON-heavy, paginated → once you write one parser, you can reuse it everywhere. Your AI assistant benefits a lot more from VAX’s uniformity.
+
+---
+
+Do you want me to sketch a **minimal extractor pattern** for a VAX results page (like how to find the JSON endpoints / keys), so you can reuse it across United Vacations, Funjet, etc.?
+

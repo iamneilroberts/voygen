@@ -1,0 +1,2067 @@
+<li class="hotelItem" data-hotel-code="SEA_78637_78637" style="margin-bottom: 12px;">
+
+			
+			<div class="smPick_heading">
+				<span style="vertical-align: middle">SkyMiles Members&apos; Pick </span>
+				<a  alt="SkyMiles Members&apos; Pick Information" aria-label="SkyMiles Members&apos; Pick Information" border="0"  class="smPick_infoIcon" href="https://www.worldagentdirect.com/delta/info/skymiles-members-pick" target="_blank">
+					<img height ="26" src="/resources/images/icon/icon_sm_members_pick_info.png"  style="vertical-align: middle;" title="SkyMiles Members Pick Information" width="26">
+				</a>
+			</div>
+			
+
+			<table border="0" cellpadding="1" cellspacing="0" class="skymilesMembersPick" width="584">
+				
+
+				
+
+				<tr valign="top">
+					<td width="70">
+						<img src="//static.deltavacations.com/images/drc/hotelbooking/sea_78637_78637_book.jpg" hspace="2" vspace="2" alt="The Edgewater Hotel" height="85" width="70" />
+
+						
+
+					</td>
+					<td width="510">
+						<table border="0" cellpadding="0" cellspacing="0" width="510">
+							<tr bgcolor="#dfeefd">
+								<td>
+									<table border="0" cellpadding="1" cellspacing="0" width="510">
+										<tr>
+											
+
+											
+											<td width="20">
+												<img src="//static.deltavacations.com/images/drc/hotelrating/4star_small.gif" alt="4 Stars" />
+											</td>
+											<td width="490">
+												
+												<a href="/delta/popover/hotelinfo?hotelId=SEA_78637_78637" target="_blank" class="bold" onclick="Lightview.show({&apos;options&apos;:{&apos;width&apos;:849,&apos;height&apos;:800},&apos;type&apos;:&apos;iframe&apos;,&apos;url&apos;:&apos;/delta/popover/hotelinfo?hotelId=SEA_78637_78637&apos;}); return false;">The Edgewater Hotel</a>
+											</td>
+											
+
+											
+
+											
+
+											
+											<td class="bold" style="white-space: nowrap;" width="80">
+												<a href="#" class="_compareHotelsLink">Compare</a>
+												<input class="_hotelCompareCheckbox" type="checkbox" value="SEA_78637_78637" />
+											</td>
+											
+										</tr>
+
+										
+									</table>
+								</td>
+							</tr>
+
+							<tr>
+								<td>
+									
+									<div class="smPick_rating">Members&apos; Rating:<br />
+										<span style="float: right;">5/5 <span class="smPick_levelName"> Superior </span></span>
+									</div>
+									
+								<p>
+									
+									
+
+										
+										<a href="/delta/popup/amenities?destinationCode=SEA" target="Amenities" onclick="window.open(this.href,&apos;Amenities&apos;,&apos;left=0,top=0,width=640,height=740,scrollbars,resizable&apos;); return false;"><img src="//static.deltavacations.com/images/drc/amenity/icon_i.png" alt="In Room Wi-Fi Access" height="18" width="18" title="In Room Wi-Fi Access" /></a>
+										
+										<a href="/delta/popup/amenities?destinationCode=SEA" target="Amenities" onclick="window.open(this.href,&apos;Amenities&apos;,&apos;left=0,top=0,width=640,height=740,scrollbars,resizable&apos;); return false;"><img src="//static.deltavacations.com/images/drc/amenity/icon_a.png" alt="Air Conditioning" height="18" width="18" title="Air Conditioning" /></a>
+										
+										<a href="/delta/popup/amenities?destinationCode=SEA" target="Amenities" onclick="window.open(this.href,&apos;Amenities&apos;,&apos;left=0,top=0,width=640,height=740,scrollbars,resizable&apos;); return false;"><img src="//static.deltavacations.com/images/drc/amenity/icon_f.png" alt="Fitness Center" height="18" width="18" title="Fitness Center" /></a>
+										
+									
+								</p>
+								</td>
+							</tr>
+
+							
+							<tr>
+								<td><strong>Hotel Location/Area:</strong> Downtown Seattle</td>
+							</tr>
+							
+
+							<tr>
+								<td>
+									
+
+									<div id="hotelOfferingDiv_SEA_78637_78637">
+										
+
+										
+										
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/pkg/shared/booking/displayHotelOfferings.tag -->
+<table border="0" class="table_lines margin_bottom_10" cellpadding="2" cellspacing="0" width="100%">
+	<thead>
+	<tr>
+		<th width="14%">Hotel Rates</th>
+		<th width="31%">Room Type</th>
+		<th colspan="3">Added Values</th>
+	</tr>
+	</thead>
+	<tbody>
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	<tr class="" style="" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		City View Queen
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="/delta/popup/inclusiveservice?inclusiveServiceCount=1&amp;codes=0013&amp;serviceTypes=VAL&amp;infoKeywords=VALA%2F78637_30RC&amp;descriptions=%2430+Daily+Resort+Credit" target="InclusiveService" onclick="window.open(this.href,&apos;InclusiveService&apos;,&apos;left=0,top=0,width=500,height=400,scrollbars,resizable&apos;); return false;">$30 Daily Resort Credit</a>
+
+
+
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$72.93
+=<br />
+$2,089.26
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRCQ,234.54,1,1,000026302|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="234.54"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		City View King
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="/delta/popup/inclusiveservice?inclusiveServiceCount=1&amp;codes=0013&amp;serviceTypes=VAL&amp;infoKeywords=VALA%2F78637_30RC&amp;descriptions=%2430+Daily+Resort+Credit" target="InclusiveService" onclick="window.open(this.href,&apos;InclusiveService&apos;,&apos;left=0,top=0,width=500,height=400,scrollbars,resizable&apos;); return false;">$30 Daily Resort Credit</a>
+
+
+
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$87.68
+=<br />
+$2,104.01
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRC1,249.29,1,1,000026302|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="249.29"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		City View Double
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="/delta/popup/inclusiveservice?inclusiveServiceCount=1&amp;codes=0013&amp;serviceTypes=VAL&amp;infoKeywords=VALA%2F78637_30RC&amp;descriptions=%2430+Daily+Resort+Credit" target="InclusiveService" onclick="window.open(this.href,&apos;InclusiveService&apos;,&apos;left=0,top=0,width=500,height=400,scrollbars,resizable&apos;); return false;">$30 Daily Resort Credit</a>
+
+
+
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$102.43
+=<br />
+$2,118.76
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRC2,264.04,1,1,000026302|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="264.04"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		City View Suite Doubles
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="/delta/popup/inclusiveservice?inclusiveServiceCount=1&amp;codes=0013&amp;serviceTypes=VAL&amp;infoKeywords=VALA%2F78637_30RC&amp;descriptions=%2430+Daily+Resort+Credit" target="InclusiveService" onclick="window.open(this.href,&apos;InclusiveService&apos;,&apos;left=0,top=0,width=500,height=400,scrollbars,resizable&apos;); return false;">$30 Daily Resort Credit</a>
+
+
+
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$220.43
+=<br />
+$2,236.76
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HJC2,382.04,1,1,000026302|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="382.04"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		City View Suite King
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="/delta/popup/inclusiveservice?inclusiveServiceCount=1&amp;codes=0013&amp;serviceTypes=VAL&amp;infoKeywords=VALA%2F78637_30RC&amp;descriptions=%2430+Daily+Resort+Credit" target="InclusiveService" onclick="window.open(this.href,&apos;InclusiveService&apos;,&apos;left=0,top=0,width=500,height=400,scrollbars,resizable&apos;); return false;">$30 Daily Resort Credit</a>
+
+
+
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$220.43
+=<br />
+$2,236.76
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HJC1,382.04,1,1,000026302|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="382.04"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		Over Water King
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="/delta/popup/inclusiveservice?inclusiveServiceCount=1&amp;codes=0013&amp;serviceTypes=VAL&amp;infoKeywords=VALA%2F78637_30RC&amp;descriptions=%2430+Daily+Resort+Credit" target="InclusiveService" onclick="window.open(this.href,&apos;InclusiveService&apos;,&apos;left=0,top=0,width=500,height=400,scrollbars,resizable&apos;); return false;">$30 Daily Resort Credit</a>
+
+
+
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$249.93
+=<br />
+$2,266.26
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRW1,411.54,1,1,000026302|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="411.54"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		Over Water Double
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="/delta/popup/inclusiveservice?inclusiveServiceCount=1&amp;codes=0013&amp;serviceTypes=VAL&amp;infoKeywords=VALA%2F78637_30RC&amp;descriptions=%2430+Daily+Resort+Credit" target="InclusiveService" onclick="window.open(this.href,&apos;InclusiveService&apos;,&apos;left=0,top=0,width=500,height=400,scrollbars,resizable&apos;); return false;">$30 Daily Resort Credit</a>
+
+
+
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$264.68
+=<br />
+$2,281.01
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRW2,426.29,1,1,000026302|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="426.29"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		Over Water King Balcony
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="/delta/popup/inclusiveservice?inclusiveServiceCount=1&amp;codes=0013&amp;serviceTypes=VAL&amp;infoKeywords=VALA%2F78637_30RC&amp;descriptions=%2430+Daily+Resort+Credit" target="InclusiveService" onclick="window.open(this.href,&apos;InclusiveService&apos;,&apos;left=0,top=0,width=500,height=400,scrollbars,resizable&apos;); return false;">$30 Daily Resort Credit</a>
+
+
+
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$338.43
+=<br />
+$2,354.76
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRWK,500.04,1,1,000026302|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="500.04"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+
+	
+	
+
+	
+
+	
+	
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		City View Double
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$120.65
+=<br />
+$2,136.98
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRC2,282.26,1,1,000026306|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="282.26"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		City View King
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$120.65
+=<br />
+$2,136.98
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRC1,282.26,1,1,000026306|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="282.26"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		City View Queen
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$120.65
+=<br />
+$2,136.98
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRCQ,282.26,1,1,000026306|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="282.26"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		City View Suite King
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$215.05
+=<br />
+$2,231.38
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HJC1,376.66,1,1,000026306|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="376.66"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		Over Water King
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$252.80
+=<br />
+$2,269.13
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRW1,414.41,1,1,000026306|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="414.41"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		City View Suite Doubles
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$262.25
+=<br />
+$2,278.58
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HJC2,423.86,1,1,000026306|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="423.86"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		Over Water Double
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$262.25
+=<br />
+$2,278.58
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRW2,423.86,1,1,000026306|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="423.86"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		Over Water King Balcony
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$290.57
+=<br />
+$2,306.90
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HRWK,452.18,1,1,000026306|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="452.18"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+	
+	
+	<tr class="option_SEA_78637_78637" style="display: none;" valign="middle">
+		<td class="pad_left_5" width="14%">Standard</td>
+		<td width="31%">
+		Over Water Junior Suite King and Sofa Bed
+		</td>
+		<td width="27%"><!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag --></td>
+
+		
+		
+		
+
+		
+		
+
+		
+		
+
+		
+		<td align="right" class="font_fineprint" width="17%">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+
+
+
+
+
+
+
++$403.85
+=<br />
+$2,420.18
+
+
+
+<!-- END: /tags/spring/pkg/shared/common/helper/displayReferencePrice.tag -->
+ total
+		
+		</td>
+		<td align="center" width="11%">
+		<form id="pkgSharedBookingAirHotelForm" class="pkgSharedBookingAirHotelForm rspTrk_request ajaxForm" action="/delta/booking/airhotel" method="post">
+		<input id="hasPriceDifference" name="hasPriceDifference" type="hidden" value="false"/>
+		<input id="isChanged" name="isChanged" type="hidden" value="false"/>
+		<input id="isModify" name="isModify" type="hidden" value="false"/>
+		<input id="processId" name="processId" type="hidden" value="20250907042536487"/>
+		<input id="roomIndex" name="roomIndex" type="hidden" value="0"/>
+		<input id="segmentIndex" name="segmentIndex" type="hidden" value="0"/>
+		<input id="sortOption" name="sortOption" type="hidden" value=""/>
+		<input type="hidden" id="hotelValueString" name="hotelValueString" value="BK,219,HJW1,565.46,1,1,000026306|ALL,SEA,78637,78637,,,,0.00"/>
+		<input type="hidden" id="preselectedHotelId" name="preselectedHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="priceRequestHotelId" name="priceRequestHotelId" value="SEA_78637_78637"/>
+		<input type="hidden" id="selectedHotelPrice" name="selectedHotelPrice" value="565.46"/>
+		<input type="hidden" name="selectHotelButton" value="submit" />
+
+		
+		
+
+		
+		<input type="image" name="ignore" src="/resources/images/button/select.gif" />
+		
+		
+
+		</form>
+		</td>
+		
+		
+	</tr>
+	
+	
+
+	
+	
+
+	
+
+	
+
+	
+	
+	</tbody>
+</table>
+
+
+<p id="moreOptionsLink_SEA_78637_78637" style=""><img src="/resources/images/button/arrow_red.gif" width="9" height="9" border="0" alt="" /> <a href="#" onclick="showOrHideMoreOptions('SEA_78637_78637', true); return false;">show more room options</a></p>
+<p id="fewerOptionsLink_SEA_78637_78637" style="display: none;"><img src="/resources/images/button/arrow_down.gif" width="9" height="9" border="0" alt="" /> <a href="#" onclick="showOrHideMoreOptions('SEA_78637_78637', false); return false;">show fewer room options</a></p>
+
+<!-- END: /tags/pkg/shared/booking/displayHotelOfferings.tag -->
+
+										
+
+										
+
+										
+									</div>
+
+									
+
+									
+									Terms and Conditions:
+									
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- We don't show links on the Printable Pages, so they can set the isInclusiveServiceDetailRequired flag to -->
+<!-- false in the request scope to not show the links. -->
+
+
+<!-- BEGIN: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag   -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="/delta/popup/inclusiveservice?inclusiveServiceCount=1&amp;codes=0012&amp;serviceTypes=VAL&amp;infoKeywords=VALA%2F78637_RSRTFEE4&amp;descriptions=Additional+Resort+Fee+%2433+Plus+Tax+Per+Night" target="InclusiveService" onclick="window.open(this.href,&apos;InclusiveService&apos;,&apos;left=0,top=0,width=500,height=400,scrollbars,resizable&apos;); return false;">Additional Resort Fee $33 Plus Tax Per Night</a>
+
+
+
+
+<!-- END: /tags/spring/pkg/shared/booking/inclusiveservice/displayInclusiveServices.tag -->
+
+									<br />
+									
+
+									
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</li>
+		

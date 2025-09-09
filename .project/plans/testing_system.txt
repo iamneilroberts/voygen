@@ -1,0 +1,30 @@
+I want an automated real-world testing setup for voygent. I was going to use codex since it's been working so well, but looks like most MCP servers are problematic with it, so I need another method. My idea was to use the mcp-chrome browser automation to interact with librechat in the chrome browser to test the system. It should start with the basics: travel_agent_start to fetch the startup instructions from prompt instructions mcp. 
+
+Then proceed through increasingly more complex interactions with claude code playing the part of a normal human travel agent user by interacting with voygent in the chat. Because claude code will also be able to see the responses, it should be able to judge the result of each test pass/fail and keep a record of failures, potential fixes, and improvements it notices are needed. 
+
+I'm basically trying to automate the very tedious testing routine that I've been doing manually that goes like this: 
+
+voygent: <travel_agent_start> (greeting)
+me: check database health
+v: <checks db health> all good
+me: show me Sara and Darren's trip
+v: <get_anything> (shows summary of trip)
+me: show me daily details 
+v: (tries several database tools, eventually gives up or writes ad hoc sql or does something else undesirable)
+me: give me a debug report of what went wrong
+v: outputs what tool it called and why, results, error, etc. 
+me: (goes back to fix the issue)
+
+And repeat. 
+
+It seems like a better use of my time to configure a real-world testing suite since claude code can act in a dual role as simulated human user and omniscient observer. If we had a decent set of tests that work up to a complex trip plan, modifying existing trips, adding a traveler, creating and publishing a proposal, etc that would be great. 
+
+Claude can have a basic script for each interaction and simulate searching for hotels and flights outside the scope of voygent and provide that information in the chat to be saved to the trip. 
+
+For each test run, claude can then analyze the results and write a plan to fix any errors or document needed improvements. 
+
+The most realistic test seems to be mcp-chrome for browser use for a realistic human user simulation while having an overall view of what is going on (including verifying database operations and published documents). Meanwhile, Voygent can provide the AI capabilities for planning and creativity and publish proposals when the trip is set. 
+
+It might be faster to interact with voygent by bypassing the browser chat if librechat can operate like an API endpoint, but it wouldn't be as realistic as actually using the browser like the human user will always do. 
+
+

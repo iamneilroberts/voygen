@@ -31,14 +31,19 @@ mcpServers:
     args: ["./mcp-local-servers/mcp-chrome/app/native-server/dist/index.js"]
     timeout: 30000
     env: {}
-    description: "Browser automation and web content extraction"
+    description: "Browser automation and web content extraction with hotel extraction capabilities"
     serverInstructions: |
-      Browser automation capabilities:
+      Browser automation and hotel extraction capabilities:
       - Use this server for real-time web interaction and content extraction:
-        • Navigate to travel websites and extract live pricing data
-        • Take screenshots for visual confirmation
-        • Fill forms and interact with booking interfaces
-        • Monitor network requests for API data
+        • chrome_extract_hotels: Extract hotel search results from travel websites (NaviTrip/CPMaxx, Booking.com, generic)
+        • chrome_navigate: Navigate to travel websites and booking platforms
+        • chrome_get_web_content: Get page content for analysis
+        • chrome_screenshot: Take screenshots for visual confirmation
+        • chrome_inject_script: Advanced page interaction and data extraction
+        • chrome_fill_or_select: Fill forms and interact with booking interfaces
+      - Hotel extraction supports multiple platforms with intelligent detection
+      - Use chrome_extract_hotels when users need hotel data from booking sites
+      - Extraction parameters: platform ('navitrip', 'auto'), extractionMode ('fast', 'complete'), maxResults
       - Ideal for dynamic content that requires JavaScript execution
       - Best for real-time price verification and availability checks
 
@@ -86,16 +91,46 @@ mcpServers:
       - "https://github-mcp-cta.somotravel.workers.dev/sse"
     timeout: 30000
     env: {}
-    description: "GitHub repository management and document publishing"
+    description: "GitHub publishing with somotravel.us dashboard integration"
     serverInstructions: |
-      GitHub integration capabilities:
-      - Use this server for document publishing and repository management:
-        • publish_travel_document: Publish HTML documents to GitHub Pages
-        • create_file: Create new files in the repository
-        • update_file: Update existing files
-        • list_files: Browse repository contents
-      - Publishes to somotravel.us and voygen.app websites
-      - Use for creating client proposals and travel documents
+      Publishing integration capabilities:
+      - Use this server for seamless travel document publishing:
+        • publish_travel_document_with_dashboard_update: Complete publishing workflow (document + dashboard update)
+        • update_dashboard_only: Update trips.json dashboard without publishing document
+        • sync_trip_status: Map Voygen status to dashboard categories
+        • github_create_file, github_update_file: Direct repository management
+      - Single command publishes document and updates somotravel.us dashboard automatically
+      - Maintains trips.json as source of truth with proper status categorization
+      - Use for /publish command - handles everything in one operation
+
+  mcp-anchor-browser:
+    command: "npx"
+    args:
+      - "-y"
+      - "mcp-remote"
+      - "https://mcp-anchor-browser-production.somotravel.workers.dev/sse"
+    timeout: 30000
+    env: {}
+    description: "Anchor Browser remote automation and travel data extraction"
+    serverInstructions: |
+      Remote browser automation capabilities:
+      - Use this server for cloud-based browser automation:
+        • anchor_create_session: Create new browser session with configurable settings
+        • anchor_navigate: Navigate to travel websites and booking platforms  
+        • anchor_get_page_content: Extract HTML content and page data
+        • anchor_take_screenshot: Capture visual screenshots for confirmation
+        • anchor_click_element: Interact with page elements (buttons, links)
+        • anchor_fill_input: Fill forms and input fields
+        • anchor_extract_data: Extract structured data from travel sites
+        • anchor_execute_script: Run custom JavaScript for complex interactions
+        • anchor_wait_for_element: Wait for dynamic content to load
+        • anchor_close_session: Clean up browser sessions
+        • anchor_list_sessions: Monitor active browser sessions
+        • anchor_get_session_info: Get details about specific sessions
+      - Ideal for travel sites that require JavaScript execution or have anti-bot measures
+      - Cost-optimized with automatic session management and cleanup
+      - Use when mcp-chrome local browser automation isn't sufficient
+      - Best for production environments requiring reliable, scalable automation
 
 # Interface customization for travel agents
 interface:

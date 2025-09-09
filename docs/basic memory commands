@@ -1,0 +1,7 @@
+# Search architecture memory for “login flow”
+./scripts/memq arch login flow
+
+# Create a new note in BasicMemory (stdin body)
+echo "Key invariants for the booking FSM…" | \
+  ./scripts/mem create --tags "workflows,booking" --title "Booking FSM invariants" --stdin
+

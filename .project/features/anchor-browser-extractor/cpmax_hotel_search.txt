@@ -1,0 +1,73 @@
+<div class="result rounded">
+						<div class="hotel-image lazy" style="background-image: url(https://i.travelapi.com/lodging/1000000/20000/15000/14917/4f502330_b.jpg), url(/images/no-hotel-image-available.png)" data-giata-id="93817">
+							<div class="num-images">
+								<i class="adzicon-image far fa-fw fa-image"></i>																	38 Pictures
+															</div>
+
+													</div>
+						<div class="hotel-details">
+							<div class="details">
+								<p class="title">
+									<a href="/HotelEngine/processor/selectHotel/93817">Red Roof Inn</a>								</p>
+								<p>
+									<i class="adzicon-star fas fa-fw fa-star"></i><i class="adzicon-star fas fa-fw fa-star"></i>								</p>
+								<p class="address">
+									16838 International Boulevard SeaTac 98188									<a href="#" class="view-on-map" data-index="0" data-bs-toggle="tooltip" title="View on map"><i class="adzicon-map fas fa-fw fa-map"></i></a>								</p>
+								<p>
+									With a stay at Red Roof Inn Seattle Airport - SEATAC in SeaTac, you'll be near the airport, within a 10-minute drive of Westfield Southcenter Mall and Silver Dollar Casino.  This hotel is 11.3 mi (18.2 km) from Lumen Field and 11.4 mi (18.4 km) from Seattle Waterfront.								</p>
+								<p class="pad10-vert-top">
+									<a href="#" class="hotel-engine-poi" data-marker="{&amp;quot;lat&amp;quot;:&amp;quot;47.45144000&amp;quot;,&amp;quot;lng&amp;quot;:&amp;quot;-122.29475000&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;Red Roof Inn&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;16838 International Boulevard SeaTac 98188&amp;quot;}"><i class="adzicon-view fas fa-fw fa-search"></i> View points of interest</a>								</p>
+								<div class="row pad10-vert-top">
+									<div class="col-md-5">
+																					<b>Commission:</b> $85.49 (30%)																			</div>
+									<div class="col-md-7 text-right">
+										
+																			</div>
+								</div>
+								
+															</div>
+														<!-- <div class="col-sm-12">
+								<div class="comparison-box">
+																														<div class="comparison-item">
+												<div class="comparison-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Expedia_2012_logo.svg/2560px-Expedia_2012_logo.svg.png"  style = "height: 20px" data-toggle = "tooltip" title = "expedia"></div>
+												<div class="comparison-price">$285</div>
+											</div>
+																																																											<div class="comparison-item">
+												<div class="comparison-logo"><img src="https://press.priceline.com/wp-content/uploads/2019/10/Priceline_Logo_RGB_Blue_2019-1-1.png"  style = "height: 20px" data-toggle = "tooltip" title = "priceline"></div>
+												<div class="comparison-price">$285</div>
+											</div>
+																											</div>
+							</div> -->
+						</div>
+						<div class="actions hotel-savings">
+							<div class="savings">
+																	<div class="row">
+										<div class="col-sm-12 text-right">
+											<span class="text-muted">compare</span>&nbsp;
+											<input type="checkbox" class="he-hotel-comparison" data-name="Red Roof Inn" data-address="16838 International Boulevard SeaTac 98188" data-description="With a stay at Red Roof Inn Seattle Airport - SEATAC in SeaTac, you'll be near the airport, within a 10-minute drive of Westfield Southcenter Mall and Silver Dollar Casino.  This hotel is 11.3 mi (18.2 km) from Lumen Field and 11.4 mi (18.4 km) from Seattle Waterfront." data-giata-id="93817" data-image="https://i.travelapi.com/lodging/1000000/20000/15000/14917/4f502330_b.jpg" data-total-stay="284.98" data-original-price="284.98" data-star-rating="2.00" data-check-in="2026-03-01" data-check-out="2026-03-02">
+										</div>
+									</div>
+									<p class="savings-original text-right margin10-top">
+																			</p>
+									<div class="pricing-box">
+										
+																				<div class="verified-box d-flex" aria-hidden="true" data-toggle="popover" title="" data-content="&lt;ul class='ota-list'&gt;&lt;li class='ota-item d-flex justify-content-between'&gt;&lt;div class='provider-name'&gt;Expedia.com&lt;/div&gt;&lt;div class='provider-price'&gt;$285&lt;/div&gt;&lt;/li&gt;&lt;li class='ota-item d-flex justify-content-between'&gt;&lt;div class='provider-name'&gt;Priceline.com&lt;/div&gt;&lt;div class='provider-price'&gt;$285&lt;/div&gt;&lt;/li&gt;&lt;/ul&gt;" data-html="true" data-trigger="hover click" data-original-title="This rate has been verified and matched to the lowest price available from leading OTAs">
+
+											<p class="verified-icon"><img src="/adzuki/images/check-icon.svg"></p>
+											<p class="verified-text">Verified Best OTA Rate</p>
+										</div>
+																				<p class="text-right">
+												<span class="min-rate">
+													$285												</span>
+											<small style="display: block; clear: both; padding-top: 0px; margin-top: -5px;"> per night
+																							</small>
+										</p>
+									</div>
+									<p class="text-right">
+										Total: $296									</p>
+									<p class="text-right small"><em>Total price includes taxes and fees</em></p>
+															</div>
+							<p class="text-right">
+								<a href="/HotelEngine/processor/selectHotel/93817" class="btn btn-primary w-100 select-button">Select Hotel</a><br><br><small> <a href="/HotelSheets/processor/selectRooms/93817/eyJjaGVja2luIjoiMjAyNi0wMy0wMSIsImNoZWNrb3V0IjoiMjAyNi0wMy0wMiIsImxvY2F0aW9uX3JhZGl1cyI6IjIwIiwibG9jYXRpb25fc2VhcmNoIjoiU2VhdHRsZSwgV0EsIFVTQSIsImNpdHkiOiJTZWF0dGxlLCBXQSwgVVNBIiwic3RhdGVfY29kZSI6IiIsImNvdW50cnlfY29kZSI6IiIsImxhdCI6IjQ3LjYwNjEzODkiLCJsbmciOiItMTIyLjMzMjg0ODEiLCJyb29tcyI6W3sibnVtX2FkdWx0cyI6IjIiLCJudW1fY2hpbGRyZW4iOiIwIn1dLCJudW1fbmlnaHRzIjoiMSJ9" class="">Create Hotel Sheet</a></small>							</p>
+						</div>
+					</div>

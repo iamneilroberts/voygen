@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# scripts/mem — thin wrapper around MCP CLI for BasicMemory
+# Usage:
+#   mem search "architecture login flow"
+#   mem create --tags "arch,auth" --title "Auth flow notes" --body "..."
+#   mem read <id>
+#   mem tools   # list tools exposed by the server
+set -euo pipefail
+SERVER="project-memory"
+
+if ! command -v mcp &>/dev/null; then
+  echo "mcp CLI not found. Install: npm i -g @modelcontextprotocol/cli" >&2
+  exit 1
+fi
+
+cmd="${1:-}"; shift || true
+case "${cmd}" in
+  tools)
+    mcp tools "$SERVER"
+    ;;
+  search)
+    query="${1:-}"; [[ -z "$query" ]] && { echo "mem search \"query...\"" >&2; exit 2; }
+    mcp call "$SERVER" search --param query="$query"
+    ;;
+  create)
+    # pass-through flags: --tags, --title, --body, or use --stdin for body
+    mcp call "$SERVER" create "$@"
+    ;;
+  read)
+    id="${1:-}"; [[ -z "$id" ]] && { echo "mem read <id>" >&2; exit 2; }
+    mcp call "$SERVER" read --param id="$id"
+    ;;
+  *)
+    echo "mem [tools|search|create|read] …" >&2
+    exit 2
+    ;;
+esac
+

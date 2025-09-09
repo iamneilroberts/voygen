@@ -1,0 +1,855 @@
+
+---
+
+# `ARCHITECTURE.md`
+
+## Overview
+
+This design enables **single-call** extraction of travel search results and ad-hoc page content using **mcp-chrome**. It favors:
+
+* **Zero/One** mcp-chrome round-trip per page
+* **Structured-first** extraction (hydration/XHR/JSON-LD), with **DOM/regex** fallbacks
+* **Common schemas** so every extractor returns the same row types (NDJSON for bulk; JSON array for generic facts)
+* **Pluggable adapters**: WAD (Delta Vacations), VAX (VacationAccess family), Navitrip/CPMaxx, plus a **Generic Travel “Smart Extractor”** for invoices, confirmations, markets, etc.
+
+## High-Level Flow
+
+1. **User asks:** “Process browser search results” or “Delta package results ready” or “Import hotel invoice…”
+2. **Claude routes:**
+
+   * If user provided platform hint → pass `pageTypeHint` to extractor (skip detection).
+   * Else → auto-detect via a “first-glance” classifier embedded in the injected script.
+3. **Single mcp-chrome call** (`chrome_inject_script`):
+
+   * Runs the **Smart Results Extractor** for pageType (WAD/VAX/Navitrip/generic).
+   * Returns **gzipped NDJSON** + small sample + telemetry (route, timing, endpoint).
+4. **Orchestrator post-processing (local):**
+
+   * Inflate gzip (no browser calls), validate sample rows, map to DTOs, persist to the trip.
+5. **(Optional)** For **detail pages** (amenities/policies prose), send URLs to a content reader (e.g., Jina Reader MCP) outside of the browser session.
+
+## Key Design Choices
+
+* **Bulk results** → NDJSON (stream-friendly, compresses 85–95%).
+* **Ad-hoc pages** → JSON array of **TravelFacts** (Flight/Hotel/Reservation/Event/Place/Generic).
+* **Adapters kept tiny** (30–80 lines each), routed by a shared runner with a common return type.
+* **Telemetry everywhere**: route used (`hydration|xhr|dom|jsonld|regex`), timing, endpoint/hydrationKey.
+
+## Directory Layout (suggested)
+
+```
+/docs
+  ARCHITECTURE.md
+  SCHEMAS.md
+  EXTRACTORS.md
+  WRAPPERS_AND_HELPERS.md
+  DESIGN_NOTES.md
+/src
+  extractors/
+    wad.ts
+    vax.ts
+    navitrip_cp.ts
+    generic_travel_parser.ts
+  wrappers/
+    extract-hotels.ts
+    hotel-extract-helper.ts
+    inflate.ts
+```
+
+---
+
+# `SCHEMAS.md`
+
+## Common Types (Results Pages → NDJSON rows)
+
+```ts
+export type HotelRow = {
+  id?: string;
+  name?: string;
+  brand?: string;
+  lat?: number;
+  lon?: number;
+  address?: string;
+  star_rating?: number | string;
+  review_score?: number | string;
+  price_text?: string;
+  currency?: string;
+  taxes_fees_text?: string;
+  cancel_text?: string;
+  refundable?: boolean;
+  package_type?: string;  // Air+Hotel, Hotel-only, etc.
+  image?: string;
+  detail_url?: string;
+};
+```
+
+### Post-map DTO (internal app)
+
+```ts
+export type HotelDTO = {
+  id: string;
+  name: string;
+  brand?: string;
+  lat?: number;
+  lon?: number;
+  address?: string;
+  starRating?: number;
+  reviewScore?: number;
+  priceText?: string;
+  currency?: string;
+  taxesFeesText?: string;
+  cancelText?: string;
+  refundable?: boolean;
+  packageType?: string;
+  image?: string;
+  detailUrl?: string;
+};
+```
+
+### Extractor Result Envelope (single tool call)
+
+```ts
+export type ExtractResult = {
+  ok: boolean;
+  pageType?: 'vax' | 'wad' | 'navitrip_cp' | 'generic';
+  route?: 'hydration' | 'xhr' | 'dom' | 'jsonld' | 'regex';
+  count?: number;
+  sample?: any[];               // up to 3–5 mapped rows
+  ndjson_gz_base64?: string;    // gzipped NDJSON of HotelRow
+  meta?: {
+    endpoint?: string;
+    hydrationKey?: string;
+    timing_ms?: number;
+    notes?: string[];
+  };
+  error?: string;
+};
+```
+
+## Generic Travel “Smart Extractor” (Ad-Hoc Pages → JSON array)
+
+### Fact Kinds
+
+```ts
+export type FactKind = 'flight' | 'hotel' | 'reservation' | 'event' | 'place' | 'generic';
+
+export type BaseFact = {
+  kind: FactKind;
+  confidence: number;  // 0..1
+  source: { route: 'jsonld'|'hydration'|'inlineJson'|'regex'; hints: string[]; selectors?: string[]; };
+  textSnippets?: string[];
+};
+```
+
+### Flight / Hotel / Reservation / Event / Place / Generic
+
+```ts
+export type FlightSegment = BaseFact & {
+  kind: 'flight';
+  airline?: string;         // e.g., DL
+  flightNumber?: string;    // e.g., DL123
+  depAirport?: string;      // IATA
+  arrAirport?: string;
+  depTime?: string;         // ISO
+  arrTime?: string;         // ISO
+  recordLocator?: string;   // PNR
+  passengerNames?: string[];
+  priceText?: string;
+};
+
+export type HotelStay = BaseFact & {
+  kind: 'hotel';
+  hotelName?: string;
+  address?: string;
+  checkIn?: string;         // ISO date
+  checkOut?: string;        // ISO date
+  confirmation?: string;
+  priceText?: string;
+  currency?: string;
+  phone?: string;
+  url?: string;
+};
+
+export type Reservation = BaseFact & {
+  kind: 'reservation';
+  supplier?: string;
+  confirmation?: string;
+  date?: string;
+  startTime?: string;
+  endTime?: string;
+  name?: string;            // e.g., “Cliffs of Moher Tour”
+  location?: string;
+  priceText?: string;
+};
+
+export type EventFact = BaseFact & {
+  kind: 'event';
+  name?: string;
+  start?: string;           // ISO dateTime
+  end?: string;
+  venue?: string;
+  address?: string;
+  url?: string;
+  priceText?: string;
+  isFree?: boolean;
+};
+
+export type PlaceFact = BaseFact & {
+  kind: 'place';
+  name?: string;
+  category?: string;
+  address?: string;
+  lat?: number;
+  lon?: number;
+  hours?: string;
+  url?: string;
+  phone?: string;
+};
+
+export type GenericNote = BaseFact & {
+  kind: 'generic';
+  title?: string;
+  body?: string;
+};
+
+export type TravelFacts = (FlightSegment | HotelStay | Reservation | EventFact | PlaceFact | GenericNote)[];
+```
+
+### Generic Parser Result
+
+```ts
+export type ParserResult = {
+  ok: boolean;
+  count?: number;
+  facts_gz_base64?: string;  // gzip(JSON.stringify(TravelFacts))
+  sample?: TravelFacts;
+  meta?: { timing_ms: number; route: string; hints: string[]; charBudget: number; };
+  error?: string;
+};
+```
+
+---
+
+# `EXTRACTORS.md`
+
+## Smart Results Extractor (single injection; auto-routes WAD/VAX/Navitrip)
+
+> Use this script body with `chrome_inject_script`, embedding `args` (see wrapper). It attempts **hydration → XHR → DOM** in a bias order per platform and returns **gzipped NDJSON** of `HotelRow`.
+
+```js
+// SMART RESULTS EXTRACTOR (for WAD/VAX/Navitrip/generic)
+(async (args) => {
+  const t0 = performance.now();
+  const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+  const MAX_ROWS = clamp(args?.maxRows ?? 5000, 100, 20000);
+  const notes = [];
+
+  // ---- First-glance classifier (skipped if pageTypeHint provided) ----
+  const classify = () => {
+    if (args?.pageTypeHint) return args.pageTypeHint;
+    const host = location.hostname.toLowerCase();
+    const title = (document.title || '').toLowerCase();
+    const textPeek = (document.querySelector('h1,h2,[role=heading]')?.textContent || '').toLowerCase();
+    const srcs = [...document.querySelectorAll('script[src],link[href]')].map(el => el.src || el.href).join(' ');
+    const htmlHead = document.documentElement.innerHTML.slice(0, 2e4);
+    const isVAX = /vacationaccess|vax/i.test(host) || /bookingservices|algv|funjet|mlt/i.test(srcs);
+    const isWAD = /worldagentdirect|delta/i.test(host) || /wad|world agent/i.test(title + textPeek);
+    const isNavCP = /navitrip|cpmaxx|cruiseplanners/i.test(host) || /__viewstate|aspnetform/i.test(htmlHead);
+    if (isWAD) return 'wad';
+    if (isVAX) return 'vax';
+    if (isNavCP) return 'navitrip_cp';
+    return 'generic';
+  };
+  const pageType = classify(); notes.push('pageType=' + pageType);
+
+  // ---- helpers ----
+  const addrJoin = (a) => {
+    if (!a) return undefined;
+    const parts = [a.full, a.line1, a.line2, a.city, a.region, a.postalCode, a.country].filter(Boolean);
+    return [...new Set(parts)].join(', ');
+  };
+  const mapRow = (r) => ({
+    id: r?.id || r?.hotelId || r?.propertyId || r?.code || r?.slug,
+    name: r?.name || r?.propertyName,
+    brand: r?.brand || r?.chain || r?.vendor,
+    lat: r?.geo?.lat ?? r?.latitude,
+    lon: r?.geo?.lng ?? r?.longitude,
+    address: addrJoin(r?.address) || [r?.address?.line1, r?.address?.city, r?.address?.country].filter(Boolean).join(', ') || r?.address,
+    star_rating: r?.starRating ?? r?.rating?.stars ?? r?.rating,
+    review_score: r?.review?.score ?? r?.reviewScore,
+    price_text: r?.price?.display || r?.price?.formatted || r?.lowestPrice?.display || r?.rate?.display || r?.price,
+    currency: r?.price?.currency || r?.currency,
+    taxes_fees_text: r?.fees?.display || r?.taxesAndFees || r?.price?.taxesAndFees,
+    cancel_text: r?.cancellationPolicy?.short || r?.cancellation?.summary || r?.refundability,
+    refundable: !!(r?.cancellationPolicy?.refundable ?? r?.refundable),
+    package_type: r?.packageType || r?.productType,
+    image: r?.images?.[0]?.url || r?.media?.[0]?.url,
+    detail_url: r?.url || r?.canonicalUrl || (r?.slug ? `/hotels/${r.slug}` : undefined)
+  });
+  const toNDJSON = (rows) => rows.map(o => JSON.stringify(o)).join('\n');
+  async function gzipBase64(str) {
+    const cs = new CompressionStream('gzip');
+    const writer = cs.writable.getWriter();
+    writer.write(new TextEncoder().encode(str));
+    await writer.close();
+    const gz = await new Response(cs.readable).arrayBuffer();
+    return btoa(String.fromCharCode(...new Uint8Array(gz)));
+  }
+
+  // ---- Strategy 1: hydration ----
+  const tryHydration = () => {
+    const keys = ['__INITIAL_STATE__','__PRELOADED_STATE__','__REDUX_STATE__','__NUXT__','__NEXT_DATA__','__APOLLO_STATE__'];
+    for (const k of keys) {
+      if (!(k in window)) continue;
+      let items = [];
+      try {
+        const w = window[k];
+        items = w?.props?.pageProps?.results ||
+                w?.search?.results?.hotels ||
+                w?.results?.hotels ||
+                w?.data?.search?.results || [];
+      } catch {}
+      if (Array.isArray(items) && items.length) {
+        notes.push('hydrationKey=' + k);
+        items = items.slice(0, MAX_ROWS);
+        return { route: 'hydration', rows: items.map(mapRow), meta: { hydrationKey: k } };
+      }
+    }
+    // inline <script type="application/json">
+    for (const s of document.querySelectorAll('script[type="application/json"]')) {
+      try {
+        const j = JSON.parse(s.textContent || '');
+        const items = j?.hotels || j?.properties || j?.results;
+        if (Array.isArray(items) && items.length) {
+          const rows = items.slice(0, MAX_ROWS).map(mapRow);
+          notes.push('hydration:inline');
+          return { route: 'hydration', rows, meta: { hydrationKey: 'inline' } };
+        }
+      } catch {}
+    }
+    return null;
+  };
+
+  // ---- Strategy 2: XHR ----
+  async function tryXHR() {
+    const urls = performance.getEntriesByType('resource')
+      .map(e => e.name)
+      .filter(u => /api|search|result|hotel|property|availability|booking|services|graphql|trams/i.test(u));
+    const uniq = [...new Set(urls)];
+    if (!uniq.length) return null;
+    const pick = (arr) =>
+      arr.find(u => new URL(u).origin === location.origin && /hotel|results|search/i.test(u)) ||
+      arr.find(u => /hotel|results|search/i.test(u)) || arr[0];
+    const endpoint = pick(uniq);
+    if (!endpoint) return null;
+    try {
+      const r = await fetch(endpoint, { credentials: 'include' });
+      const j = await r.json().catch(() => null);
+      if (!j) return null;
+      let items = j?.hotels || j?.properties || j?.results || j?.data?.hotels || j?.data?.search?.results || [];
+      if (!Array.isArray(items) || !items.length) return null;
+      items = items.slice(0, MAX_ROWS);
+      notes.push('xhr=' + endpoint);
+      return { route: 'xhr', rows: items.map(mapRow), meta: { endpoint } };
+    } catch { return null; }
+  }
+
+  // ---- Strategy 3: DOM ----
+  async function tryDOM() {
+    const sel = args?.domSelector || '.hotel-card,[data-result-id],[data-hotel-id],tr.result-row';
+    const cards = [...document.querySelectorAll(sel)];
+    if (!cards.length) return null;
+    const toRowDOM = el => ({
+      id: el.getAttribute('data-hotel-id') || el.getAttribute('data-result-id') || el.querySelector('[data-id]')?.getAttribute('data-id'),
+      name: el.querySelector('.hotel-name,[itemprop="name"]')?.textContent?.trim(),
+      price_text: el.querySelector('.price,.rate,[data-test="price"]')?.textContent?.trim(),
+      star_rating: el.querySelector('[data-stars]')?.getAttribute('data-stars') || el.querySelector('[aria-label*="star"]')?.ariaLabel,
+      address: el.querySelector('.address,[itemprop="address"]')?.textContent?.trim(),
+      detail_url: el.querySelector('a[href*="hotel"],a[href*="property"]')?.href,
+      image: el.querySelector('img')?.src
+    });
+    const n = Math.min(cards.length, MAX_ROWS);
+    const batch = 500, rows = [];
+    for (let i = 0; i < n; i += batch) {
+      rows.push(...cards.slice(i, i + batch).map(toRowDOM));
+      await new Promise(r => setTimeout(r, 0));
+    }
+    notes.push('dom=' + sel);
+    return { route: 'dom', rows, meta: { selector: sel } };
+  }
+
+  // ---- Bias routing per platform ----
+  let result = null;
+  if (pageType === 'vax') {
+    result = tryHydration() || await tryXHR() || await tryDOM();
+  } else if (pageType === 'wad' || pageType === 'navitrip_cp') {
+    result = await tryXHR() || tryHydration() || await tryDOM();
+  } else {
+    result = tryHydration() || await tryXHR() || await tryDOM();
+  }
+  if (!result) return { ok:false, pageType, error:'No results via hydration/xhr/dom', meta:{ notes } };
+
+  const ndjson = toNDJSON(result.rows);
+  const gz = await gzipBase64(ndjson);
+  const t1 = performance.now();
+  return {
+    ok: true,
+    pageType,
+    route: result.route,
+    count: result.rows.length,
+    sample: result.rows.slice(0, 3),
+    ndjson_gz_base64: gz,
+    meta: { ...result.meta, timing_ms: Math.round(t1 - t0), notes }
+  };
+})(/* args */)
+```
+
+## Generic Travel “Smart Extractor” (ad-hoc pages; single injection)
+
+> Use for invoices, emails, confirmations, markets, etc. Returns gzipped **TravelFacts** array + sample.
+
+```js
+// GENERIC TRAVEL CONTENT PARSER
+(async (args) => {
+  const t0 = performance.now();
+  const hint = (args?.hint || '').toLowerCase();
+  const maxChars = Math.max(50000, Math.min(args?.maxChars ?? 250000, 1000000));
+
+  const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+  const textOf = (el) => el?.textContent?.replace(/\s+/g,' ').trim() || '';
+  const toISODate = (s) => {
+    if (!s) return undefined;
+    const m =
+      s.match(/\b(\d{4})[-\/\.](\d{1,2})[-\/\.](\d{1,2})\b/) ||
+      s.match(/\b(\d{1,2})[\/\.](\d{1,2})[\/\.](\d{2,4})\b/) ||
+      s.match(/\b([A-Za-z]{3,9})\s+(\d{1,2}),?\s+(\d{4})\b/);
+    if (!m) return undefined;
+    try {
+      let dt;
+      if (m.length === 4 && isNaN(Number(m[1]))) dt = new Date(`${m[1]} ${m[2]} ${m[3]}`);
+      else if (m.length === 4 && Number(m[1]) > 1900) dt = new Date(`${m[1]}-${m[2]}-${m[3]}`);
+      else { const y = m[3].length === 2 ? '20'+m[3] : m[3]; dt = new Date(`${y}-${m[1]}-${m[2]}`); }
+      return isNaN(+dt) ? undefined : dt.toISOString();
+    } catch { return undefined; }
+  }
+  async function gzipBase64(json) {
+    const cs = new CompressionStream('gzip');
+    const w = cs.writable.getWriter();
+    w.write(new TextEncoder().encode(json));
+    await w.close();
+    const ab = await new Response(cs.readable).arrayBuffer();
+    return btoa(String.fromCharCode(...new Uint8Array(ab)));
+  }
+
+  // classify by hint
+  const prefer = Array.isArray(args?.preferKind) ? args.preferKind : [];
+  const guessKind = () => {
+    if (prefer.length) return prefer[0];
+    if (/\bflight|pnr|record locator|airline|segment\b/i.test(hint)) return 'flight';
+    if (/\bhotel|check[- ]?in|check[- ]?out|lodging|resort\b/i.test(hint)) return 'hotel';
+    if (/\bconfirm|reservation|booking\b/i.test(hint)) return 'reservation';
+    if (/\bevent|tour|ticket|museum|market|festival\b/i.test(hint)) return 'event';
+    if (/\baddress|location|place|poi|market\b/i.test(hint)) return 'place';
+    return 'generic';
+  };
+  const targetKind = guessKind();
+
+  // 1) JSON-LD
+  function extractJsonLd() {
+    const facts = [];
+    for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+      let j; try { j = JSON.parse(s.textContent || ''); } catch { continue; }
+      const arr = Array.isArray(j) ? j : [j];
+      for (const obj of arr) {
+        const type = (obj['@type'] || '').toString().toLowerCase();
+        if (/flightreservation|flight/.test(type) && (['flight','reservation','generic'].includes(targetKind))) {
+          facts.push({ kind:'flight', confidence:0.8,
+            airline: obj?.reservationFor?.airline?.iataCode || obj?.airline?.iataCode || obj?.reservationFor?.airline?.name,
+            flightNumber: obj?.reservationFor?.flightNumber || obj?.flightNumber,
+            depAirport: obj?.reservationFor?.departureAirport?.iataCode,
+            arrAirport: obj?.reservationFor?.arrivalAirport?.iataCode,
+            depTime: obj?.reservationFor?.departureTime, arrTime: obj?.reservationFor?.arrivalTime,
+            recordLocator: obj?.reservationNumber || obj?.reservationId,
+            source:{ route:'jsonld', hints:['FlightReservation'] }, textSnippets:[s.textContent?.slice(0,160)] });
+        }
+        if (/lodgingreservation|hotel|lodgingbusiness/.test(type) && (['hotel','reservation','generic'].includes(targetKind))) {
+          facts.push({ kind:'hotel', confidence:0.8,
+            hotelName: obj?.reservationFor?.name || obj?.name,
+            address: obj?.reservationFor?.address?.streetAddress || obj?.address?.streetAddress,
+            checkIn: obj?.checkinTime || obj?.checkInTime || obj?.checkinDate,
+            checkOut: obj?.checkoutTime || obj?.checkOutTime || obj?.checkoutDate,
+            confirmation: obj?.reservationNumber || obj?.reservationId,
+            priceText: obj?.price || obj?.totalPrice,
+            source:{ route:'jsonld', hints:[obj['@type']] }, textSnippets:[s.textContent?.slice(0,160)] });
+        }
+        if (/event/.test(type) && (['event','generic'].includes(targetKind))) {
+          facts.push({ kind:'event', confidence:0.7,
+            name: obj?.name, start: obj?.startDate, end: obj?.endDate,
+            venue: obj?.location?.name, address: obj?.location?.address?.streetAddress,
+            url: obj?.url, priceText: obj?.offers?.price,
+            isFree: obj?.offers?.price === 0,
+            source:{ route:'jsonld', hints:[obj['@type']] }, textSnippets:[s.textContent?.slice(0,160)] });
+        }
+        if (/place|touristattraction|localbusiness/.test(type) && (['place','generic','event'].includes(targetKind))) {
+          facts.push({ kind:'place', confidence:0.6,
+            name: obj?.name, category: obj['@type'], address: obj?.address?.streetAddress,
+            lat: obj?.geo?.latitude, lon: obj?.geo?.longitude, url: obj?.url, phone: obj?.telephone,
+            source:{ route:'jsonld', hints:[obj['@type']] }, textSnippets:[s.textContent?.slice(0,160)] });
+        }
+      }
+    }
+    return facts;
+  }
+
+  // 2) Inline JSON
+  function extractInlineJson() {
+    const facts = [];
+    const keep = (o) => JSON.stringify(o).match(/flight|hotel|reservation|check-?in|check-?out|pnr|record locator|event|tour|ticket|address|iata/i);
+    for (const s of document.querySelectorAll('script[type="application/json"]')) {
+      let j; try { j = JSON.parse(s.textContent || ''); } catch { continue; }
+      if (!keep(j)) continue;
+      const bag = [];
+      const pushArr = (a)=>Array.isArray(a)&&a.forEach(x=>bag.push(x));
+      pushArr(j?.hotels||j?.properties||j?.results||j?.items||j?.reservations||j?.events);
+      bag.filter(Boolean).forEach(r => {
+        const txt = JSON.stringify(r).toLowerCase();
+        if (/(flight|segment).*(number|iata)/.test(txt) && (['flight','generic'].includes(targetKind))) {
+          facts.push({ kind:'flight', confidence:0.6,
+            airline: r.airline?.code||r.airline||r.carrier, flightNumber: r.flightNumber || r.number,
+            depAirport: r.departure?.airport?.code||r.dep||r.depIata, arrAirport: r.arrival?.airport?.code||r.arr||r.arrIata,
+            depTime: r.departure?.time || r.depTime || r.departureDateTime, arrTime: r.arrival?.time || r.arrTime || r.arrivalDateTime,
+            recordLocator: r.pnr || r.recordLocator || r.confirmationNumber, priceText: r.price?.display || r.totalPrice,
+            source:{ route:'inlineJson', hints:['array candidates'] } });
+        }
+        if (/(hotel|lodging)/.test(txt) && (['hotel','generic'].includes(targetKind))) {
+          facts.push({ kind:'hotel', confidence:0.6,
+            hotelName: r.name || r.hotelName,
+            address: r.address?.full || [r.address?.line1,r.address?.city,r.address?.country].filter(Boolean).join(', '),
+            checkIn: r.checkIn || r.checkin, checkOut: r.checkOut || r.checkout,
+            confirmation: r.confirmation || r.confirmationNumber || r.recordLocator,
+            priceText: r.price?.display || r.total, currency: r.price?.currency || r.currency,
+            phone: r.phone, url: r.url, source:{ route:'inlineJson', hints:['hotel-ish'] } });
+        }
+        if (/(event|tour|ticket)/.test(txt) && (['event','reservation','generic'].includes(targetKind))) {
+          facts.push({ kind:'event', confidence:0.55,
+            name: r.name, start: r.start || r.startDate, end: r.end || r.endDate,
+            venue: r.venue?.name, address: r.venue?.address || r.address, url: r.url, priceText: r.price?.display || r.price,
+            source:{ route:'inlineJson', hints:['event-ish'] } });
+        }
+      });
+    }
+    return facts;
+  }
+
+  // 3) Visible text regex fallback
+  function extractRegex() {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let buf = '';
+    while (walker.nextNode()) {
+      const t = walker.currentNode.nodeValue || '';
+      if (t.trim()) buf += ' ' + t.replace(/\s+/g,' ');
+      if (buf.length > maxChars) break;
+    }
+    buf = buf.slice(0, maxChars);
+
+    const snippets = (re, take=1) => {
+      const out = []; let m; const R = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags+'g');
+      while ((m = R.exec(buf)) && out.length < take) out.push(buf.slice(Math.max(0, m.index-60), Math.min(buf.length, m.index+120)));
+      return out;
+    };
+
+    const facts = [];
+    const rePNR = /\b([A-Z0-9]{6})\b(?=(?:[^A-Za-z0-9]|$)).{0,40}?(?:PNR|Record Locator|Record|Locator|Confirmation)/i;
+    const reAirlineFN = /\b([A-Z]{2})\s?(\d{2,4})\b/;
+    const reIATA = /\b([A-Z]{3})\b/;
+    const reDate = /\b(?:\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4}|\d{1,2}[\/.]\d{1,2}[\/.]\d{2,4})\b/ig;
+    const reMoney = /(?:USD|\$|€|£)\s?\d{1,3}(?:[,\s]\d{3})*(?:\.\d{2})?/ig;
+    const reConf = /\b(?:Confirmation|Conf(?:\.)?|Booking|Reservation)\s*(?:#|No\.?|Number:?)\s*([A-Z0-9\-]{5,})\b/i;
+    const reHotel = /\b(?:Hotel|Resort|Inn|Suites|Lodge|Motel|Hostel)\b/i;
+    const reAddress = /\b\d{1,5}\s+[A-Za-z0-9\.\-'\s]+(?:St|Street|Ave|Avenue|Rd|Road|Blvd|Drive|Dr|Ln|Lane|Way|Trail|Ct|Court)\b.*\b[A-Za-z\s]+,\s*[A-Za-z\s]+\b/;
+    const reEventWords = /\b(farmers?|market|tour|museum|exhibit|festival|concert|show|guided|admission)\b/i;
+
+    const factsOut = [];
+
+    if (/flight|pnr|record locator|airline|segment/.test(hint)) {
+      const pnr = (buf.match(rePNR)||[])[1];
+      const afn = buf.match(reAirlineFN);
+      const dates = [...buf.matchAll(reDate)].slice(0,2).map(m=>toISODate(m[0])).filter(Boolean);
+      const ia = [...buf.matchAll(reIATA)].map(m=>m[1]).filter(code => /^[A-Z]{3}$/.test(code));
+      factsOut.push({
+        kind:'flight', confidence:0.55,
+        airline: afn?.[1], flightNumber: afn ? (afn[1]+afn[2]) : undefined,
+        depAirport: ia[0], arrAirport: ia[1],
+        depTime: dates[0], arrTime: dates[1],
+        recordLocator: pnr, priceText: (buf.match(reMoney)||[])[0],
+        source:{ route:'regex', hints:['PNR','Airline+FlightNo','Dates'] }, textSnippets: snippets(rePNR,1)
+      });
+    }
+    if (/hotel|check-?in|check-?out|lodging/.test(hint)) {
+      const name = (buf.match(reHotel)||[])[0];
+      const dates = [...buf.matchAll(reDate)].slice(0,2).map(m=>toISODate(m[0])).filter(Boolean);
+      const conf = (buf.match(reConf)||[])[1];
+      const price = (buf.match(reMoney)||[])[0];
+      const addr = (buf.match(reAddress)||[])[0];
+      factsOut.push({
+        kind:'hotel', confidence:0.5,
+        hotelName: name, checkIn: dates[0], checkOut: dates[1],
+        confirmation: conf, priceText: price, address: addr,
+        source:{ route:'regex', hints:['hotel word','dates','conf','price'] }, textSnippets: snippets(reConf,1)
+      });
+    }
+    if (reEventWords.test(hint) || reEventWords.test(buf)) {
+      const price = (buf.match(reMoney)||[])[0];
+      const date = [...buf.matchAll(reDate)].slice(0,1).map(m=>toISODate(m[0]))[0];
+      factsOut.push({
+        kind:'event', confidence:0.45,
+        name: textOf(document.querySelector('h1,h2')) || undefined,
+        start: date, priceText: price, isFree: !price,
+        source:{ route:'regex', hints:['event words','date','price'] }, textSnippets:[textOf(document.querySelector('h1,h2'))]
+      });
+    }
+    if (/place|address|poi|market/.test(hint)) {
+      const title = textOf(document.querySelector('h1,h2')) || document.title || '';
+      const addr = (buf.match(reAddress)||[])[0];
+      factsOut.push({ kind:'place', confidence:0.4, name: title, address: addr, source:{ route:'regex', hints:['title','address'] }, textSnippets:[addr || title] });
+    }
+    if (!factsOut.length) {
+      const title = textOf(document.querySelector('h1,h2')) || document.title || '';
+      const body = buf.slice(0, 600);
+      factsOut.push({ kind:'generic', confidence:0.3, title, body, source:{ route:'regex', hints:['generic fallback'] }, textSnippets:[body] });
+    }
+    return factsOut;
+  }
+
+  let facts = [];
+  let route = '';
+  try {
+    const j1 = extractJsonLd(); if (j1.length) { facts = j1; route = 'jsonld'; }
+    if (!facts.length) { const j2 = extractInlineJson(); if (j2.length) { facts = j2; route = 'inlineJson'; } }
+    if (!facts.length) { const j3 = extractRegex(); if (j3.length) { facts = j3; route = 'regex'; } }
+  } catch (e) { return { ok:false, error:String(e) }; }
+
+  facts = facts.map(f => ({ ...f, confidence: clamp((f.confidence||0.4) + (route==='jsonld'?0.15:route==='inlineJson'?0.05:0), 0, 0.99)}));
+  const sample = facts.slice(0, 5);
+  const gz = await gzipBase64(JSON.stringify(facts));
+  const t1 = performance.now();
+  return { ok: true, count: facts.length, facts_gz_base64: gz, sample, meta: { timing_ms: Math.round(t1 - t0), route, hints: [hint], charBudget: maxChars } };
+})(/* args */)
+```
+
+---
+
+# `WRAPPERS_AND_HELPERS.md`
+
+## Minimal Wrapper to Inject & Process (Results Pages)
+
+```ts
+// wrappers/extract-hotels.ts
+import { inflateValidateAndMap, ExtractResult } from './hotel-extract-helper';
+
+// Your mcp-chrome client
+export type McpChromeClient = {
+  callTool: (name: 'chrome_inject_script', args: { code: string }) => Promise<ExtractResult>;
+};
+
+// Paste the SMART EXTRACTOR source (from EXTRACTORS.md) here:
+const SMART_EXTRACTOR_SOURCE = `/* FULL async (args)=>{...} SCRIPT */`;
+
+function buildInjectedCode(args?: any) {
+  return `(${SMART_EXTRACTOR_SOURCE})(${JSON.stringify(args || {})});`;
+}
+
+export type RunArgs = {
+  pageTypeHint?: 'vax' | 'wad' | 'navitrip_cp' | 'generic';
+  maxRows?: number;
+  domSelector?: string;
+};
+
+export async function runExtractHotels(client: McpChromeClient, args?: RunArgs) {
+  const result = await client.callTool('chrome_inject_script', { code: buildInjectedCode(args) });
+  // local post-process (inflate gzip → map DTO → validate)
+  const processed = await inflateValidateAndMap(result, { maxLines: 200_000, validateSample: 64 });
+  return processed; // { ok, rows, sample, summary, pageType, route, meta, error? }
+}
+```
+
+## Helper: Inflate + Validate + Map (Results)
+
+```ts
+// wrappers/hotel-extract-helper.ts
+import type { HotelRow, HotelDTO, ExtractResult } from '../types';
+
+function base64ToUint8(b64: string): Uint8Array {
+  if (typeof Buffer !== 'undefined') return new Uint8Array(Buffer.from(b64, 'base64'));
+  const bin = atob(b64); const out = new Uint8Array(bin.length);
+  for (let i=0;i<bin.length;i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+async function gunzipToText(buf: Uint8Array): Promise<string> {
+  const hasDS = typeof (globalThis as any).DecompressionStream === 'function';
+  if (hasDS) {
+    const ds = new (globalThis as any).DecompressionStream('gzip');
+    const stream = new Response(new Blob([buf]).stream().pipeThrough(ds));
+    return await stream.text();
+  }
+  const zlib = await import('zlib');
+  return zlib.gunzipSync(Buffer.from(buf)).toString('utf8');
+}
+
+export function parseNDJSON(ndjson: string, maxLines = 200000): HotelRow[] {
+  const rows: HotelRow[] = []; let i=0;
+  for (const line of ndjson.split('\n')) {
+    if (!line) continue;
+    if (++i > maxLines) break;
+    try { rows.push(JSON.parse(line)); } catch {}
+  }
+  return rows;
+}
+
+export function mapToDTO(r: HotelRow): HotelDTO | null {
+  const id = (r.id ?? r.detail_url ?? '').toString().trim();
+  const name = (r.name ?? '').toString().trim();
+  if (!id || !name) return null;
+  const toNum = (v: any) => v==null ? undefined : (isFinite(+String(v).replace(/[^\d.-]/g,'')) ? +String(v).replace(/[^\d.-]/g,'') : undefined);
+  return {
+    id, name, brand: r.brand,
+    lat: typeof r.lat==='number'?r.lat:undefined,
+    lon: typeof r.lon==='number'?r.lon:undefined,
+    address: r.address,
+    starRating: toNum(r.star_rating),
+    reviewScore: toNum(r.review_score),
+    priceText: r.price_text,
+    currency: r.currency,
+    taxesFeesText: r.taxes_fees_text,
+    cancelText: r.cancel_text,
+    refundable: r.refundable ?? undefined,
+    packageType: r.package_type,
+    image: r.image,
+    detailUrl: r.detail_url,
+  };
+}
+
+export function validateRows(
+  rows: HotelDTO[], required: (keyof HotelDTO)[] = ['name','priceText','detailUrl'], sampleSize = 50
+) {
+  const total = rows.length; const sampled = Math.min(sampleSize, total);
+  if (!sampled) return { ok:false, total, sampled, passed:0, missingExamples:{} as Record<string,number> };
+  const idxs = new Set<number>(); while (idxs.size < sampled) idxs.add(Math.floor(Math.random() * total));
+  let passed = 0; const missing: Record<string,number> = {};
+  for (const i of idxs) {
+    const r = rows[i];
+    const ok = required.every(k => (r[k] ?? '').toString().trim().length > 0 || r[k] === true || r[k] === false);
+    if (ok) passed++; else required.forEach(k => { if ((r[k] ?? '').toString().trim().length === 0) missing[String(k)] = (missing[String(k)] ?? 0) + 1; });
+  }
+  return { ok: passed >= Math.ceil(sampled * 0.7), total, sampled, passed, missingExamples: missing };
+}
+
+export async function inflateValidateAndMap(
+  result: ExtractResult, limits = { maxLines: 200000, validateSample: 64 }
+) {
+  if (!result.ok) return { ok:false, rows:[], sample:[], summary:{ ok:false, total:0, sampled:0, passed:0, missingExamples:{} }, error: result.error, meta: result.meta, route: result.route, pageType: result.pageType };
+  if (!result.ndjson_gz_base64) {
+    const sample = (result.sample ?? []).map(mapToDTO).filter(Boolean) as HotelDTO[];
+    const summary = validateRows(sample, ['name','priceText','detailUrl'], Math.min(sample.length, limits.validateSample));
+    return { ok: sample.length>0, rows: sample, sample, summary, meta: result.meta, route: result.route, pageType: result.pageType };
+  }
+  const buf = base64ToUint8(result.ndjson_gz_base64);
+  const text = await gunzipToText(buf);
+  const raw = parseNDJSON(text, limits.maxLines);
+  const mapped = raw.map(mapToDTO).filter(Boolean) as HotelDTO[];
+  const summary = validateRows(mapped, ['name','priceText','detailUrl'], limits.validateSample);
+  return { ok: summary.ok, rows: mapped, sample: mapped.slice(0,5), summary, meta: result.meta, route: result.route, pageType: result.pageType };
+}
+```
+
+## Helper: Inflate Generic TravelFacts
+
+```ts
+// wrappers/inflate.ts
+export async function inflateBase64GzipJSON<T = unknown>(b64: string): Promise<T> {
+  const toU8 = (s: string) => {
+    if (typeof Buffer !== 'undefined') return new Uint8Array(Buffer.from(s, 'base64'));
+    const bin = atob(s); const u = new Uint8Array(bin.length);
+    for (let i=0;i<bin.length;i++) u[i] = bin.charCodeAt(i); return u;
+  };
+  const buf = toU8(b64);
+  const hasDS = typeof (globalThis as any).DecompressionStream === 'function';
+  if (hasDS) {
+    const ds = new (globalThis as any).DecompressionStream('gzip');
+    const res = new Response(new Blob([buf]).stream().pipeThrough(ds));
+    return await res.json();
+  } else {
+    const zlib = await import('zlib');
+    const text = zlib.gunzipSync(Buffer.from(buf)).toString('utf8');
+    return JSON.parse(text);
+  }
+}
+```
+
+## Usage Examples
+
+```ts
+// A) Results pages (WAD/VAX/Navitrip)
+import { runExtractHotels } from './wrappers/extract-hotels';
+const processed = await runExtractHotels(mcpChrome, { pageTypeHint: 'wad', maxRows: 8000 });
+if (processed.ok) {
+  // processed.rows → HotelDTO[]
+  saveHotelsToTrip(tripId, processed.rows);
+}
+
+// B) Generic page (invoice/email/tour/market)
+import { inflateBase64GzipJSON } from './wrappers/inflate';
+// Build injected code from GENERIC parser source, then:
+const result = await mcpChrome.callTool('chrome_inject_script', { code: buildInjectedCode(genericParserSource, { hint: userPromptText }) });
+const facts = await inflateBase64GzipJSON<TravelFacts>(result.facts_gz_base64!);
+saveFactsToTrip(tripId, facts);
+```
+
+---
+
+# `DESIGN_NOTES.md`
+
+## Single-Call Strategy
+
+* **Bundle detection + extraction** inside one injected script:
+
+  * If **explicit hint** (e.g., “Delta package results”) → pass `pageTypeHint:'wad'`.
+  * Else **auto-detect** using hostname/title/script sources and proceed.
+* Return both:
+
+  * **`ndjson_gz_base64`** for the full dataset (results pages), or **`facts_gz_base64`** (generic pages).
+  * A tiny **`sample`** for instant UI feedback without inflating.
+  * **`meta`** with `route`, `endpoint|hydrationKey`, `timing_ms` for logs.
+
+## Performance
+
+* Prefer **hydration**/**XHR** over DOM traversal.
+* DOM fallback in **batches** (400–500 nodes) to keep UI responsive and side-step memory spikes.
+* Cap with `maxRows`; allow caller to tune per platform (e.g., WAD 8k, VAX 5k).
+
+## Reliability
+
+* **Adapters tiny & isolated**; log the route and source so break/fix is trivial.
+* For **authenticated portals**, XHR within page context piggybacks cookies securely.
+* **No LLM** in extraction. Use Claude only to:
+
+  * Choose tool & pass hints,
+  * Summarize results,
+  * Ask user to confirm low-confidence facts.
+
+## Storage
+
+* **Results**: store normalized `HotelDTO` rows; compute dedupe keys (e.g., `geohash6 + normalizedName`).
+* **Generic Facts**: store raw `TravelFacts` plus `confidence` and provenance; promote to structured trip items (flight/hotel/tour) after user confirmation or additional enrichment.
+
+## Future Extensions
+
+* Add **site-specific enrichers** (currency/ISO parsing, taxes split, refundable tags).
+* Chunked returns for ultra-large pages (multiple gzip parts).
+* Detail page processing via content reader (e.g., Jina Reader MCP) for policy/amenities prose.
+
+---
+
+If you want, I can also generate these as real files (e.g., zipped) or wire up a tiny NPM package structure around them.
+

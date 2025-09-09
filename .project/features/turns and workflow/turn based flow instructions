@@ -1,0 +1,21 @@
+5) Basic “turn instructions” (orchestrator) for your POC
+
+Keep it simple—intents, then fallbacks:
+
+Intent tools (HTTP endpoints you own):
+
+trips.search_by_city_dates_budget → SQL template on Neon
+
+ingest.hotels, ingest.rooms → writes caches + materializes trip_facts
+
+facts.query → GIN/JSONPath limited search over trip_facts
+
+Claude prompt (your system) says:
+
+Prefer intent tools;
+
+else use facts.query;
+
+else respond with a short “capability gap” message.
+
+You can start with just /api/orchestrator/chat and stub the others with mock JSON to prove wiring.

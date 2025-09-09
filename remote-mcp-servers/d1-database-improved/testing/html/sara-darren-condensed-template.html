@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Proposal: Sara & Darren Jones 25th Anniversary - Bristol & Bath</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.4;
+            color: #333;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #ffffff;
+        }
+        
+        .proposal-container {
+            background: white;
+            border: 2px solid #2a5aa0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2a5aa0;
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .header h2 {
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+        
+        .trip-dates {
+            font-size: 0.9rem;
+            opacity: 0.95;
+        }
+        
+        .content { padding: 25px 20px; }
+        .section { margin-bottom: 25px; }
+        
+        .section h3 {
+            font-size: 1.2rem;
+            color: #2a5aa0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #e1e8ed;
+            padding-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .hotel-summary {
+            background: #f8f9fa;
+            border-left: 4px solid #2a5aa0;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+        
+        .hotel-summary h4 {
+            font-size: 1rem;
+            color: #1e3d6f;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .hotel-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .hotel-line strong {
+            color: #333;
+        }
+        
+        .price {
+            font-weight: 700;
+            color: #2a5aa0;
+        }
+        
+        .highlights {
+            background: #f0f8ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .highlights h4 {
+            color: #1e3d6f;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .highlights ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .highlights li {
+            margin-bottom: 5px;
+            padding-left: 15px;
+            position: relative;
+            font-size: 0.9rem;
+        }
+        
+        .highlights li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #2a5aa0;
+            font-weight: bold;
+        }
+        
+        .cost-summary {
+            background: #2a5aa0;
+            color: white;
+            padding: 20px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .cost-summary h3 {
+            color: white;
+            border: none;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .cost-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .cost-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .cost-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 3px;
+        }
+        
+        .cost-amount {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .total-line {
+            border-top: 1px solid rgba(255,255,255,0.3);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        
+        .total-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+        
+        .quick-facts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .fact-box {
+            background: #e8f4f8;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            border-left: 3px solid #2a5aa0;
+        }
+        
+        .fact-number {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2a5aa0;
+        }
+        
+        .fact-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #e1e8ed;
+            text-align: center;
+            color: #666;
+            font-size: 0.8rem;
+        }
+        
+        .footer strong {
+            color: #2a5aa0;
+        }
+        
+        @media print {
+            .proposal-container { border: 1px solid #ccc; }
+        }
+        
+        @media (max-width: 600px) {
+            .cost-grid { grid-template-columns: 1fr; }
+            .quick-facts { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="proposal-container">
+        <header class="header">
+            <h1>25th Anniversary Travel Proposal</h1>
+            <h2>Bristol & Bath, England</h2>
+            <div class="trip-dates">Oct 5-15, 2025 | 10 Days | 2 Guests</div>
+        </header>
+        
+        <main class="content">
+            <div class="quick-facts">
+                <div class="fact-box">
+                    <div class="fact-number">10</div>
+                    <div class="fact-label">Days</div>
+                </div>
+                <div class="fact-box">
+                    <div class="fact-number">2</div>
+                    <div class="fact-label">Cities</div>
+                </div>
+                <div class="fact-box">
+                    <div class="fact-number">5★</div>
+                    <div class="fact-label">Hotels</div>
+                </div>
+                <div class="fact-box">
+                    <div class="fact-number">25th</div>
+                    <div class="fact-label">Anniversary</div>
+                </div>
+            </div>
+            
+            <section class="section">
+                <h3>Accommodation</h3>
+                
+                <div class="hotel-summary">
+                    <h4>Bristol Harbour Hotel & Spa (Oct 5-10)</h4>
+                    <div class="hotel-line">
+                        <span><strong>Room:</strong> Harbour View Suite</span>
+                        <span class="price">£245/night</span>
+                    </div>
+                    <div class="hotel-line">
+                        <span><strong>Total:</strong> 5 nights</span>
+                        <span class="price">£1,225</span>
+                    </div>
+                </div>
+                
+                <div class="hotel-summary">
+                    <h4>The Royal Crescent Hotel & Spa (Oct 10-15)</h4>
+                    <div class="hotel-line">
+                        <span><strong>Room:</strong> Garden Suite</span>
+                        <span class="price">£395/night</span>
+                    </div>
+                    <div class="hotel-line">
+                        <span><strong>Total:</strong> 5 nights</span>
+                        <span class="price">£1,975</span>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="highlights">
+                <h4>🎉 Anniversary Package Includes:</h4>
+                <ul>
+                    <li>5-star harbour and Georgian hotel stays</li>
+                    <li>Daily breakfast and £100 dining credit</li>
+                    <li>Couples spa treatments at both hotels</li>
+                    <li>Private Bristol and Bath city tours</li>
+                    <li>Roman Baths and Thermae Bath Spa access</li>
+                    <li>Anniversary dinner with harbour views</li>
+                    <li>Complimentary room upgrades (subject to availability)</li>
+                </ul>
+            </div>
+            
+            <section class="section">
+                <h3>Investment</h3>
+                
+                <div class="cost-summary">
+                    <h3>Package Total</h3>
+                    
+                    <div class="cost-grid">
+                        <div class="cost-item">
+                            <div class="cost-label">Accommodation</div>
+                            <div class="cost-amount">£3,200</div>
+                        </div>
+                        <div class="cost-item">
+                            <div class="cost-label">Experiences</div>
+                            <div class="cost-amount">£835</div>
+                        </div>
+                    </div>
+                    
+                    <div class="total-line">
+                        <div>Complete 25th Anniversary Celebration</div>
+                        <div class="total-amount">£4,035</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px;">
+                            For 2 guests | All major expenses included
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="footer">
+            <strong>VoygentCE Travel</strong> | Template: Condensed (Executive Summary)<br>
+            Proposal ID: 26 | For: Sara & Darren Jones (sara.jones@email.com)<br>
+            Generated: Sept 8, 2025 | Valid for 14 days
+        </footer>
+    </div>
+</body>
+</html>

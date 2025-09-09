@@ -1,0 +1,50 @@
+										<div class="item-container">
+							<div class="box item" data-page-num="1" data-id="544385" data-product-code="14788P1">
+								<div class="row compare">
+									<div class="col-md-6 commences">compare</div>
+									<div class="col-md-6 text-right"><input type="checkbox" class="inline-checkbox arc-checkbox" data-checkbox-id="544385"></div>
+								</div>
+								<div class="prod-image" style="background-image:url('https://media-cdn.tripadvisor.com/media/attractions-splice-spp-200x200/11/86/7d/c7.jpg')"></div>
+								<div class="below">
+									<div class="title">Discovery Point Kayak Tour</div>
+									<div class="stars"><i class="adzicon-star fas fa-fw fa-star fa-2x"></i><i class="adzicon-star fas fa-fw fa-star fa-2x"></i><i class="adzicon-star fas fa-fw fa-star fa-2x"></i><i class="adzicon-star fas fa-fw fa-star fa-2x"></i><i class="adzicon-star fas fa-fw fa-star fa-2x"></i></div>
+									<div class="commences">Seattle</div>
+									<div class="commences">3 hours 30 minutes</div>
+									<div class="commences">14788P1</div>
+									<div>
+										<a href="#" class="bucket-addto" data-item-type="viator" data-item-id="14788P1" data-item-description="Discovery Point Kayak Tour" data-item-image="https://media-cdn.tripadvisor.com/media/attractions-splice-spp-200x200/11/86/7d/c7.jpg" data-supplier-name="Viator" data-original-title="" title=""><i class="adzicon-bucket fab fa-fw fa-bitbucket"></i>&nbsp;Add to Bucket</a>									</div>
+																			<div class="from">From</div>
+										<div class="price">USD $155.00</div>
+																		<div class="view-button">
+										<button class="btn btn-primary btn-block">
+											View Details
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+											<div class="item-container">
+							<div class="box item" data-page-num="1" data-id="283357" data-product-code="14788P4">
+								<div class="row compare">
+									<div class="col-md-6 commences">compare</div>
+									<div class="col-md-6 text-right"><input type="checkbox" class="inline-checkbox arc-checkbox" data-checkbox-id="283357"></div>
+								</div>
+								<div class="prod-image" style="background-image:url('https://media-cdn.tripadvisor.com/media/attractions-splice-spp-200x200/11/89/26/f5.jpg')"></div>
+								<div class="below">
+									<div class="title">2 Hour Sound Tour</div>
+									<div class="stars"><i class="adzicon-star fas fa-fw fa-star fa-2x"></i><i class="adzicon-star fas fa-fw fa-star fa-2x"></i><i class="adzicon-star fas fa-fw fa-star fa-2x"></i><i class="adzicon-star fas fa-fw fa-star fa-2x"></i><i class="adzicon-star fas fa-fw fa-star fa-2x"></i></div>
+									<div class="commences">Seattle</div>
+									<div class="commences">2 hours</div>
+									<div class="commences">14788P4</div>
+									<div>
+										<a href="#" class="bucket-addto" data-item-type="viator" data-item-id="14788P4" data-item-description="2 Hour Sound Tour" data-item-image="https://media-cdn.tripadvisor.com/media/attractions-splice-spp-200x200/11/89/26/f5.jpg" data-supplier-name="Viator" data-original-title="" title=""><i class="adzicon-bucket fab fa-fw fa-bitbucket"></i>&nbsp;Add to Bucket</a>									</div>
+																			<div class="from">From</div>
+										<div class="price">USD $118.00</div>
+																		<div class="view-button">
+										<button class="btn btn-primary btn-block">
+											View Details
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>

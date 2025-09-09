@@ -1,0 +1,221 @@
+Great target. For **Delta Vacations / WorldAgent Direct (WAD)**, treat big hotel-result pages as **apps with a hidden JSON feed**, not documents. Because WAD is login-gated, you’ll run these **inside your logged-in browser** via `mcp-chrome`. Public references just to anchor context: WAD is the Delta Vacations trade portal at **worldagentdirect.com** (Delta’s agent tooling points there; many vendors still reference the `/trams` endpoint) ([worldagentdirect.com][1], [trestechnologieshelp.zendesk.com][2]).
+
+Below is a concrete, drop-in playbook I’ve used on similar portals that’ll work well for WAD.
+
+---
+
+# 0) What to expect from WAD
+
+* Historically a legacy app (Northwest era) that’s been modernized; parts may now be SPA-like while others still render server-side. So you may see **hydration blobs** on `window` *or* **XHR/GraphQL** calls feeding the card grid. ([David DeMumbrum][3])
+* URLs often include `/trams` for Live Connect/booking handoff (ClientBase docs still reference it). That’s useful when identifying API base paths. ([trestechnologieshelp.zendesk.com][2])
+
+---
+
+# 1) First: grab the structured payload (JSON) instead of the 50k-line HTML
+
+Run this **once** on a hotel search results page via `mcp-chrome.evaluate`:
+
+```js
+(() => {
+  const hits = {};
+
+  // A) Common SPA hydration globals
+  for (const k of [
+    '__NEXT_DATA__','__APOLLO_STATE__','__NUXT__','__INITIAL_STATE__',
+    '__PRELOADED_STATE__','__REDUX_STATE__','__WAD_STATE__','__DATA__'
+  ]) {
+    if (k in window) {
+      try { hits[k] = JSON.parse(JSON.stringify(window[k])); } catch {}
+    }
+  }
+
+  // B) Inline JSON blobs (includes JSON-LD)
+  hits.inline = [];
+  for (const s of document.querySelectorAll('script[type="application/json"],script[type="application/ld+json"]')) {
+    const t = s.textContent?.trim();
+    if (!t) continue;
+    try {
+      const j = JSON.parse(t);
+      // keep only promising shapes
+      if (JSON.stringify(j).match(/hotel|property|room|rate|offer|amenit|cancell|price/i)) {
+        hits.inline.push(j);
+      }
+    } catch {}
+  }
+
+  // C) Network calls used to render (API, search, graphql)
+  const apiish = performance.getEntriesByType('resource')
+    .filter(e => /api|search|graphql|results|hotel|rate|property|trams/i.test(e.name))
+    .map(e => e.name);
+  hits.network = [...new Set(apiish)];
+
+  // D) small preview only (avoid shipping megabytes)
+  const preview = {};
+  for (const [k,v] of Object.entries(hits)) {
+    preview[k] = Array.isArray(v) ? v.slice(0,3) : (typeof v === 'object' ? Object.keys(v) : v);
+  }
+  return { found: Object.keys(hits), preview, hasNext: !!hits.__NEXT_DATA__, networkCount: hits.network?.length ?? 0 };
+})();
+```
+
+* If you see keys like `results`, `hotels`, `properties`, `entitiesById`, or GraphQL `edges/node`, **that’s your mother-lode**: extract **only the fields you need** and export **NDJSON**.
+
+---
+
+# 2) Distill to NDJSON (cheap + streamable)
+
+Once you locate where WAD puts the results (adjust the `items` path below):
+
+```js
+(() => {
+  // Example paths to try, comment/uncomment as needed
+  const candidates = [
+    // Next.js style
+    () => window.__NEXT_DATA__?.props?.pageProps?.results,
+    // Redux/APOLLO style
+    () => window.__APOLLO_STATE__?.ROOT_QUERY?.searchResults?.items,
+    // Inline script JSON (pick the largest with 'hotels' key)
+    () => (window.__INLINE_CACHE__ ||= (Array.from(document.querySelectorAll('script[type="application/json"]'))
+      .map(s=>{try{return JSON.parse(s.textContent)}catch{};})
+      .filter(Boolean))).find(o => o?.hotels || o?.results)?.hotels || []
+  ];
+
+  let items = [];
+  for (const f of candidates) {
+    try { const v = f(); if (Array.isArray(v) && v.length) { items = v; break; } } catch {}
+  }
+  if (!items.length) return { ok:false, msg:'No items found in common hydration spots' };
+
+  const out = [];
+  for (const r of items) {
+    out.push({
+      id: r.id || r.hotelId || r.propertyId || r.slug,
+      name: r.name,
+      brand: r.brand || r.chain,
+      lat: r.geo?.lat ?? r.latitude,
+      lon: r.geo?.lng ?? r.longitude,
+      address: r.address?.full || [r.address?.line1, r.address?.city, r.address?.country].filter(Boolean).join(', '),
+      star_rating: r.starRating ?? r.rating,
+      review_score: r.reviewScore ?? r.review?.score,
+      // WAD specifics you likely care about:
+      price_text: r.price?.display || r.rate?.display || r.lowestPrice?.display || r.price,
+      currency: r.price?.currency || r.currency,
+      taxes_fees_text: r.fees?.display || r.taxesAndFees || r.price?.taxesAndFees,
+      cancel_text: r.cancellationPolicy?.short || r.cancellation?.summary,
+      refundable: !!(r.cancellationPolicy?.refundable ?? r.refundable),
+      package_type: r.packageType || r.productType, // e.g., Air+Hotel vs Hotel-only
+      image: r.images?.[0]?.url || r.media?.[0]?.url,
+      detail_url: r.url || r.canonicalUrl || (r.slug ? `/hotels/${r.slug}` : undefined)
+    });
+  }
+  return {
+    ok: true,
+    count: out.length,
+    sample: out.slice(0, 3),
+    ndjson: out.map(o => JSON.stringify(o)).join('\n')
+  };
+})();
+```
+
+If nothing is found in hydration:
+
+**Follow the network crumbs** discovered in step 1C:
+
+```js
+(async () => {
+  const urls = performance.getEntriesByType('resource')
+    .map(e => e.name)
+    .filter(u => /api|search|graphql|results|hotel|rate|property|trams/i.test(u));
+  const uniq = [...new Set(urls)];
+  for (const url of uniq.slice(0,15)) {
+    try {
+      const r = await fetch(url, { credentials: 'include' });
+      const json = await r.json().catch(() => null);
+      if (!json) continue;
+      // TODO: inspect shape and map to your schema
+      // Return a quick peek so your orchestrator can decide which endpoint to mine
+      return { candidateEndpoint: url, topKeys: Object.keys(json).slice(0,20) };
+    } catch {}
+  }
+  return { ok:false, msg:'No JSON endpoints readable from page context' };
+})();
+```
+
+> Why this works: You’re piggybacking **your authenticated session** (cookies) from inside the page context, which is aligned with normal use—no separate headless scraper needed. (Delta’s official agent tooling is split between **pro.delta.com** and **worldagentdirect.com**, but WAD is the booking portal) ([Delta Professional][4], [worldagentdirect.com][1]).
+
+---
+
+# 3) When you must read the DOM: do it in fast, safe **batches**
+
+If WAD renders server-side tables/lists, use a selector pass that avoids full `innerText` of the page:
+
+```js
+(async () => {
+  const selCard = '.hotel-card,[data-result-id],[data-hotel-id],tr.result-row';
+  const toRow = el => ({
+    id: el.getAttribute('data-result-id') || el.getAttribute('data-hotel-id') || el.querySelector('[data-id]')?.getAttribute('data-id'),
+    name: el.querySelector('.hotel-name,[itemprop="name"]')?.textContent?.trim(),
+    price_text: el.querySelector('.price,.rate,[data-test="price"]')?.textContent?.trim(),
+    star_rating: el.querySelector('[data-stars]')?.getAttribute('data-stars') ||
+                 el.querySelector('[aria-label*="stars"]')?.ariaLabel,
+    address: el.querySelector('.address,[itemprop="address"]')?.textContent?.trim(),
+    detail_url: el.querySelector('a[href*="/hotel"], a[href*="Hotel"], a[href*="Property"]')?.href,
+    image: el.querySelector('img')?.src,
+    cancel_text: el.querySelector('[data-test*="cancel"], .cancellation')?.textContent?.trim()
+  });
+
+  const cards = [...document.querySelectorAll(selCard)];
+  const batch = 400;
+  const chunks = [];
+  for (let i=0;i<cards.length;i+=batch) {
+    const slice = cards.slice(i, i+batch).map(toRow);
+    chunks.push(slice.map(x=>JSON.stringify(x)).join('\n'));
+    await new Promise(r => setTimeout(r,0)); // yield
+  }
+  return { batches: chunks.length, total: cards.length, ndjson: chunks.join('\n') };
+})();
+```
+
+---
+
+# 4) Normalize + enrich downstream (minimal LLM)
+
+* **Schema** (per property):
+  `id, name, brand, lat, lon, address, star_rating, review_score, price_text, currency, taxes_fees_text, refundable, cancel_text, package_type, image, detail_url`
+* **Deterministic parsing (no LLM):**
+
+  * Price: regex for currency symbol/ISO; split **base vs taxes/fees** when available.
+  * Refundability tag from `cancel_text` keywords (Refundable / Non-Refundable / Partial).
+* **Distance to POIs**: compute Haversine to airport/city center.
+* **Deduping**: `geohash(precision=6) + normalized name` to coalesce near-dupes across suppliers.
+
+---
+
+# 5) Detail pages → **Jina Reader** shines
+
+For hotel **detail** pages (amenities, policy prose, room descriptions), pipe the URL through **Jina Reader (MCP)** to get clean Markdown and run a **small, schema-guided** extractor. WAD/WAD-linked public pages (marketing, policies, etc.) cleanly distill with Reader; reserve mcp-chrome for pages that require your session. ([Delta Professional][5])
+
+---
+
+# 6) Pragmatics, ToS, and resilience
+
+* Stay within your **normal agent session** (no bypassing access controls). You’re just reading what your browser already loaded.
+* Add a **validator**: if fewer than N fields present, fallback (Hydration → XHR → DOM).
+* Version your **per-site adapters** (20–50 lines each). Log which route produced data (`hydration:__APOLLO_STATE__`, `xhr:/api/hotels/search`, `dom:.hotel-card v2`) so when WAD changes, you know exactly what broke.
+* Cache NDJSON by **search signature** (destination, dates, pax, filters) + **content hash** of the payload to avoid re-work.
+
+---
+
+## TL;DR routing
+
+* **Results page** (thousands of properties): **JSON first** (hydration or XHR). Only if missing → **batched DOM**.
+* **Property detail page**: **Jina Reader** (URL→Markdown) → tiny extractor.
+
+If you want, paste me the **network URL patterns** you see in `performance.getEntriesByType('resource')` on a WAD search page (or a redacted snippet of any JSON you find), and I’ll map the exact keys to a clean NDJSON schema for your app.
+
+[1]: https://www.worldagentdirect.com/?utm_source=chatgpt.com "WorldAgent Direct - Travel Agent Tools & Resources"
+[2]: https://trestechnologieshelp.zendesk.com/hc/en-us/articles/4405056921107-Delta-Vacations?utm_source=chatgpt.com "Delta Vacations"
+[3]: https://www.demumbrum.com/delta-vacations-worldagent-direct-redesign.html?utm_source=chatgpt.com "Delta Vacations WorldAgent Direct Redesign"
+[4]: https://pro.delta.com/content/agency/us/en/home.html?utm_source=chatgpt.com "Home - Delta Professional Travel Agency Site"
+[5]: https://pro.delta.com/content/agency/us/en/products-and-services/other-programs-services/delta-vacations-.html?utm_source=chatgpt.com "Delta Vacations®"
+

@@ -1,0 +1,145 @@
+li id="_f2" class="componentContainer clear">
+    
+            
+            <table class="avail-grid-table">
+                
+                
+                <tr class="room-repeater-visibility">        
+                    <td class="hotel-avail-col-1" colspan="3">
+                        <div class="hotel-info-wrapper"> 
+                        
+                            <h2>
+                                
+                                    <button class="view-all-room-types link" type="button" onclick="$('#availWaitIndicator').show(); $.ajax({type: 'GET', url:'HotelAvail.aspx?itin=1&cmpt=H&start=3&length=1&itemids=-2051090175|H|1|1|0&uid=3', cache: false}).done(function (html) {$('#_f2').html($(html).find('#_rep2').html().trim()); $('#availWaitIndicator').hide();$('#_f2').find('button.view-all-room-types')[0].focus();});">
+                                        <i class="fa fa-plus-circle"></i>
+                                        <span class="aria-only">View All Room Options</span>
+                                    </button>
+                                
+
+                                <a href="javascript:;" onclick="javascript:showModal('','modalPopup',1,-1,WebForm_GetScrollY() + 20,'/HotelInformation/Default.aspx?VendorCode=APV&amp;RemoteSourceCode=PegasusHotel&amp;DestinationCode=SEA&amp;HotelId=WI%3bWASHI&amp;Item=PD94bWwgdmVyc2lvbj0iMS4wIj8%2bDQo8U2VyaWFsaXplZERhdGEgeG1sbnM6eHNkPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSIgeG1sbnM6eHNpPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZSI%2bDQogIDxEYXRhPi0yMDUxMDkwMTc1fEh8MXwxfDA8L0RhdGE%2bDQo8L1NlcmlhbGl6ZWREYXRhPg%3d%3d&amp;Itin=1&amp;StartPos=1&amp;SortDir=Ascending&amp;SortType=PrefAvail&amp;EnablePricing=True',695,550);">The Westin Seattle</a>
+                            </h2>                          
+                        
+                        <div class="hotel-rating-info">
+                            
+                               <!-- do not reformat code on line below - correct display of hotel ratings depends on it -->
+                               <button class="hotel-rating-btn" type="button" onclick="javascript:showModal('modalHotelRating', 'modalPopup', 3, -1, -1, '',-1,-1);" ><span class="aria-only">Hotel Rating 4 en-US-HotelRatingOutOfText 5</span><img src="https://trisept.widen.net/content/1pinuj3mzp/gif/TRI_IMG_WEBSITE_spacer.gif" class="rating_ST" alt="" aria-hidden="true" /><img src="https://trisept.widen.net/content/1pinuj3mzp/gif/TRI_IMG_WEBSITE_spacer.gif" class="rating_ST" alt="" aria-hidden="true" /><img src="https://trisept.widen.net/content/1pinuj3mzp/gif/TRI_IMG_WEBSITE_spacer.gif" class="rating_ST" alt="" aria-hidden="true" /><img src="https://trisept.widen.net/content/1pinuj3mzp/gif/TRI_IMG_WEBSITE_spacer.gif" class="rating_ST" alt="" aria-hidden="true" /><img src="https://trisept.widen.net/content/1pinuj3mzp/gif/TRI_IMG_WEBSITE_spacer.gif" class="rating_ST_empty" alt="" aria-hidden="true" /></button>
+                             
+                        
+                            <div class="trip-advisory-wrap">
+                                
+    <img class="trip-advisor-image" src="https://trisept.widen.net/content/qb1parj93t/svg/TRI_LOGO_ANCILLARY_4.0-59905-5.svg" alt="4.1 of 5 stars" title="" />    
+    <span class="trip-advisor-label">TripAdvisor Traveler Rating</span>
+    
+        <a href="javascript:;" onclick="javascript:showModal('','modalPopup',1,-1,WebForm_GetScrollY() + 20,'/HotelInformation/Default.aspx?VendorCode=APV&amp;RemoteSourceCode=PegasusHotel&amp;DestinationCode=SEA&amp;HotelId=WI%3bWASHI&amp;Item=PD94bWwgdmVyc2lvbj0iMS4wIj8%2bDQo8U2VyaWFsaXplZERhdGEgeG1sbnM6eHNkPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSIgeG1sbnM6eHNpPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZSI%2bDQogIDxEYXRhPi0yMDUxMDkwMTc1fEh8MXwxfDA8L0RhdGE%2bDQo8L1NlcmlhbGl6ZWREYXRhPg%3d%3d&amp;Itin=1&amp;StartPos=1&amp;SortType=PrefAvail&amp;SortDir=Ascending&amp;EnablePricing=True&amp;tab=TA',695,550);">Based on 4324 reviews</a>
+    
+                            </div>
+                        
+                        </div>
+                        <div class="hotel-location-info">
+                            Seattle,&#160;WA
+                                    <span class="pipe"> | </span>
+                                
+                                <strong>11.40 miles </strong> from&#160;airport&nbsp;(SEA)
+                                <a href="javascript:;" onclick="javascript:showModal('','modalPopup',1,-1,WebForm_GetScrollY() + 100,'../DetailedInformation/Hotel/HotelMapVE.aspx?VendorCode=APV&amp;RemoteSourceCode=PegasusHotel&amp;DestinationCode=SEA&amp;HotelId=WI;WASHI&amp;Item=PD94bWwgdmVyc2lvbj0iMS4wIj8%2bDQo8U2VyaWFsaXplZERhdGEgeG1sbnM6eHNkPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSIgeG1sbnM6eHNpPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZSI%2bDQogIDxEYXRhPi0yMDUxMDkwMTc1fEh8MXwxfDA8L0RhdGE%2bDQo8L1NlcmlhbGl6ZWREYXRhPg%3d%3d&amp;Itin=1&amp;StartPos=3&amp;SortDir=Ascending&amp;SortType=PrefAvail',900,590);" style="display:none">Map</a>
+                            
+                            
+                            <ul id="_f2_landmarks" class="distance-from-list"></ul>
+                        </div>
+                        </div>
+                        
+    <button type="button" class="link cleaning-badge" onclick="parent.showModal('','modalPopup',1,-1,parent.WebForm_GetScrollY() + 100,'https://new.www.vaxvacationaccess.com/CleaningVerificationDetails.aspx?program=LX&itin=1',500,200);">
+        <img src="https://trisept.widen.net/content/itubjcmgpr/png/Badge_LX.png" alt="Luxe by ALG Vacations® badge" />
+    </button>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="hotel-room-col-1 mobile-full-col">
+                        
+                            <div id="rtn2_0" class="hotel-avail-room-type-wrap">
+                                <a href="javascript:;" onclick="javascript:showModal('','modalPopup',1,-1,WebForm_GetScrollY() + 20,'/HotelInformation/Default.aspx?tab=R&amp;room=DUOC&amp;VendorCode=APV&amp;RemoteSourceCode=PegasusHotel&amp;DestinationCode=SEA&amp;HotelId=WI%3bWASHI&amp;Item=PD94bWwgdmVyc2lvbj0iMS4wIj8%2bDQo8U2VyaWFsaXplZERhdGEgeG1sbnM6eHNkPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSIgeG1sbnM6eHNpPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZSI%2bDQogIDxEYXRhPi0yMDUxMDkwMTc1fEh8MXwxfDA8L0RhdGE%2bDQo8L1NlcmlhbGl6ZWREYXRhPg%3d%3d&amp;Itin=1&amp;StartPos=3&amp;SortDir=Ascending&amp;SortType=PrefAvail&amp;EnablePricing=True',695,550);">Guest Room, 1 King, Sofa bed, 325sqft&#47;29sqm, Li ving&#47;sitting area, Wireless internet, for a fee , Wired internet, for a fee, Coffee&#47;tea maker</a>&#160;
+                                
+                                <button type="button" class="hotel-avail-calendar is-empty" onclick="javascript:showModal('','modalPopup',3,-1,-1,'HotelAltAvail.aspx?itin=1&amp;itemid=-2051090175%7cH%7c1%7c1%7c0&amp;hotelname=The+Westin+Seattle&amp;hoteldesc=Guest+Room%2c+1+King%2c+Sofa+bed%2c+325sqft%2f29sqm%2c+Li+ving%2fsitting+area%2c+Wireless+internet%2c+for+a+fee+%2c+Wired+internet%2c+for+a+fee%2c+Coffee%2ftea+maker&amp;hotelid=WI%3bWASHI&amp;plancode=DUOC',320, 465);"></button>                                                  
+                            </div>
+                            
+                        
+                        
+                    </td>
+                    <td class="hotel-room-col-2 mobile-full-col is-empty">
+                        <!-- do not format markup in below repeater -->
+                        <ul class="value-indicator"><li><img src="https://trisept.widen.net/content/aqtyvm0vvk/gif/TRI_IMG_WEBSITE_REZ_gold.gif" alt="" /><span id="2_0_0_ValueTooltipTrigger" title="" class="tooltip" tabindex="0">Full Commission</span><div id="2_0_0_ValueTooltip" style="display:none;">  Hotel qualifies for full commission.&#13;&#10;</div><script type="text/javascript">CreateTooltip('2_0_0_ValueTooltipTrigger', '2_0_0_ValueTooltip');</script></li><li><img src="https://trisept.widen.net/content/smfggxulas/gif/TRI_IMG_WEBSITE_REZ_silver.gif" alt="" /><span id="2_0_1_ValueTooltipTrigger" title="" class="tooltip" tabindex="0">Luxe by ALG Vacations</span><div id="2_0_1_ValueTooltip" style="display:none;">  Book this hotel for exclusive access to our Luxury Concierge Desk which provides extra services for your high-end clients.&#160; See hotel profile for any special luxury extras.</div><script type="text/javascript">CreateTooltip('2_0_1_ValueTooltipTrigger', '2_0_1_ValueTooltip');</script></li><li><img src="https://trisept.widen.net/content/aqtyvm0vvk/gif/TRI_IMG_WEBSITE_REZ_gold.gif" alt="" /><span id="2_0_2_ValueTooltipTrigger" title="" class="tooltip" tabindex="0">Contracted Connect Hotel</span><div id="2_0_2_ValueTooltip" style="display:none;">   Features specifically negotiated rates and inventory benefits.  Special policies may apply for modifications.  Some exceptions may apply.&#13;&#10;</div><script type="text/javascript">CreateTooltip('2_0_2_ValueTooltipTrigger', '2_0_2_ValueTooltip');</script></li></ul> 
+                                       
+                            <div class="added-value-wrap">
+                                <button type="button" class="link clear" onclick="javascript:showModal('promoAddedValueDescription9202977Avail', 'modalPopup',3, -1, -1, '',-1,-1);">
+                                    Special Reduced Rates&#33;
+                                </button>
+                            </div>
+                        
+                        
+<span id="ctl00_ctl00_ContentPlaceHolder_ContentPlaceHolder_scncc_ctl00_NavigationRepeater_ctl04_ctl00_AC_ap_l_HR_ctl02_ctl00_HRR_ctl00_HotelBaseAddedValueComponent_tcvItin" style="color:Red;visibility:hidden;"></span>
+           
+
+    <div id="promoAddedValueDescription9202977Avail" style="display:none">
+        <div class="modalContainer">
+            <h2 id="addedValuesTitle9202977Avail" class="modal-title">Special Reduced Rates&#33;</h2>
+            <div class="modalYScroll" id="addedValuesDescription9202977Avail">
+                <p>Discount is already reflected in the vacation package.</p>
+                <strong>Valid Booking Dates:Now - 12/31/2050</strong>
+                <p><em>Applicable promotions will display with your room selection. Some restrictions may apply.</em></p>
+            </div>
+        </div>
+    </div>
+   
+
+                                   
+                    </td>
+                    <td class="hotel-room-col-3 mobile-full-col">
+                        <div>
+                            <div class="price-difference-wrap">
+                                
+                                    (+$57.41)&#160;
+                                
+                                                                
+                            </div>
+                            <div class="hotel-total-price">
+                                <span id="2_0_PriceTooltipTrigger" title="" class="tooltip avail-price avail-hotel-price componentPricePosition price" tabindex="0">
+                                    <strong>$1,405.37</strong>
+                                </span>
+                                <div id="2_0_PriceTooltip" style="display:none;">
+                                    $702.69 per person
+                                </div>
+                                
+                                    <script type="text/javascript">
+                                        CreateTooltip('2_0_PriceTooltipTrigger', '2_0_PriceTooltip');
+                                    </script>
+                                
+                            </div>
+                                                                  
+                            
+                            
+                                <div><a href="javascript:;" class="floatRight" onclick="javascript:showModal('','modalPopup',3,-1,-1,'AvailabilityHotelInclusions.aspx?itin=1&itemId=PD94bWwgdmVyc2lvbj0iMS4wIj8%2bDQo8U2VyaWFsaXplZERhdGEgeG1sbnM6eHNkPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSIgeG1sbnM6eHNpPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZSI%2bDQogIDxEYXRhPi0yMDUxMDkwMTc1fEh8MXwxfDA8L0RhdGE%2bDQo8L1NlcmlhbGl6ZWREYXRhPg%3d%3d',620,400);">Included Values</a></div>
+                            
+                            
+                            
+                                <button type="button" id="hotelComponentBtn2_0" class="button" onclick="availDisplay.HideFilterCallout();availDisplay.Items()[2].ItemId = 'PD94bWwgdmVyc2lvbj0iMS4wIj8+DQo8U2VyaWFsaXplZERhdGEgeG1sbnM6eHNkPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSIgeG1sbnM6eHNpPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZSI+DQogIDxEYXRhPi0yMDUxMDkwMTc1fEh8MXwxfDA8L0RhdGE+DQo8L1NlcmlhbGl6ZWREYXRhPg==';availDisplay.Items()[2].MultiRoomItemIds = [];avsel('ADD',availDisplay.Items()[2].ItemId,2)">
+                                    Select
+                                </button>
+                            
+                            
+                             
+                            
+                                <div class="sales-email-option-wrap" style="display:none;">
+                                    <strong>
+                                        <label for="ctl00_ctl00_ContentPlaceHolder_ContentPlaceHolder_scncc_ctl00_NavigationRepeater_ctl04_ctl00_AC_ap_l_HR_ctl02_ctl00_HRR_ctl00_ChkSalesEmail">Add to Sales Email&nbsp;</label>
+                                        <input name="ctl00$ctl00$ContentPlaceHolder$ContentPlaceHolder$scncc$ctl00$NavigationRepeater$ctl04$ctl00$AC$ap$l$HR$ctl02$ctl00$HRR$ctl00$ChkSalesEmail" type="checkbox" id="ctl00_ctl00_ContentPlaceHolder_ContentPlaceHolder_scncc_ctl00_NavigationRepeater_ctl04_ctl00_AC_ap_l_HR_ctl02_ctl00_HRR_ctl00_ChkSalesEmail" onclick="javascript:avmail(this,&quot;-2051090175|H|1|1|0&quot;,&quot;1/1/0001 12:00:00 AM&quot;);" />
+                                    </strong>
+                                </div>
+                            
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            
+            
+            </li>
+                       

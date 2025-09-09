@@ -1,16 +1,13 @@
 /**
- * GitHub API Client with PAT authentication
+ * GitHub API Client for Voygen Publishing
  */
 
-import { Env, GitHubFile, GitHubFileContent, ValidationError, PublishingError, RetryableError, NonRetryableError } from './types.js';
+import { Env, GitHubFile, GitHubCommitResponse, GitHubError, ValidationError } from './types.js';
 
 export class GitHubClient {
   private baseUrl = 'https://api.github.com';
-  private token: string;
-  public owner: string;
-  public repo: string;
-
-  constructor(env: Env) {
+  
+  constructor(private env: Env) {
     if (!env.GITHUB_TOKEN) {
       throw new ValidationError('GITHUB_TOKEN is required');
     }
@@ -20,187 +17,142 @@ export class GitHubClient {
     if (!env.GITHUB_REPO) {
       throw new ValidationError('GITHUB_REPO is required');
     }
-
-    this.token = env.GITHUB_TOKEN;
-    this.owner = env.GITHUB_OWNER;
-    this.repo = env.GITHUB_REPO;
   }
 
-  private async makeRequest(endpoint: string, options: RequestInit = {}): Promise<Response> {
-    const url = `${this.baseUrl}${endpoint}`;
-    
-    const headers: Record<string, string> = {
-      'Authorization': `Bearer ${this.token}`,
+  private async request(path: string, options: RequestInit = {}): Promise<any> {
+    const url = `${this.baseUrl}${path}`;
+    const headers = {
+      'Authorization': `Bearer ${this.env.GITHUB_TOKEN}`,
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'github-mcp-cta/1.0.0',
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...(options.headers as Record<string, string>),
+      'User-Agent': 'Voygen-GitHub-MCP/1.0.0',
+      ...options.headers
     };
 
-    if (options.body && typeof options.body === 'object') {
-      headers['Content-Type'] = 'application/json';
-      options.body = JSON.stringify(options.body);
-    }
-
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
-
-    // Handle rate limiting
-    if (response.status === 403 && response.headers.get('x-ratelimit-remaining') === '0') {
-      const resetTime = parseInt(response.headers.get('x-ratelimit-reset') || '0') * 1000;
-      throw new RetryableError(
-        `GitHub API rate limit exceeded. Reset at ${new Date(resetTime).toISOString()}`,
-        resetTime - Date.now()
+    const response = await fetch(url, { ...options, headers });
+    
+    if (!response.ok) {
+      const errorData: any = await response.json().catch(() => ({ message: response.statusText }));
+      throw new GitHubError(
+        `GitHub API error: ${errorData.message}`,
+        path,
+        response.status,
+        errorData
       );
     }
 
-    // Handle authentication errors (non-retryable)
-    if (response.status === 401) {
-      throw new NonRetryableError('GitHub authentication failed. Check GITHUB_TOKEN permissions.');
-    }
-
-    // Handle not found errors (non-retryable for most cases)
-    if (response.status === 404) {
-      throw new NonRetryableError(`GitHub resource not found: ${endpoint}`);
-    }
-
-    // Handle other client errors (non-retryable)
-    if (response.status >= 400 && response.status < 500) {
-      const errorData = await response.json().catch(() => ({})) as any;
-      throw new NonRetryableError(`GitHub API error: ${response.status} ${response.statusText}. ${errorData.message || ''}`);
-    }
-
-    // Handle server errors (retryable)
-    if (response.status >= 500) {
-      throw new RetryableError(`GitHub API server error: ${response.status} ${response.statusText}`);
-    }
-
-    return response;
+    return response.json();
   }
 
-  async getFile(path: string, branch: string = 'main'): Promise<GitHubFileContent> {
-    try {
-      const response = await this.makeRequest(
-        `/repos/${this.owner}/${this.repo}/contents/${path}?ref=${branch}`
-      );
+  async getFile(path: string, branch = 'main'): Promise<GitHubFile & { content: string }> {
+    const encodedPath = encodeURIComponent(path);
+    const data = await this.request(
+      `/repos/${this.env.GITHUB_OWNER}/${this.env.GITHUB_REPO}/contents/${encodedPath}?ref=${branch}`
+    );
 
-      const data = await response.json() as any;
+    if (data.type !== 'file') {
+      throw new GitHubError(`Path is not a file: ${path}`, 'getFile');
+    }
+
+    // Use atob and TextDecoder for proper base64 to UTF-8 conversion in Cloudflare Workers
+    const binaryString = atob(data.content);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const decoder = new TextDecoder();
+    const content = decoder.decode(bytes);
+    return { ...data, content };
+  }
+
+  async createFile(
+    path: string, 
+    content: string, 
+    message: string, 
+    branch = 'main'
+  ): Promise<GitHubCommitResponse> {
+    const encodedPath = encodeURIComponent(path);
+    // Use TextEncoder and btoa for proper UTF-8 to base64 conversion in Cloudflare Workers
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(content);
+    const base64Content = btoa(String.fromCharCode(...bytes));
+
+    const response = await this.request(
+      `/repos/${this.env.GITHUB_OWNER}/${this.env.GITHUB_REPO}/contents/${encodedPath}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          content: base64Content,
+          branch
+        })
+      }
+    );
+
+    return response.commit;
+  }
+
+  async updateFile(
+    path: string, 
+    content: string, 
+    message: string, 
+    sha: string, 
+    branch = 'main'
+  ): Promise<GitHubCommitResponse> {
+    const encodedPath = encodeURIComponent(path);
+    // Use TextEncoder and btoa for proper UTF-8 to base64 conversion in Cloudflare Workers
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(content);
+    const base64Content = btoa(String.fromCharCode(...bytes));
+
+    const response = await this.request(
+      `/repos/${this.env.GITHUB_OWNER}/${this.env.GITHUB_REPO}/contents/${encodedPath}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          content: base64Content,
+          sha,
+          branch
+        })
+      }
+    );
+
+    return response.commit;
+  }
+
+  async listFiles(path = '', branch = 'main'): Promise<GitHubFile[]> {
+    const encodedPath = path ? encodeURIComponent(path) : '';
+    return this.request(
+      `/repos/${this.env.GITHUB_OWNER}/${this.env.GITHUB_REPO}/contents/${encodedPath}?ref=${branch}`
+    );
+  }
+
+  async healthCheck(): Promise<{ repository_accessible: boolean; rate_limit?: any }> {
+    try {
+      // Check repository access
+      await this.request(`/repos/${this.env.GITHUB_OWNER}/${this.env.GITHUB_REPO}`);
       
-      if (data.type !== 'file') {
-        throw new ValidationError(`Path ${path} is not a file`);
-      }
-
-      // Decode base64 content
-      const content = data.encoding === 'base64' 
-        ? atob(data.content.replace(/\n/g, ''))
-        : data.content;
-
-      return {
-        ...data,
-        content,
-      } as GitHubFileContent;
-    } catch (error) {
-      if (error instanceof ValidationError || error instanceof NonRetryableError || error instanceof RetryableError) {
-        throw error;
-      }
-      throw new PublishingError(`Failed to get file ${path}: ${(error as Error).message}`, 'get_file', { path, branch });
-    }
-  }
-
-  async createFile(path: string, content: string, message: string, branch: string = 'main'): Promise<any> {
-    try {
-      // Encode content to base64
-      const encodedContent = btoa(content);
-
-      const response = await this.makeRequest(
-        `/repos/${this.owner}/${this.repo}/contents/${path}`,
-        {
-          method: 'PUT',
-          body: JSON.stringify({
-            message,
-            content: encodedContent,
-            branch,
-          }),
-        }
-      );
-
-      return await response.json();
-    } catch (error) {
-      if (error instanceof ValidationError || error instanceof NonRetryableError || error instanceof RetryableError) {
-        throw error;
-      }
-      throw new PublishingError(`Failed to create file ${path}: ${(error as Error).message}`, 'create_file', { path, branch });
-    }
-  }
-
-  async updateFile(path: string, content: string, message: string, sha: string, branch: string = 'main'): Promise<any> {
-    try {
-      // Encode content to base64
-      const encodedContent = btoa(content);
-
-      const response = await this.makeRequest(
-        `/repos/${this.owner}/${this.repo}/contents/${path}`,
-        {
-          method: 'PUT',
-          body: JSON.stringify({
-            message,
-            content: encodedContent,
-            sha,
-            branch,
-          }),
-        }
-      );
-
-      return await response.json();
-    } catch (error) {
-      if (error instanceof ValidationError || error instanceof NonRetryableError || error instanceof RetryableError) {
-        throw error;
-      }
-      throw new PublishingError(`Failed to update file ${path}: ${(error as Error).message}`, 'update_file', { path, branch, sha });
-    }
-  }
-
-  async listFiles(path: string = '', branch: string = 'main'): Promise<GitHubFile[]> {
-    try {
-      const response = await this.makeRequest(
-        `/repos/${this.owner}/${this.repo}/contents/${path}?ref=${branch}`
-      );
-
-      const data = await response.json() as any;
-      
-      if (Array.isArray(data)) {
-        return data as GitHubFile[];
-      } else if (data.type === 'file') {
-        return [data as GitHubFile];
-      } else {
-        throw new ValidationError(`Path ${path} is not a valid file or directory`);
-      }
-    } catch (error) {
-      if (error instanceof ValidationError || error instanceof NonRetryableError || error instanceof RetryableError) {
-        throw error;
-      }
-      throw new PublishingError(`Failed to list files in ${path}: ${(error as Error).message}`, 'list_files', { path, branch });
-    }
-  }
-
-  async healthCheck(): Promise<{ status: string; repository: string; accessible: boolean }> {
-    try {
-      const response = await this.makeRequest(`/repos/${this.owner}/${this.repo}`);
-      const data = await response.json() as any;
+      // Get rate limit info
+      const rateLimit = await this.request('/rate_limit');
       
       return {
-        status: 'healthy',
-        repository: data.full_name,
-        accessible: true,
+        repository_accessible: true,
+        rate_limit: rateLimit
       };
     } catch (error) {
       return {
-        status: 'error',
-        repository: `${this.owner}/${this.repo}`,
-        accessible: false,
+        repository_accessible: false
       };
     }
+  }
+
+  getFileUrl(filename: string): string {
+    return `https://${this.env.GITHUB_OWNER}.github.io/${this.env.GITHUB_REPO}/${filename}`;
+  }
+
+  getDashboardUrl(): string {
+    return `https://${this.env.GITHUB_OWNER}.github.io/${this.env.GITHUB_REPO}/`;
   }
 }

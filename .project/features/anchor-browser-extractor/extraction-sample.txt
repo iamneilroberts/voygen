@@ -1,0 +1,107 @@
+[INFO] Here is the extracted hotel data for Seattle, WA for March 1-2, 2026:
+
+```json
+{
+  "hotels": [
+    {
+      "name": "The Edgewater Hotel",
+      "price_per_night": "$245",
+      "total_price": "$275"
+    },
+    {
+      "name": "Hotel FIVE Seattle",
+      "price_per_night": "$158",
+      "total_price": "$177"
+    },
+    {
+      "name": "Watertown",
+      "price_per_night": "$140",
+      "total_price": "$155"
+    },
+    {
+      "name": "Sleep Inn SeaTac Airport",
+      "price_per_night": "$123",
+      "total_price": "$137"
+    },
+    {
+      "name": "Travelodge by Wyndham Seattle By The Space Needle",
+      "price_per_night": "$107",
+      "total_price": "$123"
+    },
+    {
+      "name": "Kings Inn - Seattle",
+      "price_per_night": "$179",
+      "total_price": "$201"
+    },
+    {
+      "name": "Baymont by Wyndham Bremerton WA",
+      "price_per_night": "$127",
+      "total_price": "$137"
+    },
+    {
+      "name": "Comfort Inn & Suites Sea-Tac Airport",
+      "price_per_night": "$132",
+      "total_price": "$145"
+    },
+    {
+      "name": "Econo Lodge Edmonds North Seattle",
+      "price_per_night": "$101",
+      "total_price": "$114"
+    },
+    {
+      "name": "Baymont by Wyndham Kent - Seattle",
+      "price_per_night": "$84",
+      "total_price": "$91"
+    },
+    {
+      "name": "Red Roof Inn",
+      "price_per_night": "$107",
+      "total_price": "$118"
+    },
+    {
+      "name": "University Inn",
+      "price_per_night": "$158",
+      "total_price": "$176"
+    },
+    {
+      "name": "Staybridge Suites Seattle Fremont",
+      "price_per_night": "$148",
+      "total_price": "$172"
+    },
+    {
+      "name": "Holiday Inn Seattle Downtown - Lake Union",
+      "price_per_night": "$121",
+      "total_price": "$138"
+    },
+    {
+      "name": "Redmond Inn",
+      "price_per_night": "$107",
+      "total_price": "$119"
+    },
+    {
+      "name": "Eastgate Hotel, BW Signature Collection",
+      "price_per_night": "$141",
+      "total_price": "$158"
+    },
+    {
+      "name": "Motel 6 Seattle South",
+      "price_per_night": "$79",
+      "total_price": "$89"
+    },
+    {
+      "name": "Ramada by Wyndham Tukwila Southcenter",
+      "price_per_night": "$122",
+      "total_price": "$135"
+    },
+    {
+      "name": "Super 8 by Wyndham Lynnwood",
+      "price_per_night": "$71",
+      "total_price": "$80"
+    },
+    {
+      "name": "Travelodge by Wyndham Seattle North of Downtown",
+      "price_per_night": "$82",
+      "total_price": "$92"
+    }
+  ]
+}

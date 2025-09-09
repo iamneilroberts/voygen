@@ -1,9 +1,20 @@
 name = "d1-database-improved"
-main = "src/index.ts"
+main = "src/index-simple-streamable.ts"
 compatibility_date = "2025-01-20"
+compatibility_flags = ["nodejs_compat"]
 
+[vars]
+PROMPT_INSTRUCTIONS_URL = "https://prompt-instructions-d1-mcp.somotravel.workers.dev"
+
+## Primary DB binding now points to voygent-prod
+## IMPORTANT: Replace database_id after creating voygent-prod
 [[d1_databases]]
 binding = "DB"
+database_name = "voygent-prod"
+database_id = "b0eb7ec7-67bc-4b54-b66b-02f4efc22a24"
+
+[[d1_databases]]
+binding = "DB_OLD"
 database_name = "travel_assistant"
 database_id = "e6723f99-1d99-45bb-a941-e7600a56abe9"
 

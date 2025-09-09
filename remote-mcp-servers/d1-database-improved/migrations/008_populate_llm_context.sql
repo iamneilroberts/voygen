@@ -1,7 +1,7 @@
 -- Clear existing context to start fresh
 DELETE FROM llm_trip_context;
 DELETE FROM llm_faq_cache;
-DELETE FROM search_index;
+--DELETE FROM search_index;
 
 -- Populate trip context with proper formatting
 INSERT INTO llm_trip_context (

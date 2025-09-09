@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# scripts/memq — quick “/mem …” macro for common buckets
+# Examples:
+#   memq arch login flow
+#   memq wf release checklist
+set -euo pipefail
+
+bucket="${1:-}"; shift || true
+[[ -z "$bucket" ]] && { echo "usage: memq <bucket|tag> <query...>"; exit 2; }
+query="$*"
+
+case "$bucket" in
+  arch|architecture) tag="architecture" ;;
+  dm|domain|models)  tag="domain-models" ;;
+  wf|workflow|flows) tag="workflows" ;;
+  prof|profile)      tag="project-profile" ;;
+  *)                 tag="$bucket" ;;
+esac
+
+# Where BasicMemory stores notes (same path you set in config.toml)
+ROOT="${MEMORY_BASE_DIR:-$HOME/.project-memory/${PWD##*/}}"
+
+# 1) get candidate files by tag (frontmatter/line contains tag or path includes it)
+mapfile -t files < <(
+  { rg -li --hidden --glob '!**/.git/**' --glob '**/*.*' \
+       -e "tags?:.*\b${tag}\b" -e "/${tag}[^/]*$" -e "\b${tag}\b" "$ROOT" \
+    || true; } | sort -u
+)
+
+# 2) if no tag match, search everything (still useful)
+if (( ${#files[@]} == 0 )); then
+  files=("$ROOT")
+fi
+
+# 3) search the query within the candidates
+rg -n --hidden --no-heading --smart-case "$query" "${files[@]}" | head -100

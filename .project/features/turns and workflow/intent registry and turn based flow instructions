@@ -1,0 +1,170 @@
+4) Ad-hoc SQL sandbox handler (safe-ish default)
+// /api/adhoc-sql/run
+import { Pool } from 'pg';
+import { NextRequest, NextResponse } from 'next/server';
+import { format } from 'sql-formatter';           // formatting only
+import * as ast from 'pgsql-ast-parser';          // lightweight parse
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL_READONLY, // <-- app_readonly role
+  max: 2
+});
+
+export async function POST(req: NextRequest) {
+  if (!process.env.ADMIN_ADHOC_SQL) return NextResponse.json({ error: 'disabled' }, { status: 403 });
+  const user = await requireAdmin(req); // your auth check
+  const { nl_query, sql_text } = await req.json();
+
+  // 1) Parse & validate: SELECT-only, no INTO, no CALL/DO/; etc.
+  try {
+    const parsed = ast.parse(sql_text);
+    if (parsed.length !== 1) throw new Error('One statement only');
+    const stmt = parsed[0];
+    if (stmt.type !== 'select') throw new Error('SELECT only');
+    // Optional: forbid functions, set operations, etc., if you want it stricter
+  } catch (e:any) {
+    return NextResponse.json({ error: `SQL not allowed: ${e.message}` }, { status: 400 });
+  }
+
+  // 2) Force a LIMIT if missing
+  const sql = /limit\s+\d+/i.test(sql_text) ? sql_text : `${sql_text}\nLIMIT 50`;
+
+  const client = await pool.connect();
+  let rows:any[] = [], durationMs = 0, error:string|undefined;
+
+  try {
+    const start = Date.now();
+    await client.query(`set statement_timeout='500ms'`);
+    await client.query(`set default_transaction_read_only=on`);
+    await client.query(`set row_security=on`);
+
+    const result = await client.query(sql);
+    durationMs = Date.now() - start;
+    rows = (result.rows || []).slice(0, 25); // sample
+  } catch (e:any) {
+    error = e.message;
+  } finally {
+    client.release();
+  }
+
+  // 3) Log it
+  try {
+    await pool.query(
+      `insert into adhoc_sql_runs (user_id, env, nl_query, sql_text, row_count, duration_ms, error, result_sample)
+       values ($1,$2,$3,$4,$5,$6,$7,$8)`,
+      [user.id, process.env.NODE_ENV || 'dev', nl_query, format(sql), rows.length, durationMs, error || null, JSON.stringify(rows)]
+    );
+  } catch {}
+
+  if (error) return NextResponse.json({ ok:false, error }, { status: 400 });
+  return NextResponse.json({ ok:true, duration_ms: durationMs, rows });
+}
+
+
+Facts-query fallback (GIN-powered)
+// /api/intents/facts-query
+import { Pool } from 'pg';
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+/*
+  body: {
+    city?: string, start?: string, end?: string,
+    jsonpath?: string, contains?: object,
+    limit?: number
+  }
+*/
+export async function POST(req: Request) {
+  const b = await req.json();
+  const limit = Math.min(Math.max(b.limit ?? 25, 1), 50);
+
+  const clauses = [];
+  const params:any[] = [];
+  let i = 1;
+
+  if (b.city && b.start && b.end) {
+    clauses.push(`exists (select 1 from trip_legs l where l.trip_id = t.id and l.city = $${i++} and l.arrive_date between $${i++} and $${i++})`);
+    params.push(b.city, b.start, b.end);
+  }
+
+  if (b.jsonpath) {
+    clauses.push(`tf.facts @@ $${i++}`);
+    params.push(b.jsonpath);
+  } else if (b.contains) {
+    clauses.push(`tf.facts @> $${i++}::jsonb`);
+    params.push(JSON.stringify(b.contains));
+  }
+
+  const where = clauses.length ? `where ${clauses.join(' and ')}` : '';
+  const sql = `
+    select t.id, t.title, tf.lead_price_min, tf.facts -> 'client' as client
+    from trips t
+    join trip_facts tf on tf.trip_id = t.id
+    ${where}
+    order by coalesce(tf.lead_price_min, 1e9)
+    limit ${limit};
+  `;
+
+  const { rows } = await pool.query(sql, params);
+  return new Response(JSON.stringify({ ok:true, rows }));
+}
+
+6) Intent registry (hybrid path)
+
+Keep a tiny registry of named intents → SQL + validator.
+
+Claude outputs { tool: "trips.search_by_city_dates_budget", params: {...} }.
+
+Your executor picks the SQL, binds params, runs it.
+
+Example registry shape:
+type IntentSpec = {
+  sql: string;                       // with $1..$N placeholders
+  validateParams: (p:any)=>{ok:boolean, error?:string, values:any[]};
+};
+
+export const INTENTS: Record<string, IntentSpec> = {
+  'trips.search_by_city_dates_budget': {
+    sql: `
+      select t.id, t.title, tf.lead_price_min
+      from trips t
+      join trip_facts tf on tf.trip_id = t.id
+      where exists (select 1 from trip_legs l
+                    where l.trip_id=t.id and l.city=$1
+                      and l.arrive_date between $2 and $3)
+        and (tf.lead_price_min is null or tf.lead_price_min <= $4)
+        and ($5::bool is false or tf.facts @@ '$.rooms[*].rates[*].refundable == true')
+      order by coalesce(tf.lead_price_min, 1e9)
+      limit least($6::int, 50);
+    `,
+    validateParams: (p) => {
+      if (!p.city || !p.start || !p.end) return { ok:false, error:'city/start/end required', values:[] };
+      const max = Math.max(1, Math.min(p.max_budget ?? 1e9, 1e6));
+      const limit = Math.max(1, Math.min(p.limit ?? 20, 50));
+      return { ok:true, values:[p.city, p.start, p.end, max, !!p.must_refundable, limit] };
+    }
+  },
+  // add others...
+};
+
+
+5) Basic “turn instructions” (orchestrator) for your POC
+
+Keep it simple—intents, then fallbacks:
+
+Intent tools (HTTP endpoints you own):
+
+trips.search_by_city_dates_budget → SQL template on Neon
+
+ingest.hotels, ingest.rooms → writes caches + materializes trip_facts
+
+facts.query → GIN/JSONPath limited search over trip_facts
+
+Claude prompt (your system) says:
+
+Prefer intent tools;
+
+else use facts.query;
+
+else respond with a short “capability gap” message.
+
+You can start with just /api/orchestrator/chat and stub the others with mock JSON to prove wiring.

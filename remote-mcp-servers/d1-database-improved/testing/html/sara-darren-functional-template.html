@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Proposal: Sara & Darren Jones 25th Anniversary - Bristol & Bath</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            color: #2c3e50;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .proposal-container {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #6c757d;
+            color: white;
+            padding: 30px 25px;
+            border-bottom: 3px solid #495057;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .header h2 {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 15px;
+        }
+        
+        .trip-dates {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .content { padding: 30px 25px; }
+        .section { margin-bottom: 35px; }
+        
+        .section h3 {
+            font-size: 1.3rem;
+            color: #495057;
+            margin-bottom: 18px;
+            border-left: 4px solid #6c757d;
+            padding-left: 12px;
+        }
+        
+        .hotel {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            padding: 20px;
+        }
+        
+        .hotel h4 {
+            font-size: 1.1rem;
+            color: #343a40;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .hotel-meta {
+            display: table;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        
+        .hotel-meta > div {
+            display: table-cell;
+            vertical-align: top;
+            padding-right: 20px;
+        }
+        
+        .hotel-meta p {
+            margin: 3px 0;
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+        
+        .hotel-meta strong {
+            color: #495057;
+        }
+        
+        .price {
+            font-weight: 600;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+        
+        .amenities {
+            margin-top: 12px;
+        }
+        
+        .amenity {
+            display: inline-block;
+            background: #e9ecef;
+            color: #495057;
+            padding: 2px 6px;
+            margin: 1px 3px 1px 0;
+            border-radius: 2px;
+            font-size: 0.8rem;
+        }
+        
+        .itinerary {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .itinerary h4 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .day-item {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .day-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .summary {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 20px;
+        }
+        
+        .summary h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            border: none;
+            padding: 0;
+        }
+        
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .cost-table th,
+        .cost-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .cost-table th {
+            background: #e9ecef;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .total-row {
+            font-weight: 600;
+            background: #f8f9fa;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            text-align: left;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @media print {
+            body { background: none; padding: 10px; }
+            .proposal-container { border: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="proposal-container">
+        <header class="header">
+            <h1>Travel Proposal</h1>
+            <h2>25th Anniversary - Bristol & Bath</h2>
+            <div class="trip-dates">
+                October 5-15, 2025 | Bristol & Bath, England, United Kingdom
+            </div>
+        </header>
+        
+        <main class="content">
+            <section class="section">
+                <h3>Accommodation Options</h3>
+                
+                <div class="hotel">
+                    <h4>Bristol Harbour Hotel & Spa (5 nights)</h4>
+                    <div class="hotel-meta">
+                        <div>
+                            <p><strong>Location:</strong> Harbourside, Bristol</p>
+                            <p><strong>Check-in:</strong> October 5, 2025</p>
+                            <p><strong>Check-out:</strong> October 10, 2025</p>
+                        </div>
+                        <div>
+                            <p><strong>Room:</strong> Harbour View Suite</p>
+                            <p><strong>Rate:</strong> <span class="price">£245/night</span></p>
+                            <p><strong>Total:</strong> <span class="price">£1,225</span></p>
+                        </div>
+                    </div>
+                    <div class="amenities">
+                        <span class="amenity">Harbour Views</span>
+                        <span class="amenity">Spa Access</span>
+                        <span class="amenity">Restaurant</span>
+                        <span class="amenity">Concierge</span>
+                        <span class="amenity">WiFi</span>
+                    </div>
+                </div>
+                
+                <div class="hotel">
+                    <h4>The Royal Crescent Hotel & Spa (5 nights)</h4>
+                    <div class="hotel-meta">
+                        <div>
+                            <p><strong>Location:</strong> Royal Crescent, Bath</p>
+                            <p><strong>Check-in:</strong> October 10, 2025</p>
+                            <p><strong>Check-out:</strong> October 15, 2025</p>
+                        </div>
+                        <div>
+                            <p><strong>Room:</strong> Garden Suite</p>
+                            <p><strong>Rate:</strong> <span class="price">£395/night</span></p>
+                            <p><strong>Total:</strong> <span class="price">£1,975</span></p>
+                        </div>
+                    </div>
+                    <div class="amenities">
+                        <span class="amenity">Georgian Architecture</span>
+                        <span class="amenity">Award-winning Spa</span>
+                        <span class="amenity">Private Gardens</span>
+                        <span class="amenity">Michelin Dining</span>
+                        <span class="amenity">Butler Service</span>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h3>Suggested Itinerary</h3>
+                
+                <div class="itinerary">
+                    <h4>Bristol Highlights (Days 1-5)</h4>
+                    <div class="day-item">
+                        <strong>Day 1:</strong> Arrival and Harbourside exploration
+                    </div>
+                    <div class="day-item">
+                        <strong>Day 2:</strong> Bristol Cathedral and SS Great Britain
+                    </div>
+                    <div class="day-item">
+                        <strong>Day 3:</strong> Clifton Suspension Bridge and Observatory
+                    </div>
+                    <div class="day-item">
+                        <strong>Day 4:</strong> Bristol Museum and Cabot Circus
+                    </div>
+                    <div class="day-item">
+                        <strong>Day 5:</strong> Street art tour and departure to Bath
+                    </div>
+                </div>
+                
+                <div class="itinerary">
+                    <h4>Bath Experience (Days 6-10)</h4>
+                    <div class="day-item">
+                        <strong>Day 6:</strong> Roman Baths and Bath Abbey
+                    </div>
+                    <div class="day-item">
+                        <strong>Day 7:</strong> Royal Crescent and Assembly Rooms
+                    </div>
+                    <div class="day-item">
+                        <strong>Day 8:</strong> Thermae Bath Spa and shopping
+                    </div>
+                    <div class="day-item">
+                        <strong>Day 9:</strong> Jane Austen Centre and afternoon tea
+                    </div>
+                    <div class="day-item">
+                        <strong>Day 10:</strong> Final explorations and departure
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h3>Investment Summary</h3>
+                
+                <div class="summary">
+                    <table class="cost-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Rate</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Bristol Harbour Hotel</td>
+                                <td>5 nights</td>
+                                <td>£245</td>
+                                <td>£1,225</td>
+                            </tr>
+                            <tr>
+                                <td>Royal Crescent Hotel</td>
+                                <td>5 nights</td>
+                                <td>£395</td>
+                                <td>£1,975</td>
+                            </tr>
+                            <tr>
+                                <td>Activities & Tours</td>
+                                <td>Various</td>
+                                <td>-</td>
+                                <td>£650</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td colspan="3"><strong>Total Investment</strong></td>
+                                <td><strong>£3,850</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="footer">
+            <strong>VoygentCE Travel Proposal</strong><br>
+            Template: Functional (Business Format)<br>
+            Trip ID: 26 | Prepared for: Sara & Darren Jones (sara.jones@email.com)<br>
+            Generated: Sunday, September 8, 2025
+        </footer>
+    </div>
+</body>
+</html>

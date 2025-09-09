@@ -1,0 +1,13 @@
+{
+  "memory_system": {
+    "enabled": true,
+    "auto_update": true,
+    "performance_mode": "speed",
+    "cache_size": 10
+  },
+  "hooks": {
+    "precompact": false,
+    "session_start": false,
+    "post_tool_use": true
+  }
+}

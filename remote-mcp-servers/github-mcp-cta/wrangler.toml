@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 ENVIRONMENT = "production"
 GITHUB_OWNER = "iamneilroberts"
-GITHUB_REPO = "trip-summary"
+GITHUB_REPO = "SoMoTravel.us"
 
 # Development environment
 [env.development]

@@ -1,0 +1,4 @@
+anchorbrowser questions
+- export logs for ingestion by ai coder?
+- model choice suggestions? 
+- cloud mcp vs self-hosted?

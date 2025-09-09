@@ -1,0 +1,51 @@
+{
+  "method": "tools/call",
+  "params": {
+    "name": "preview_proposal",
+    "arguments": {
+      "trip_id": "test-trip",
+      "template": "detailed",
+      "custom_data": {
+        "trip_id": "test-trip-2025",
+        "title": "London & Paris Luxury Experience",
+        "destinations": "London, Paris", 
+        "start_date": "2025-05-15",
+        "end_date": "2025-05-25",
+        "client": {
+          "name": "Sarah Johnson",
+          "email": "sarah@example.com"
+        },
+        "hotels": [
+          {
+            "id": "hotel-1",
+            "name": "The Savoy London",
+            "city": "London",
+            "star_rating": 5,
+            "lead_price": {
+              "amount": 450,
+              "currency": "USD"
+            },
+            "amenities": ["Spa", "Fine Dining", "Thames View"],
+            "refundable": true,
+            "site": "luxury-hotels.com"
+          },
+          {
+            "id": "hotel-2", 
+            "name": "The Ritz Paris",
+            "city": "Paris",
+            "star_rating": 5,
+            "lead_price": {
+              "amount": 650,
+              "currency": "USD"
+            },
+            "amenities": ["Michelin Star Restaurant", "Spa"],
+            "refundable": true,
+            "site": "luxury-hotels.com"
+          }
+        ],
+        "total_cost": 4500,
+        "total_commission": 450
+      }
+    }
+  }
+}

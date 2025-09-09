@@ -36,7 +36,7 @@ export class FactTableManager {
     // Compute metrics from available tables (defensive if optional tables absent)
     const total_nights = await this.scalar(
       `SELECT COALESCE(MAX(day_number) - MIN(day_number) + 1, 0) AS n FROM TripDays WHERE trip_id = ?1`,
-      [tripId]
+      [parseInt(tripId)]
     );
 
     const total_activities = await this.scalar(
@@ -45,7 +45,7 @@ export class FactTableManager {
       exists
         ? this.scalar(
             `SELECT COUNT(1) FROM trip_activities_enhanced WHERE trip_id = ?1`,
-            [tripId]
+            [parseInt(tripId)]
           )
         : 0
     );
@@ -56,7 +56,7 @@ export class FactTableManager {
       exists
         ? this.scalar(
             `SELECT COUNT(1) FROM trip_activities_enhanced WHERE trip_id = ?1 AND LOWER(activity_type) IN ('hotel','lodging')`,
-            [tripId]
+            [parseInt(tripId)]
           )
         : 0
     );
@@ -67,7 +67,7 @@ export class FactTableManager {
       exists
         ? this.scalar(
             `SELECT COALESCE(SUM(cost),0) FROM trip_activities_enhanced WHERE trip_id = ?1`,
-            [tripId]
+            [parseInt(tripId)]
           )
         : 0
     );
@@ -77,9 +77,9 @@ export class FactTableManager {
     ).then(async (exists) =>
       exists
         ? this.scalar(
-            `SELECT COALESCE(SUM((strftime('%s', COALESCE(arrive_datetime, start_time)) - strftime('%s', depart_datetime)) / 60), 0)
-             FROM trip_legs WHERE trip_id = ?1 AND depart_datetime IS NOT NULL`,
-            [tripId]
+            `SELECT COALESCE(SUM((strftime('%s', arrive_datetime) - strftime('%s', depart_datetime)) / 60), 0)
+             FROM trip_legs WHERE trip_id = ?1 AND depart_datetime IS NOT NULL AND arrive_datetime IS NOT NULL`,
+            [parseInt(tripId)]
           )
         : 0
     );
@@ -96,7 +96,7 @@ export class FactTableManager {
            transit_minutes=excluded.transit_minutes,
            last_computed=CURRENT_TIMESTAMP`
       )
-      .bind(tripId, total_nights, total_hotels, total_activities, total_cost, transit_minutes)
+      .bind(parseInt(tripId), total_nights, total_hotels, total_activities, total_cost, transit_minutes)
       .run();
   }
 

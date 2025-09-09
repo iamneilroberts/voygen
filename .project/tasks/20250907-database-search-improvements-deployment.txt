@@ -1,0 +1,98 @@
+Environment: Non-production development systemDeployment Method: Claude
+  Code interactive deploymentDuration: 30-45 minutesRisk: Low (development
+  environment)
+
+  Pre-Deployment
+
+  # Verify we're in the right directory and everything builds
+  cd /home/neil/dev/voygen/remote-mcp-servers/d1-database-improved
+  npm run build
+
+  Single-Stage Deployment
+
+  Step 1: Deploy All Phases Together
+
+  # Deploy the enhanced search system
+  npm run deploy
+
+  Step 2: Test Phase 1 (Enhanced Preprocessing)
+
+  Test that enhanced punctuation handling works:
+  # Test via MCP call
+  curl -X POST "https://d1-database-improved.somotravel.workers.dev/mcp" \
+    -H "Content-Type: application/json" \
+    -d '{"method": "tools/call", "params": {"name": "get_anything", 
+  "arguments": {"query": "Sara & Darren test"}}}'
+
+  Look for: Console logs showing "PHASE 1: Search preprocessing completed
+  in Xms"
+
+  Step 3: Test Phase 2 (Slug System) - Optional Migration
+
+  If you want to test slug functionality:
+  # Check if trip_slug column exists
+  wrangler d1 execute voygen-d1 --command "PRAGMA table_info(trips_v2)" |
+  grep trip_slug
+
+  # If not, run the migration (development safe)
+  wrangler d1 execute voygen-d1 --file migrations/013_trip_slug_system.sql
+
+  # Test slug-based search
+  curl -X POST "https://d1-database-improved.somotravel.workers.dev/mcp" \
+    -H "Content-Type: application/json" \
+    -d '{"method": "tools/call", "params": {"name": "get_anything", 
+  "arguments": {"query": "test-trip-2024"}}}'
+
+  Step 4: Test Phase 3 (Semantic Search) - Optional
+
+  Only if you want the advanced features:
+  # Add semantic tables (development safe)
+  wrangler d1 execute voygen-d1 --file
+  migrations/014_semantic_search_system.sql
+
+  # Test natural language search
+  curl -X POST "https://d1-database-improved.somotravel.workers.dev/mcp" \
+    -H "Content-Type: application/json" \
+    -d '{"method": "tools/call", "params": {"name": "get_anything", 
+  "arguments": {"query": "find hawaii trip for anniversary 2024"}}}'
+
+  Quick Validation
+
+  Test a few common search patterns to verify improvements:
+
+  # 1. Punctuation handling (should work better now)
+  # Via Claude Code: Test search for "Sara & Darren"
+
+  # 2. Natural language (should show semantic results if Phase 3 active)  
+  # Via Claude Code: Test search for "find hawaii anniversary trip"
+
+  # 3. Performance check
+  # Look in logs for preprocessing times <50ms
+
+  Success Criteria (Simple)
+
+  - No deployment errors
+  - Basic search still works
+  - Enhanced punctuation handling active (check logs)
+  - If Phase 2 deployed: Slug column exists and populates
+  - If Phase 3 deployed: Semantic search provides results for natural
+  language
+
+  Rollback (Simple)
+
+  If anything breaks:
+  git log --oneline -5
+  git checkout <previous-working-commit>
+  npm run deploy
+
+  Quick Test Commands for Claude Code
+
+  I can help you run these tests interactively:
+
+  1. Deploy: npm run deploy
+  2. Test basic search: Use MCP call to get_anything with a simple query
+  3. Test enhanced search: Use MCP call with punctuation-heavy query like
+  "Sara & Darren"
+  4. Check performance: Look for "PHASE 1" messages in logs
+  5. Optional migrations: Run the SQL files if you want Phase 2/3 features
+
