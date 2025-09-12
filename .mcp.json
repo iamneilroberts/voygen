@@ -41,7 +41,7 @@
       ]
     },
     "zen": {
-      "command": "zen-mcp-server/zen-mcp-server",
+      "command": "zen-mcp-server/zen-mcp-server.disabled",
       "args": [],
       "env": {
         "OPENAI_API_KEY": "${OPENAI_API_KEY}",
