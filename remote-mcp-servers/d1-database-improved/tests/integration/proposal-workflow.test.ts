@@ -202,7 +202,7 @@ describe('Proposal Generation Workflow Integration Tests', () => {
         theme: {
           colorScheme: 'executive',
           typography: 'clean',
-          decorative: 'minimal',
+          decorative: 'minimal-emoji',
           layout: 'efficient'
         }
       };
@@ -221,7 +221,7 @@ describe('Proposal Generation Workflow Integration Tests', () => {
 
     it('should generate multiple theme variations for same trip', async () => {
       const themeVariations = [
-        { colorScheme: 'professional', typography: 'modern', decorative: 'minimal', layout: 'standard' },
+        { colorScheme: 'professional-blue', typography: 'corporate', decorative: 'minimal-emoji', layout: 'spacious' },
         { colorScheme: 'luxury', typography: 'elegant', decorative: 'rich', layout: 'immersive' },
         { colorScheme: 'friendly', typography: 'relaxed', decorative: 'moderate', layout: 'comfortable' },
         { colorScheme: 'modern', typography: 'bold', decorative: 'geometric', layout: 'dynamic' }

@@ -4,10 +4,10 @@
   "description": "Voygen - AI-Powered Travel Assistant with LibreChat Integration",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "cd librechat-source && npm run frontend:dev",
-    "build": "cd librechat-source && npm run frontend",
-    "start": "cd librechat-source && npm run backend",
-    "preview": "cd librechat-source && npm run frontend && npm run backend",
+    "dev": "npm --prefix voygen-api run dev",
+    "build": "npm --prefix voygen-api ci || npm --prefix voygen-api install && npm --prefix voygen-api run build && npm --prefix librechat-source ci && npm --prefix librechat-source run frontend",
+    "start": "node voygen-api/dist/index-with-librechat.js",
+    "preview": "npm run build && node voygen-api/dist/index-with-librechat.js",
     "test": "cd librechat-source && npm test",
     "test:mcp": "cd mcp-local-servers/mcp-chrome && npm test",
     "test:unit": "npm run test:mcp",
@@ -18,7 +18,11 @@
     "format": "cd librechat-source && npm run format",
     "install-deps": "cd librechat-source && npm install && cd ../mcp-local-servers/mcp-chrome && npm install && npm run build",
     "setup": "./scripts/setup.sh",
-    "deploy:mcp": "cd remote-mcp-servers/d1-database-improved && npm run deploy && cd ../prompt-instructions-d1-mcp && npm run deploy && cd ../github-mcp-cta && npm run deploy"
+    "setup:hooks": "node scripts/setup-hooks.js",
+    "deploy:mcp": "cd remote-mcp-servers/d1-database-improved && npm run deploy && cd ../prompt-instructions-d1-mcp && npm run deploy && cd ../github-mcp-cta && npm run deploy",
+    "handoff": "node scripts/handoff.js",
+    "handoff:done": "node scripts/handoff.js --update-current",
+    "changelog:add": "node scripts/changelog-add.js"
   },
   "keywords": [
     "ai",

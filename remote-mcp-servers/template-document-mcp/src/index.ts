@@ -845,6 +845,7 @@ footer {
 // Environment interface
 interface Env {
   TRAVEL_ASSISTANT: D1Database;
+  BRANDING_URL?: string; // optional: override Voygent landing URL
 }
 
 // Template rendering engine with proper Handlebars support
@@ -1222,7 +1223,19 @@ class TemplateEngine {
   async render(templateContent: string, data: any, cssStyles?: string): Promise<string> {
     try {
       const template = Handlebars.compile(templateContent);
-      const html = template(data);
+      let html = template(data);
+
+      // Inject Voygent branding link into footer (configurable via BRANDING_URL)
+      try {
+        const defaultUrl = 'https://voygent.ai/pricing?utm_source=proposal&utm_medium=footer';
+        const url = (globalThis as any)?.BRANDING_URL || defaultUrl;
+        const brandingMarkup = `\n<p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener" style="color:#888;text-decoration:underline">Powered by Voygent.ai — Try for free</a></p>`;
+        if (html.includes('</footer>')) {
+          html = html.replace('</footer>', `${brandingMarkup}\n</footer>`);
+        } else {
+          html += `\n<footer style=\"text-align:center;padding:2rem 0;color:#666;border-top:1px solid #e0e0e0;margin-top:2rem\">${brandingMarkup}</footer>`;
+        }
+      } catch {}
       
       // If CSS styles are provided, wrap in complete HTML document
       if (cssStyles) {

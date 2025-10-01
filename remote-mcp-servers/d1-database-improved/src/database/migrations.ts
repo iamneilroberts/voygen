@@ -64,6 +64,11 @@ const MIGRATIONS = {
       total_activities INTEGER DEFAULT 0,
       total_cost REAL DEFAULT 0,
       transit_minutes INTEGER DEFAULT 0,
+      traveler_count INTEGER DEFAULT 0,
+      traveler_names TEXT,
+      traveler_emails TEXT,
+      primary_client_email TEXT,
+      primary_client_name TEXT,
       last_computed DATETIME,
       version INTEGER DEFAULT 1,
       FOREIGN KEY (trip_id) REFERENCES trips_v2(trip_id) ON DELETE CASCADE
@@ -85,56 +90,56 @@ const MIGRATIONS = {
     CREATE TRIGGER IF NOT EXISTS trg_trips_ai_dirty
     AFTER INSERT ON trips_v2
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'trip_insert');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'trip_insert');
     END;
 
     CREATE TRIGGER IF NOT EXISTS trg_trips_au_dirty
     AFTER UPDATE ON trips_v2
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'trip_update');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'trip_update');
     END;
 
     CREATE TRIGGER IF NOT EXISTS trg_trips_ad_dirty
     AFTER DELETE ON trips_v2
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'trip_delete');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'trip_delete');
     END;
 
     CREATE TRIGGER IF NOT EXISTS trg_tripdays_ai_dirty
     AFTER INSERT ON TripDays
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'tripday_insert');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'tripday_insert');
     END;
 
     CREATE TRIGGER IF NOT EXISTS trg_tripdays_au_dirty
     AFTER UPDATE ON TripDays
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'tripday_update');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'tripday_update');
     END;
 
     CREATE TRIGGER IF NOT EXISTS trg_tripdays_ad_dirty
     AFTER DELETE ON TripDays
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'tripday_delete');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'tripday_delete');
     END;
 
     -- ActivityLog also affects derived metrics
     CREATE TRIGGER IF NOT EXISTS trg_activitylog_ai_dirty
     AFTER INSERT ON ActivityLog
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_insert');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_insert');
     END;
 
     CREATE TRIGGER IF NOT EXISTS trg_activitylog_au_dirty
     AFTER UPDATE ON ActivityLog
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_update');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_update');
     END;
 
     CREATE TRIGGER IF NOT EXISTS trg_activitylog_ad_dirty
     AFTER DELETE ON ActivityLog
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'activity_delete');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'activity_delete');
     END;
 
     COMMIT;
@@ -346,6 +351,11 @@ const MIGRATIONS = {
       total_activities INTEGER DEFAULT 0,
       total_cost REAL DEFAULT 0,
       transit_minutes INTEGER DEFAULT 0,
+      traveler_count INTEGER DEFAULT 0,
+      traveler_names TEXT,
+      traveler_emails TEXT,
+      primary_client_email TEXT,
+      primary_client_name TEXT,
       last_computed DATETIME,
       version INTEGER DEFAULT 1,
       FOREIGN KEY (trip_id) REFERENCES trips_v2(trip_id) ON DELETE CASCADE
@@ -354,6 +364,7 @@ const MIGRATIONS = {
     -- Create indexes for v2 tables
     CREATE INDEX IF NOT EXISTS idx_facts_dirty_v2_trip ON facts_dirty_v2(trip_id);
     CREATE INDEX IF NOT EXISTS idx_trip_facts_v2_computed ON trip_facts_v2(last_computed);
+    CREATE INDEX IF NOT EXISTS idx_trip_facts_v2_primary_email ON trip_facts_v2(primary_client_email);
 
     COMMIT;
   `,
@@ -377,6 +388,11 @@ const MIGRATIONS = {
       total_activities INTEGER DEFAULT 0,
       total_cost REAL DEFAULT 0,
       transit_minutes INTEGER DEFAULT 0,
+      traveler_count INTEGER DEFAULT 0,
+      traveler_names TEXT,
+      traveler_emails TEXT,
+      primary_client_email TEXT,
+      primary_client_name TEXT,
       last_computed DATETIME,
       version INTEGER DEFAULT 1,
       FOREIGN KEY (trip_id) REFERENCES trips_v2(trip_id) ON DELETE CASCADE
@@ -394,6 +410,7 @@ const MIGRATIONS = {
     -- Create indexes
     CREATE INDEX idx_facts_dirty_trip ON facts_dirty(trip_id);
     CREATE INDEX idx_trip_facts_computed ON trip_facts(last_computed);
+    CREATE INDEX idx_trip_facts_primary_email ON trip_facts(primary_client_email);
 
     -- Recreate triggers with correct table references
     DROP TRIGGER IF EXISTS trg_trips_ai_dirty;
@@ -409,57 +426,57 @@ const MIGRATIONS = {
     CREATE TRIGGER trg_trips_v2_ai_dirty
     AFTER INSERT ON trips_v2
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'trip_insert');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'trip_insert');
     END;
 
     CREATE TRIGGER trg_trips_v2_au_dirty
     AFTER UPDATE ON trips_v2
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'trip_update');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'trip_update');
     END;
 
     CREATE TRIGGER trg_trips_v2_ad_dirty
     AFTER DELETE ON trips_v2
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'trip_delete');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'trip_delete');
     END;
 
     -- Update TripDays triggers to use trips_v2 schema (assuming TripDays.trip_id is INTEGER)
     CREATE TRIGGER trg_tripdays_ai_dirty
     AFTER INSERT ON TripDays
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'tripday_insert');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'tripday_insert');
     END;
 
     CREATE TRIGGER trg_tripdays_au_dirty
     AFTER UPDATE ON TripDays
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'tripday_update');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'tripday_update');
     END;
 
     CREATE TRIGGER trg_tripdays_ad_dirty
     AFTER DELETE ON TripDays
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'tripday_delete');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'tripday_delete');
     END;
 
     -- Update ActivityLog triggers (assuming ActivityLog.trip_id is INTEGER)
     CREATE TRIGGER trg_activitylog_ai_dirty
     AFTER INSERT ON ActivityLog
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_insert');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_insert');
     END;
 
     CREATE TRIGGER trg_activitylog_au_dirty
     AFTER UPDATE ON ActivityLog
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_update');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_update');
     END;
 
     CREATE TRIGGER trg_activitylog_ad_dirty
     AFTER DELETE ON ActivityLog
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'activity_delete');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'activity_delete');
     END;
 
     COMMIT;
@@ -623,55 +640,55 @@ const MIGRATIONS = {
     CREATE TRIGGER trg_tripcosts_ai_dirty
     AFTER INSERT ON TripCosts
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'cost_insert');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'cost_insert');
     END;
 
     CREATE TRIGGER trg_tripcosts_au_dirty
     AFTER UPDATE ON TripCosts
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'cost_update');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'cost_update');
     END;
 
     CREATE TRIGGER trg_tripcosts_ad_dirty
     AFTER DELETE ON TripCosts
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'cost_delete');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'cost_delete');
     END;
 
     CREATE TRIGGER trg_bookinghistory_ai_dirty
     AFTER INSERT ON BookingHistory
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'booking_insert');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'booking_insert');
     END;
 
     CREATE TRIGGER trg_bookinghistory_au_dirty
     AFTER UPDATE ON BookingHistory
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'booking_update');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'booking_update');
     END;
 
     CREATE TRIGGER trg_bookinghistory_ad_dirty
     AFTER DELETE ON BookingHistory
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'booking_delete');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'booking_delete');
     END;
 
     CREATE TRIGGER trg_trip_activities_enhanced_ai_dirty
     AFTER INSERT ON trip_activities_enhanced
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_insert');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_insert');
     END;
 
     CREATE TRIGGER trg_trip_activities_enhanced_au_dirty
     AFTER UPDATE ON trip_activities_enhanced
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_update');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'activity_update');
     END;
 
     CREATE TRIGGER trg_trip_activities_enhanced_ad_dirty
     AFTER DELETE ON trip_activities_enhanced
     BEGIN
-      INSERT INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'activity_delete');
+      INSERT OR IGNORE INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'activity_delete');
     END;
 
     COMMIT;
@@ -1105,4 +1122,3 @@ export class MigrationRunner {
     }
   }
 }
-

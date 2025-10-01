@@ -16,7 +16,9 @@ export const analyzeRecentErrorsTool = {
   }),
   handler: async (input: any, db: D1Database) => {
     try {
-      const hoursAgo = new Date(Date.now() - (input.hours * 60 * 60 * 1000)).toISOString();
+      const hours = Number.isFinite(Number(input?.hours)) ? Number(input.hours) : 24;
+      const limit = Number.isFinite(Number(input?.limit)) ? Number(input.limit) : 10;
+      const hoursAgo = new Date(Date.now() - (hours * 60 * 60 * 1000)).toISOString();
       
       // Get recent errors
       const errors = await db.prepare(`
@@ -32,7 +34,7 @@ export const analyzeRecentErrorsTool = {
         GROUP BY error_message, attempted_operation
         ORDER BY occurrence_count DESC, created_at DESC
         LIMIT ?
-      `).bind(hoursAgo, input.limit).all();
+      `).bind(hoursAgo, limit).all();
 
       // Analyze error patterns
       const patterns = [];
@@ -71,14 +73,14 @@ export const analyzeRecentErrorsTool = {
 
       return {
         success: true,
-        analysis_period: `${input.hours} hours`,
+        analysis_period: `${hours} hours`,
         total_error_patterns: patterns.length,
         total_occurrences: patterns.reduce((sum, p) => sum + p.occurrences, 0),
         error_patterns: patterns,
         operation_failures: operationStats,
         table_failures: tableStats,
         recommendations: recommendations,
-        message: `Analyzed ${patterns.length} error patterns from the last ${input.hours} hours`
+        message: `Analyzed ${patterns.length} error patterns from the last ${hours} hours`
       };
 
     } catch (error: any) {

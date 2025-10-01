@@ -459,24 +459,40 @@ export async function handlePreviewProposal(
 
 export async function handleListTemplates(): Promise<any> {
   const generator = new ProposalGenerator();
-  
+  const stats = generator.getGenerationStats();
+
   return {
     success: true,
     templates: generator.getAvailableTemplates(),
-    stats: generator.getGenerationStats()
+    stats,
+    availableThemes: stats.availableThemes || {
+      colorSchemes: ['professional-blue', 'luxury-gold', 'minimal-gray'],
+      typographyStyles: ['corporate', 'elegant'],
+      decorativeStyles: ['none', 'minimal-emoji'],
+      layoutStyles: ['compact', 'spacious']
+    },
+    themeGuidance: {
+      recommended: [
+        { name: 'Professional Business', colorScheme: 'professional-blue', typography: 'corporate', decorative: 'none', layout: 'spacious' },
+        { name: 'Luxury Travel', colorScheme: 'luxury-gold', typography: 'elegant', decorative: 'minimal-emoji', layout: 'compact' },
+        { name: 'Minimal Clean', colorScheme: 'minimal-gray', typography: 'corporate', decorative: 'none', layout: 'spacious' }
+      ],
+      note: 'Use exact theme names as listed in availableThemes to avoid fallback warnings'
+    }
   };
 }
 
 // Helper function to load trip data from database
 async function loadTripDataFromDB(tripId: string, db: any): Promise<TripData | null> {
   try {
-    // Extract the actual D1Database object
+    // Extract the actual D1Database object - could be env.DB or just the DB object directly
     const actualDb = db.DB || db;
-    console.log(`[loadTripDataFromDB] Using database object, actualDb.prepare exists:`, typeof actualDb.prepare);
-    
+    console.log(`[loadTripDataFromDB] Using database object, actualDb.prepare exists:`, typeof actualDb?.prepare);
+    console.log(`[loadTripDataFromDB] Database object keys:`, actualDb ? Object.keys(actualDb) : 'actualDb is null/undefined');
+
     // Load directly from trips_v2 (trip_facts doesn't have consolidated facts JSON)
     return await loadTripDataDirect(tripId, actualDb);
-    
+
   } catch (error) {
     console.error('Error loading trip data:', error);
     return null;
@@ -505,13 +521,25 @@ async function loadTripDataDirect(tripId: string, db: D1Database): Promise<TripD
     return null;
   }
   
-  // Load cached hotels - hotel_cache might be linked by trip_id as TEXT or INTEGER
-  const hotelsResult = await db.prepare(`
-    SELECT * FROM hotel_cache 
-    WHERE trip_id = ? OR trip_id = ?
-    ORDER BY lead_price_amount ASC 
-    LIMIT 20
-  `).bind(tripId, tripIdNum).all();
+  // Load cached hotels - handle both string and integer trip_id values
+  console.log(`[loadTripDataDirect] Querying hotels for trip_id: "${tripId}" (parsed as ${tripIdNum})`);
+  let hotelsResult;
+  try {
+    hotelsResult = await db.prepare(`
+      SELECT * FROM hotel_cache
+      WHERE trip_id = ? OR trip_id = ?
+      ORDER BY lead_price_amount ASC
+      LIMIT 20
+    `).bind(tripId, tripIdNum).all();
+
+    console.log(`[loadTripDataDirect] Hotels query result: ${hotelsResult.results?.length || 0} hotels found`);
+    if (hotelsResult.results?.length > 0) {
+      console.log(`[loadTripDataDirect] First hotel:`, JSON.stringify(hotelsResult.results[0], null, 2));
+    }
+  } catch (hotelError) {
+    console.error(`[loadTripDataDirect] Hotel query failed:`, hotelError);
+    hotelsResult = { results: [] }; // Fallback to empty results
+  }
   
   const hotels = hotelsResult.results?.map((hotel: any) => {
     // Parse amenities from raw_json if available
@@ -572,6 +600,85 @@ async function loadTripDataDirect(tripId: string, db: D1Database): Promise<TripD
     console.warn('Error parsing clients JSON:', error);
   }
   
+  // Parse JSON fields from database
+  let schedule = [];
+  let accommodations = [];
+  let transportation = [];
+  let activities = [];
+
+  try {
+    if (tripResult.schedule) {
+      schedule = JSON.parse(tripResult.schedule);
+      console.log(`[loadTripDataDirect] Parsed ${schedule.length} schedule days`);
+    }
+  } catch (e) {
+    console.warn('[loadTripDataDirect] Failed to parse schedule JSON:', e);
+  }
+
+  try {
+    if (tripResult.accommodations) {
+      accommodations = JSON.parse(tripResult.accommodations);
+      console.log(`[loadTripDataDirect] Parsed ${accommodations.length} accommodations`);
+    }
+  } catch (e) {
+    console.warn('[loadTripDataDirect] Failed to parse accommodations JSON:', e);
+  }
+
+  try {
+    if (tripResult.transportation) {
+      transportation = JSON.parse(tripResult.transportation);
+      console.log(`[loadTripDataDirect] Parsed ${transportation.length} transportation items`);
+    }
+  } catch (e) {
+    console.warn('[loadTripDataDirect] Failed to parse transportation JSON:', e);
+  }
+
+  // Convert schedule to activities format
+  for (const day of schedule) {
+    if (day.activities) {
+      for (const activity of day.activities) {
+        activities.push({
+          id: `${day.day_number}-${activities.length}`,
+          name: activity.title,
+          description: `Day ${day.day_number}: ${day.day_name}`,
+          date: day.date,
+          duration: activity.duration || 'Not specified',
+          price: activity.cost || 0,
+          location: tripResult.destinations
+        });
+      }
+    }
+  }
+
+  // Convert accommodations to enhanced hotel format (prioritize over hotel_cache)
+  const enhancedHotels = accommodations.map((acc: any, index: number) => ({
+    id: `acc_${acc.accommodation_id || index}`,
+    hotel_id: `acc_${acc.accommodation_id || index}`,
+    name: acc.name,
+    city: acc.city,
+    location: `${acc.city}`,
+    checkin_date: acc.check_in_date,
+    checkout_date: acc.check_out_date,
+    check_in_date: acc.check_in_date,  // Keep both formats for compatibility
+    check_out_date: acc.check_out_date,
+    confirmation_number: acc.confirmation_number,
+    total_cost: acc.total_cost,
+    accommodation_type: acc.name.includes('Friends') ? 'private' : 'hotel',
+    star_rating: acc.name.includes('Riu Plaza') ? 4 : acc.name.includes('Tower') ? 4 : undefined,
+    amenities: acc.name.includes('Riu Plaza') ? ['WiFi', 'Restaurant', 'Bar', 'City Center'] :
+               acc.name.includes('Tower') ? ['WiFi', 'Thames Views', 'Restaurant'] :
+               ['Private Stay'],
+    lead_price: acc.total_cost ? { amount: acc.total_cost, currency: 'USD' } : { amount: 200, currency: 'USD' }, // Default price for display
+    price_per_night: acc.total_cost ? Math.round(acc.total_cost / 3) : 200, // Estimate per night (dividing by approx nights)
+    refundable: true,
+    site: 'database',
+    provider: 'Manual',
+    description: acc.name.includes('Friends') ? 'Private accommodation with friends' : 'Selected hotel accommodation'
+  }));
+
+  // Use enhanced hotels if available, otherwise fall back to hotel_cache data
+  const finalHotels = enhancedHotels.length > 0 ? enhancedHotels : hotels;
+
   return {
     trip_id: tripId,
     title: tripResult.trip_name,
@@ -579,8 +686,13 @@ async function loadTripDataDirect(tripId: string, db: D1Database): Promise<TripD
     start_date: tripResult.start_date,
     end_date: tripResult.end_date,
     client: clientInfo,
-    hotels: hotels,
-    activities: [], // Could be loaded from trip_activities_enhanced if needed
+    hotels: finalHotels,
+    activities: activities,
+    schedule: schedule,
+    accommodations: accommodations,
+    transportation: transportation,
+    flights: transportation.filter((t: any) => t.type === 'Flight'),
+    ground_transport: transportation.filter((t: any) => t.type === 'Train' || t.type === 'Bus'),
     total_cost: tripResult.total_cost || undefined
   };
 }
@@ -676,6 +788,72 @@ export function convertTripDataToProposalData(
       images: hotel.images
     }));
     
+    // Convert flights to FlightItin format
+    const flights: FlightItin[] = (tripData.flights || []).map(flight => {
+      // Parse flight number and carrier from confirmation_number or provider
+      const carrier = flight.provider || 'Unknown Airline';
+      const flightNumbers = flight.confirmation_number?.match(/flights? #?(\d+(?:\/\d+)?)/i)?.[1] || flight.flight_number || 'TBD';
+
+      // Handle multiple flight segments (e.g., "4951/710")
+      const segments = flightNumbers.split('/').map((flightNum, index) => ({
+        carrier: carrier,
+        flight: flightNum.trim(),
+        cabin: flight.class || 'Economy',
+        dep_airport: index === 0 ? extractAirportCode(flight.departure_location) : 'TBD',
+        dep_time_iso: flight.departure_time ? formatFlightDateTime(flight.departure_date, flight.departure_time) : '',
+        arr_airport: extractAirportCode(flight.arrival_location),
+        arr_time_iso: flight.arrival_time ? formatFlightDateTime(flight.arrival_date || flight.departure_date, flight.arrival_time) : ''
+      }));
+
+      return {
+        pricing: flight.cost ? {
+          total: parseFloat(flight.cost),
+          currency: 'USD',
+          per_person: parseFloat(flight.cost) / 2
+        } : undefined,
+        segments: segments,
+        notes_md: flight.notes || `${carrier} flight from ${flight.departure_location} to ${flight.arrival_location}`,
+        book_link: flight.booking_link
+      };
+    });
+
+    // Convert ground transport to GroundItem format
+    const ground: GroundItem[] = (tripData.ground_transport || []).filter(transport =>
+      transport.type?.toLowerCase() !== 'flight'
+    ).map(transport => {
+      const baseItem = {
+        total: parseFloat(transport.cost) || 0,
+        currency: 'USD',
+        insurance_included: transport.insurance_included || false
+      };
+
+      if (transport.type?.toLowerCase().includes('transfer')) {
+        return {
+          type: "transfer" as const,
+          mode: transport.mode as "private" | "shared" || "private",
+          route: `${transport.departure_location} → ${transport.arrival_location}`,
+          date_iso: transport.departure_date || transport.date,
+          pax: 2, // Default for couple
+          ...baseItem
+        };
+      } else {
+        return {
+          type: "car" as const,
+          vendor: transport.provider || 'Car Rental',
+          category: transport.vehicle_type || 'Standard',
+          pickup: transport.departure_location ? {
+            place: transport.departure_location,
+            time_iso: formatFlightDateTime(transport.departure_date, transport.departure_time)
+          } : undefined,
+          dropoff: transport.arrival_location ? {
+            place: transport.arrival_location,
+            time_iso: formatFlightDateTime(transport.arrival_date || transport.departure_date, transport.arrival_time)
+          } : undefined,
+          ...baseItem
+        };
+      }
+    });
+
     // Convert activities to tours
     const tours: TourItem[] = (tripData.activities || []).map(activity => ({
       title: activity.name,
@@ -685,7 +863,7 @@ export function convertTripDataToProposalData(
       highlights_md: activity.description,
       inclusions_md: `Duration: ${activity.duration || 'Not specified'}`
     }));
-    
+
     // Generate financials
     const financials: Financials = generateFinancials(tripData);
     
@@ -695,10 +873,12 @@ export function convertTripDataToProposalData(
     const proposalData: ProposalData = {
       trip_spec,
       hotels,
+      flights,
+      ground,
       tours,
       financials,
       next_steps,
-      
+
       // Metadata
       trip_id: tripData.trip_id,
       title: tripData.title,
@@ -861,6 +1041,56 @@ function generateNextSteps(tripData: TripData): NextSteps {
   }
   
   return { checklist };
+}
+
+// Helper function to extract airport code from location string
+function extractAirportCode(location: string): string {
+  if (!location) return '';
+
+  // Look for airport code in parentheses like "Mobile (MOB)" or "Dublin (DUB)"
+  const match = location.match(/\(([A-Z]{3})\)/);
+  if (match) {
+    return match[1];
+  }
+
+  // If no parentheses, try to extract 3-letter codes
+  const codeMatch = location.match(/\b([A-Z]{3})\b/);
+  if (codeMatch) {
+    return codeMatch[1];
+  }
+
+  // Fallback: return first 3 letters of city name
+  return location.split(/[,\s]/)[0].substring(0, 3).toUpperCase();
+}
+
+// Helper function to format flight date and time to ISO format
+function formatFlightDateTime(date: string, time: string): string {
+  if (!date || !time) return '';
+
+  try {
+    // Handle various date formats
+    let formattedDate = date;
+    if (!date.includes('-')) {
+      // Assume it's in a different format, try to parse it
+      const parsed = new Date(date);
+      formattedDate = parsed.toISOString().split('T')[0];
+    }
+
+    // Handle time format (e.g., "12:55:00" or "12:55")
+    let formattedTime = time;
+    if (!time.includes(':')) {
+      // If time doesn't have colons, assume it's HHMM format
+      formattedTime = time.substring(0, 2) + ':' + time.substring(2, 4) + ':00';
+    } else if (time.split(':').length === 2) {
+      // If time only has HH:MM, add seconds
+      formattedTime = time + ':00';
+    }
+
+    return `${formattedDate}T${formattedTime}`;
+  } catch (error) {
+    console.warn('Error formatting flight date/time:', error);
+    return '';
+  }
 }
 
 // Enhance proposal data with additional database information

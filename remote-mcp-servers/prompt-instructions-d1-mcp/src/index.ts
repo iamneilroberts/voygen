@@ -691,27 +691,32 @@ async function handleMCPRequest(json: any, env: Env) {
               console.error('Failed to get active trip status:', error);
             }
 
-            const welcomeMessage = `${statusDashboard}✅ **Claude Travel Agent System Ready!**
+            const welcomeMessage = `${statusDashboard}✅ Voygent Travel Assistant is active
 
-🤖 **Operating as**: Kim Henderson's AI Travel Assistant
-📋 **Mode**: Interactive [💬]
-🎯 **Instructions**: startup-core v${instruction.version} loaded
-${recentActivity}💡 **Quick Commands:**
-${recentActivity ? '- Type a number (1-5) to continue work on a trip above\n' : ''}- Type "help" for all workflows and commands
-- Type "/new" to start fresh trip planning
-- Type "status" to check loaded instructions
-- Say what you need help with in plain language
+🤖 Operating as: Kim Henderson's AI travel assistant
+📋 Mode: Interactive [💬]
+🎯 Instructions: startup-core v${instruction.version} loaded
+${recentActivity}🔎 Shortcuts & Commands:
+${recentActivity ? '- Type a number (1-5) to continue with a trip above\n' : ''}- /new  — start a new trip
+- /import — import a web page into a trip
+- /list — list trips or documents
+- /search — search trips/clients
+- /status — show loaded instructions
+- /validate — run trip checks
+- /publish — publish a proposal/document
+- /continue — resume recent work
+- /help — show all workflows & commands
 
-**Typical Usage Examples:**
+Examples:
 • "Search hotels in Miami for next week"
 • "Create itinerary for family trip to Italy"
 • "Show me Kim's Gems for Paris"
 • "Check commission on current trips"
 
-Ready to help with your travel planning! What would you like to work on?
+What would you like to do next?
 
 ---
-*System initialized with full travel agent capabilities*`;
+*Voygent is ready with full travel tools*`;
 
             return {
               jsonrpc: '2.0',
@@ -758,7 +763,7 @@ Ready to help with your travel planning! What would you like to work on?
               };
             }
 
-            let statusMessage = "📋 **Travel Agent System Status**\n\n";
+            let statusMessage = "📋 Voygent Travel Assistant Status\n\n";
             let currentCategory = "";
             
             for (const inst of results.results) {
@@ -793,13 +798,17 @@ Ready to help with your travel planning! What would you like to work on?
           }
 
           case 'help': {
-            const helpMessage = `🛠️ **Travel Agent System Help**
+            const helpMessage = `🛠️ Voygent Travel Assistant Help
 
 ## 🚀 Quick Start Commands
-- **travel_agent_start** - Load travel agent instructions and get ready
-- **status** - Show which instructions are currently loaded  
+- **travel_agent_start** - Load core instructions and show greeting
+- **status** - Show which instructions are currently loaded
 - **help** - Show this help menu
 - **reload** - Refresh system instructions
+
+### Slash Commands
+- /new, /import, /list, /search
+- /status, /validate, /publish, /continue, /help, /debug
 
 ## 🎯 Main Workflows
 

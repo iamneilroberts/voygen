@@ -211,6 +211,11 @@ export interface TripData {
   };
   hotels?: HotelData[];
   activities?: ActivityData[];
+  schedule?: any[]; // Raw schedule JSON from database
+  accommodations?: any[]; // Raw accommodations JSON from database
+  transportation?: any[]; // Raw transportation JSON from database
+  flights?: any[]; // Filtered flight data
+  ground_transport?: any[]; // Filtered ground transport data
   total_cost?: number;
   total_commission?: number;
 }

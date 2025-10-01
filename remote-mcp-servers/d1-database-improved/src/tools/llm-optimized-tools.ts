@@ -1,5 +1,6 @@
 // Import all tool categories
 import { getAnythingTool, continueTripTool } from './search-tools';
+import { refreshTripSearchSurfaceTool } from './search-surface';
 import { rememberContextTool, regenerateContextTool } from './context-tools';
 import { 
   advanceWorkflowPhaseTool, 
@@ -25,6 +26,8 @@ import {
   resolveErrorPatternTool, 
   getRecentActivitiesTool 
 } from './operations-tools';
+import { refreshTripFactsTool } from './fact-management';
+import { importTripPageTool, getTripDocumentsTool, importTripPageAndParseTool, previewTravelDocTool } from './import-tools';
 
 /**
  * LLM-Optimized Tools - Refactored Version
@@ -78,6 +81,12 @@ export const llmOptimizedTools = [
   
   // Recent activity retrieval for CTA startup
   getRecentActivitiesTool,
+  refreshTripSearchSurfaceTool,
+  refreshTripFactsTool,
+  importTripPageTool,
+  getTripDocumentsTool,
+  importTripPageAndParseTool,
+  previewTravelDocTool,
   
   // Continue command tool
   continueTripTool,
@@ -119,5 +128,11 @@ export {
   // Operations tools
   analyzeRecentErrorsTool,
   resolveErrorPatternTool,
-  getRecentActivitiesTool
+  getRecentActivitiesTool,
+  refreshTripSearchSurfaceTool,
+  refreshTripFactsTool
+  ,importTripPageTool
+  ,getTripDocumentsTool
+  ,importTripPageAndParseTool
+  ,previewTravelDocTool
 };

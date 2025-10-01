@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { D1Database } from '@cloudflare/workers-types';
 import { recordDatabaseError, createErrorResponse, extractOperationContext } from '../utils/error-recording';
+import { importTripPageTool, importTripPageAndParseTool } from './import-tools';
 import { generateSessionId } from '../utils/session-management';
 
 /**
@@ -345,7 +346,10 @@ export const bulkTripOperationsTool = {
   inputSchema: z.object({
     trip_identifier: z.string().describe('Trip name or ID'),
     operations: z.array(z.object({
-      type: z.enum(['add_activity', 'update_cost', 'add_note', 'update_status', 'add_document', 'assign_client', 'advance_workflow', 'set_workflow_step']),
+      type: z.enum([
+        'add_activity', 'update_cost', 'add_note', 'update_status', 'add_document', 'assign_client', 'advance_workflow', 'set_workflow_step',
+        'import_from_url', 'import_and_parse_from_url', 'rename_trip'
+      ]),
       data: z.any().optional().describe('Operation-specific data. For workflow operations: {phase?, step_number?, completion_data?, notes?}')
     })).describe('Array of operations to perform including workflow operations')
   }),
@@ -493,6 +497,100 @@ export const bulkTripOperationsTool = {
                 WHERE trip_id = ?
               `).bind(JSON.stringify(currentWorkflow), trip.trip_id).run();
               result = { success: true, message: `Workflow step set to ${operation.data?.step_number}` };
+              break;
+
+            case 'import_from_url':
+              if (!operation.data?.url) throw new Error('import_from_url requires data.url');
+              {
+                const importResult: any = await importTripPageTool.handler({
+                  trip_id: trip.trip_id,
+                  url: operation.data.url,
+                  tag: operation.data.tag,
+                  save_raw_html: operation.data.save_raw_html ?? true,
+                  save_text: operation.data.save_text ?? true,
+                  overwrite: operation.data.overwrite ?? false
+                }, db);
+                result = { success: !!importResult?.success, message: importResult?.message || 'Imported', details: importResult };
+              }
+              break;
+
+            case 'import_and_parse_from_url':
+              if (!operation.data?.url) throw new Error('import_and_parse_from_url requires data.url');
+              {
+                // Step 1: Import the page
+                const importResult: any = await importTripPageTool.handler({
+                  trip_id: trip.trip_id,
+                  url: operation.data.url,
+                  tag: operation.data.tag || 'imported_and_parsed',
+                  save_raw_html: operation.data.save_raw_html ?? true,
+                  save_text: operation.data.save_text ?? true,
+                  overwrite: operation.data.overwrite ?? false
+                }, db);
+
+                if (!importResult?.success) {
+                  throw new Error(`Import failed: ${importResult?.message || 'Unknown error'}`);
+                }
+
+                // Step 2: Parse the imported page
+                const parseResult: any = await importTripPageAndParseTool.handler({
+                  trip_id: trip.trip_id,
+                  doc_id: importResult.doc_id,
+                  strategy: operation.data.strategy || 'schedule_first',
+                  overwrite: operation.data.overwrite || 'none',
+                  dry_run: operation.data.dry_run || false,
+                  max_days: operation.data.max_days || 14,
+                  max_activities_per_day: operation.data.max_activities_per_day || 30
+                }, db);
+
+                if (!parseResult?.success) {
+                  throw new Error(`Parse failed: ${parseResult?.message || 'Unknown error'}`);
+                }
+
+                // Step 3: Optional rename trip
+                let renameResult = null;
+                if (operation.data.rename_to) {
+                  await db.prepare(`
+                    UPDATE trips_v2
+                    SET trip_name = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE trip_id = ?
+                  `).bind(operation.data.rename_to, trip.trip_id).run();
+
+                  if (operation.data.update_slug) {
+                    const newSlug = generateTripSlug(operation.data.rename_to, trip.start_date);
+                    await db.prepare(`
+                      UPDATE trips_v2
+                      SET trip_slug = ?, updated_at = CURRENT_TIMESTAMP
+                      WHERE trip_id = ?
+                    `).bind(newSlug, trip.trip_id).run();
+                  }
+
+                  renameResult = { renamed_to: operation.data.rename_to };
+                }
+
+                result = {
+                  success: true,
+                  message: 'Import, parse, and optional rename completed',
+                  imported: importResult,
+                  parsed: parseResult,
+                  renamed: renameResult
+                };
+              }
+              break;
+
+            case 'rename_trip':
+              if (!operation.data?.new_name) throw new Error('rename_trip requires data.new_name');
+              {
+                const newName: string = operation.data.new_name;
+                // Optionally update slug based on start_date
+                const tripRow = await db.prepare('SELECT start_date FROM trips_v2 WHERE trip_id = ?').bind(trip.trip_id).first();
+                const startDate = tripRow?.start_date || (new Date().getFullYear() + '-01-01');
+                const updateSlug = operation.data?.update_slug !== false; // default true
+                const newSlug = updateSlug ? generateTripSlug(newName, startDate) : trip.trip_slug;
+                await db.prepare(`UPDATE trips_v2 SET trip_name = ?, ${updateSlug ? 'trip_slug = ?, ' : ''} updated_at = CURRENT_TIMESTAMP WHERE trip_id = ?`)
+                  .bind(...(updateSlug ? [newName, newSlug, trip.trip_id] : [newName, trip.trip_id]))
+                  .run();
+                result = { success: true, message: `Trip renamed to ${newName}` };
+              }
               break;
 
             default:

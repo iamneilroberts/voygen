@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Lightweight reminder to keep CHANGELOG.md up to date.
+# Does NOT block commits; prints a friendly hint when appropriate.
+
+set -euo pipefail
+
+# Allow bypass
+if [[ "${SKIP_CHANGELOG_CHECK:-}" == "1" ]]; then
+  exit 0
+fi
+
+# Commit message path (unused, here for future heuristics)
+MSG_FILE="$1"
+MSG_CONTENT="$(cat "$MSG_FILE" 2>/dev/null || true)"
+
+# Skip for merge commits, version bumps, or changelog-related commits
+if grep -Eq '^(Merge|Revert|chore\(release\)|release:|version:|bump|changelog)' <<<"$MSG_CONTENT"; then
+  exit 0
+fi
+
+# Staged files
+CHANGED_FILES=$(git diff --cached --name-only)
+if [[ -z "$CHANGED_FILES" ]]; then
+  exit 0
+fi
+
+# If CHANGELOG.md already staged, no reminder needed
+if grep -qx "CHANGELOG.md" <<<"$CHANGED_FILES" || grep -Eq '^CHANGELOG\.md$' <<<"$CHANGED_FILES"; then
+  exit 0
+fi
+
+# Only nudge when touching code/ops areas (reduce noise on pure docs changes)
+if ! grep -Eq '^(src|scripts|voygen-api|librechat-source|mcp-local-servers|remote-mcp-servers|zen-mcp-server)/' <<<"$CHANGED_FILES"; then
+  exit 0
+fi
+
+echo "\n🔎 Reminder: Consider updating CHANGELOG.md (Unreleased)."
+echo "   Tip: npm run changelog:add -- --type feat|fix|docs|chore --scope \"<area>\" --summary \"<what changed>\"\n"
+
+exit 0
+

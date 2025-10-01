@@ -117,10 +117,10 @@ const mockProposalData: ProposalData = {
 };
 
 const mockThemeRemix: ThemeRemix = {
-  colorScheme: 'professional',
-  typography: 'modern',
-  decorative: 'minimal',
-  layout: 'standard'
+  colorScheme: 'professional-blue',
+  typography: 'corporate',
+  decorative: 'minimal-emoji',
+  layout: 'spacious'
 };
 
 describe('Proposal Remix System - Core Architecture', () => {
@@ -199,10 +199,10 @@ describe('Proposal Remix System - Core Architecture', () => {
   describe('Theme System Integration', () => {
     it('should validate theme configurations', () => {
       const validTheme: ThemeRemix = {
-        colorScheme: 'professional',
-        typography: 'modern',
-        decorative: 'minimal',
-        layout: 'standard'
+        colorScheme: 'professional-blue',
+        typography: 'corporate',
+        decorative: 'minimal-emoji',
+        layout: 'spacious'
       };
 
       const validation = themeEngine.validateTheme(validTheme);
@@ -212,9 +212,9 @@ describe('Proposal Remix System - Core Architecture', () => {
     it('should reject invalid theme configurations', () => {
       const invalidTheme = {
         colorScheme: 'invalid_color',
-        typography: 'modern',
-        decorative: 'minimal',
-        layout: 'standard'
+        typography: 'corporate',
+        decorative: 'minimal-emoji',
+        layout: 'spacious'
       } as ThemeRemix;
 
       const validation = themeEngine.validateTheme(invalidTheme);
@@ -286,9 +286,9 @@ describe('Template Rendering Tests', () => {
     it('should render functional template', async () => {
       const functionalTheme: ThemeRemix = {
         colorScheme: 'modern',
-        typography: 'clean',
-        decorative: 'minimal',
-        layout: 'efficient'
+        typography: 'elegant',
+        decorative: 'minimal-emoji',
+        layout: 'compact'
       };
 
       const html = await templateFactory.renderTemplate(
@@ -304,9 +304,9 @@ describe('Template Rendering Tests', () => {
 
   describe('Theme Application', () => {
     const themes: ThemeRemix[] = [
-      { colorScheme: 'professional', typography: 'modern', decorative: 'minimal', layout: 'standard' },
+      { colorScheme: 'professional-blue', typography: 'corporate', decorative: 'minimal-emoji', layout: 'spacious' },
       { colorScheme: 'luxury', typography: 'elegant', decorative: 'rich', layout: 'immersive' },
-      { colorScheme: 'executive', typography: 'clean', decorative: 'minimal', layout: 'efficient' },
+      { colorScheme: 'luxury-gold', typography: 'elegant', decorative: 'minimal-emoji', layout: 'compact' },
       { colorScheme: 'friendly', typography: 'relaxed', decorative: 'moderate', layout: 'comfortable' }
     ];
 

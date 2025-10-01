@@ -47,3 +47,10 @@ echo "2. Ensure MongoDB is running (required for LibreChat)"
 echo "3. Run 'npm run start' to launch Voygen"
 echo ""
 echo "For detailed setup instructions, see README.md"
+
+# Try to install local git hooks (best-effort)
+if [ -d ".git" ]; then
+  if command -v node >/dev/null 2>&1; then
+    node scripts/setup-hooks.js || true
+  fi
+fi

@@ -17,10 +17,17 @@ import {
 } from '../utils/search-normalization';
 import { performSemanticSearch } from '../utils/semantic-search';
 import { executeWithProgressiveFallback, createFallbackQueries } from '../utils/query-fallback';
-import { SearchResponse, QueryPerformanceMetrics, DEFAULT_COMPLEXITY_LIMITS } from '../types/search-types';
+import {
+  SearchResponse,
+  QueryPerformanceMetrics,
+  DEFAULT_COMPLEXITY_LIMITS,
+  TripSuggestion,
+  TripSelection
+} from '../types/search-types';
 import { recordDatabaseError, createErrorResponse, analyzeErrorPattern, shouldBypassForComplexity, extractOperationContext } from '../utils/error-recording';
 import { generateSessionId, extractTableNames, sanitizeQueryForLogging } from '../utils/session-management';
 import { extractTripStatus, formatStatusDashboard } from '../utils/status-formatter';
+import { searchTripSurface, TripSurfaceMatch } from '../utils/trip-surface-search';
 
 // EMERGENCY TIMEOUT PROTECTION
 const QUERY_TIMEOUT_MS = 800; // Buffer before D1's 1000ms limit
@@ -86,6 +93,239 @@ async function logActivity(
     console.error(`[logActivity] Failed to log activity:`, error);
     // Don't throw - logging failures shouldn't break main functionality
   }
+}
+
+interface TravelerInfo {
+  name: string;
+  email?: string | null;
+}
+
+interface TripContextData {
+  trip: any;
+  facts: any | null;
+  travelers: TravelerInfo[];
+  traveler_names: string[];
+  traveler_emails: string[];
+  workflow_phase: string | null;
+  workflow_step: number | null;
+  progress_percentage: number;
+  days_until_departure: number | null;
+  workflow_state: any;
+}
+
+function fallbackNameFromEmail(email?: string | null): string | null {
+  if (!email) {
+    return null;
+  }
+  const local = email.split('@')[0] || '';
+  if (!local) {
+    return null;
+  }
+  return local
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
+function parseJsonArray(value?: string | null): string[] {
+  if (!value) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+function mergeTravelerDetails(names: string[], emails: string[]): TravelerInfo[] {
+  const maxLength = Math.max(names.length, emails.length);
+  const seenKeys = new Set<string>();
+  const travelers: TravelerInfo[] = [];
+
+  for (let i = 0; i < maxLength; i += 1) {
+    const nameCandidate = names[i]?.trim();
+    const emailCandidate = emails[i] || null;
+    const resolvedName = nameCandidate || fallbackNameFromEmail(emailCandidate) || `Traveler ${travelers.length + 1}`;
+    const key = emailCandidate ? emailCandidate.toLowerCase() : `${resolvedName.toLowerCase()}#${i}`;
+    if (seenKeys.has(key)) {
+      continue;
+    }
+    seenKeys.add(key);
+    travelers.push({ name: resolvedName, email: emailCandidate });
+  }
+
+  for (let i = maxLength; i < names.length; i += 1) {
+    const name = names[i]?.trim();
+    if (!name) {
+      continue;
+    }
+    const key = `${name.toLowerCase()}#extra`;
+    if (seenKeys.has(key)) {
+      continue;
+    }
+    seenKeys.add(key);
+    travelers.push({ name });
+  }
+
+  for (let i = maxLength; i < emails.length; i += 1) {
+    const email = emails[i];
+    if (!email) {
+      continue;
+    }
+    const key = email.toLowerCase();
+    if (seenKeys.has(key)) {
+      continue;
+    }
+    seenKeys.add(key);
+    travelers.push({ name: fallbackNameFromEmail(email) || `Traveler ${travelers.length + 1}`, email });
+  }
+
+  return travelers;
+}
+
+async function fetchTripContext(
+  db: D1Database,
+  tripId: number,
+  match?: TripSurfaceMatch
+): Promise<TripContextData | null> {
+  const trip = await db
+    .prepare(`
+      SELECT
+        t.trip_id,
+        t.trip_name,
+        t.trip_slug,
+        t.status,
+        t.start_date,
+        t.end_date,
+        t.destinations,
+        t.primary_client_email,
+        cv.full_name AS primary_client_name,
+        t.workflow_state,
+        t.total_cost,
+        t.clients
+      FROM trips_v2 t
+      LEFT JOIN clients_v2 cv ON cv.email = t.primary_client_email
+      WHERE t.trip_id = ?
+    `)
+    .bind(tripId)
+    .first();
+
+  if (!trip) {
+    return null;
+  }
+
+  const facts = await db
+    .prepare(`
+      SELECT traveler_count, traveler_names, traveler_emails, total_nights, total_hotels, total_activities, total_cost, transit_minutes
+      FROM trip_facts
+      WHERE trip_id = ?
+    `)
+    .bind(tripId)
+    .first();
+
+  let travelerNames: string[] = match?.traveler_names ?? [];
+  let travelerEmails: string[] = match?.traveler_emails ?? [];
+
+  if (facts) {
+    const factNames = parseJsonArray(facts.traveler_names);
+    const factEmails = parseJsonArray(facts.traveler_emails);
+    if (factNames.length) {
+      travelerNames = factNames;
+    }
+    if (factEmails.length) {
+      travelerEmails = factEmails;
+    }
+  }
+
+  if (travelerNames.length === 0 && travelerEmails.length === 0) {
+    const assignments = await db
+      .prepare(`
+        SELECT a.client_email AS email, coalesce(cv.full_name, '') AS full_name
+        FROM trip_client_assignments a
+        LEFT JOIN clients_v2 cv ON cv.email = a.client_email
+        WHERE a.trip_id = ?
+      `)
+      .bind(tripId)
+      .all();
+
+    const assignmentRows = (assignments as any).results || [];
+    travelerNames = assignmentRows
+      .map((row: any) => (row.full_name || '').trim())
+      .filter(Boolean);
+    travelerEmails = assignmentRows
+      .map((row: any) => row.email)
+      .filter(Boolean);
+  }
+
+  const travelers = mergeTravelerDetails(travelerNames, travelerEmails);
+
+  let workflowPhase: string | null = null;
+  let workflowStep: number | null = null;
+  let workflowState: any = null;
+
+  if (trip.workflow_state) {
+    try {
+      workflowState = JSON.parse(trip.workflow_state);
+      workflowPhase = workflowState?.current_phase ?? null;
+      workflowStep = workflowState?.current_step ?? null;
+    } catch {
+      workflowState = null;
+    }
+  }
+
+  const progressPercentage = calculateProgressPercentage(workflowState);
+  const daysUntilDeparture = trip.start_date ? calculateDaysUntil(trip.start_date) : null;
+
+  return {
+    trip,
+    facts: facts || null,
+    travelers,
+    traveler_names: travelerNames,
+    traveler_emails: travelerEmails,
+    workflow_phase: workflowPhase,
+    workflow_step: workflowStep,
+    progress_percentage: progressPercentage,
+    days_until_departure: daysUntilDeparture,
+    workflow_state: workflowState
+  };
+}
+
+function formatTravelerLines(travelers: TravelerInfo[]): string {
+  if (!travelers.length) {
+    return '_No traveler details stored yet_';
+  }
+  return travelers
+    .map((traveler) => `• ${traveler.name}${traveler.email ? ` (${traveler.email})` : ''}`)
+    .join('\n');
+}
+
+function buildTripSuggestionFromMatch(match: TripSurfaceMatch): TripSuggestion {
+  return {
+    trip_id: match.trip_id,
+    trip_name: match.trip_name,
+    trip_slug: match.trip_slug,
+    status: match.status,
+    destinations: match.destinations,
+    start_date: match.start_date,
+    end_date: match.end_date,
+    primary_client_name: match.primary_client_name,
+    primary_client_email: match.primary_client_email,
+    traveler_preview: match.traveler_names.slice(0, 3),
+    score: match.score
+  };
+}
+
+function toSelectedTrip(match: TripSurfaceMatch): TripSelection {
+  return {
+    ...buildTripSuggestionFromMatch(match),
+    traveler_emails: match.traveler_emails,
+    traveler_count: match.traveler_count,
+    matched_tokens: match.matched_tokens,
+    match_reasons: match.match_reasons
+  };
 }
 
 /**
@@ -214,6 +454,75 @@ The system returns MORE complete data with DISTINCTIVE search terms.`,
         }
       }
       
+      // PHASE 2B: Unified trip search surface fuzzy matching
+      try {
+        const surfaceMatches = await searchTripSurface(db, input.query, { limit: 5 });
+        if (surfaceMatches.length) {
+          const bestMatch = surfaceMatches[0];
+          const tripContext = await fetchTripContext(db, bestMatch.trip_id, bestMatch);
+
+          if (tripContext) {
+            const facts = tripContext.facts || {};
+            const metrics: string[] = [];
+            if (typeof facts.total_nights === 'number') {
+              metrics.push(`Total Nights: ${facts.total_nights}`);
+            }
+            if (typeof facts.total_hotels === 'number') {
+              metrics.push(`Hotels Booked: ${facts.total_hotels}`);
+            }
+            if (typeof facts.total_activities === 'number' && facts.total_activities > 0) {
+              metrics.push(`Total Activities: ${facts.total_activities}`);
+            }
+            if (typeof facts.total_cost === 'number' && facts.total_cost > 0) {
+              metrics.push(`Estimated Cost: $${Number(facts.total_cost).toLocaleString()}`);
+            }
+            if (typeof facts.transit_minutes === 'number' && facts.transit_minutes > 0) {
+              const hours = Math.round((facts.transit_minutes / 60) * 10) / 10;
+              metrics.push(`Transit Time: ${hours} hrs`);
+            }
+
+            const travelerBlock = formatTravelerLines(tripContext.travelers);
+            const metricsBlock = metrics.length ? `\n**Key Metrics**\n${metrics.map((item) => `• ${item}`).join('\n')}` : '';
+            const matchedTokens = bestMatch.matched_tokens.length
+              ? `\n**Matched Tokens:** ${bestMatch.matched_tokens.join(', ')}`
+              : '';
+
+            const response = `**Trip Match:** ${tripContext.trip.trip_name} (ID ${tripContext.trip.trip_id})\n` +
+              `• **Status:** ${tripContext.trip.status || 'unknown'}\n` +
+              `• **Dates:** ${tripContext.trip.start_date || 'TBD'} → ${tripContext.trip.end_date || 'TBD'}\n` +
+              `• **Destinations:** ${tripContext.trip.destinations || 'Not specified'}\n` +
+              `• **Primary Client:** ${tripContext.trip.primary_client_name || 'Unknown'}${tripContext.trip.primary_client_email ? ` (${tripContext.trip.primary_client_email})` : ''}\n` +
+              `• **Workflow Phase:** ${tripContext.workflow_phase || 'Not set'} (step ${tripContext.workflow_step ?? 1})\n` +
+              `• **Progress:** ${tripContext.progress_percentage}%\n` +
+              (tripContext.days_until_departure != null ? `• **Days Until Departure:** ${tripContext.days_until_departure}\n` : '') +
+              `\n**Travelers**\n${travelerBlock}${metricsBlock}${matchedTokens}\n\n_Score: ${bestMatch.score.toFixed(1)} via trip search surface_`;
+
+            const selectedTrip = toSelectedTrip(bestMatch);
+            selectedTrip.traveler_emails = tripContext.travelers
+              .map((trav) => trav.email)
+              .filter((email): email is string => Boolean(email));
+            selectedTrip.traveler_count = tripContext.travelers.length;
+
+            const suggestionPayload = surfaceMatches
+              .slice(1)
+              .map((match) => buildTripSuggestionFromMatch(match));
+
+            return {
+              response,
+              context_type: 'trip_search_surface_match',
+              natural_key: tripContext.trip.trip_name,
+              source: 'trip_search_surface',
+              trip_id: tripContext.trip.trip_id,
+              search_terms: optimizedTerms,
+              selected_trip: selectedTrip,
+              trip_suggestions: suggestionPayload
+            } as SearchResponse;
+          }
+        }
+      } catch (surfaceError) {
+        console.warn('Trip search surface lookup failed', surfaceError);
+      }
+      
       // Continue with progressive fallback search
       const fallbackResult = await executeWithProgressiveFallback(
         db, 
@@ -316,6 +625,8 @@ export const continueTripTool = {
     try {
       const sessionId = generateSessionId();
       let targetTrip: any;
+      let fuzzyMatches: TripSurfaceMatch[] = [];
+      let selectedMatch: TripSurfaceMatch | null = null;
       
       // Find the target trip
       if (input.activity_id) {
@@ -337,26 +648,103 @@ export const continueTripTool = {
         
         targetTrip = activity;
       } else if (input.search_query) {
-        // Search for specific trip
-        const searchResults = await db.prepare(`
+        // Normalize search input
+        const normalizedQuery = input.search_query.trim().toLowerCase();
+        const likeTerm = `%${normalizedQuery}%`;
+
+        // Primary search (single LIKE)
+        let searchResults: any = await db.prepare(`
           SELECT a.*, t.trip_name, t.status as trip_status,
                  ROW_NUMBER() OVER (PARTITION BY a.trip_id ORDER BY a.created_at DESC) as rn
           FROM ActivityLog a
           LEFT JOIN trips_v2 t ON a.trip_id = t.trip_id
-          WHERE (t.trip_name LIKE ? OR t.destinations LIKE ? OR a.activity_details LIKE ?)
+          WHERE (
+            LOWER(t.trip_name) LIKE ? OR 
+            LOWER(t.destinations) LIKE ? OR 
+            LOWER(a.activity_details) LIKE ?
+          )
             AND a.trip_id IS NOT NULL
           ORDER BY a.created_at DESC
-        `).bind(`%${input.search_query}%`, `%${input.search_query}%`, `%${input.search_query}%`).all();
-        
+        `).bind(likeTerm, likeTerm, likeTerm).all();
+
+        // Fallback: require all distinctive terms to appear somewhere
         if (!searchResults.results || searchResults.results.length === 0) {
-          return {
-            success: false,
-            error: 'No matching trips found',
-            message: `No trips found matching "${input.search_query}"`
-          };
+          const distinctiveTerms = normalizedQuery
+            .split(/[^a-z0-9]+/i)
+            .map((term: string) => term.trim())
+            .filter((term: string) => term.length >= 3)
+            .slice(0, 3);
+
+          if (distinctiveTerms.length > 0) {
+            const clauses = distinctiveTerms
+              .map(
+                () =>
+                  `(
+                    LOWER(t.trip_name) LIKE ? OR 
+                    LOWER(t.destinations) LIKE ? OR 
+                    LOWER(a.activity_details) LIKE ?
+                  )`,
+              )
+              .join(' AND ');
+
+            const fallbackParams: string[] = [];
+            distinctiveTerms.forEach((term: string) => {
+              const pattern = `%${term}%`;
+              fallbackParams.push(pattern, pattern, pattern);
+            });
+
+            searchResults = await db.prepare(`
+              SELECT a.*, t.trip_name, t.status as trip_status,
+                     ROW_NUMBER() OVER (PARTITION BY a.trip_id ORDER BY a.created_at DESC) as rn
+              FROM ActivityLog a
+              LEFT JOIN trips_v2 t ON a.trip_id = t.trip_id
+              WHERE ${clauses}
+                AND a.trip_id IS NOT NULL
+              ORDER BY a.created_at DESC
+            `).bind(...fallbackParams).all();
+          }
         }
-        
-        targetTrip = searchResults.results[0];
+
+        if (searchResults.results && searchResults.results.length > 0) {
+          targetTrip = searchResults.results[0];
+          fuzzyMatches = await searchTripSurface(db, input.search_query, { limit: 5 });
+          selectedMatch = fuzzyMatches.find((match) => match.trip_id === targetTrip.trip_id) || null;
+        } else {
+          fuzzyMatches = await searchTripSurface(db, input.search_query, { limit: 5 });
+          if (!fuzzyMatches.length) {
+            return {
+              success: false,
+              error: 'No matching trips found',
+              message: `No trips found matching "${input.search_query}"`,
+              suggestions: []
+            };
+          }
+
+          selectedMatch = fuzzyMatches[0];
+          const latestActivity = await db.prepare(`
+            SELECT a.*, t.trip_name, t.status as trip_status
+            FROM ActivityLog a
+            LEFT JOIN trips_v2 t ON a.trip_id = t.trip_id
+            WHERE a.trip_id = ?
+            ORDER BY a.created_at DESC
+            LIMIT 1
+          `)
+            .bind(selectedMatch.trip_id)
+            .first();
+
+          if (latestActivity) {
+            targetTrip = latestActivity;
+          } else {
+            targetTrip = {
+              trip_id: selectedMatch.trip_id,
+              trip_name: selectedMatch.trip_name,
+              trip_status: selectedMatch.status,
+              activity_type: 'TripMatch',
+              activity_details: 'Matched via trip search surface',
+              created_at: new Date().toISOString()
+            };
+          }
+        }
       } else {
         // Get most recent trip
         const recentActivity = await db.prepare(`
@@ -379,37 +767,40 @@ export const continueTripTool = {
         targetTrip = recentActivity;
       }
       
-      // Get comprehensive trip data
-      const tripData = await db.prepare(`
-        SELECT 
-          t.*,
-          c.full_name as primary_client_name,
-          c.email as primary_client_email,
-          c.phone as primary_client_phone
-        FROM trips_v2 t
-        LEFT JOIN clients_v2 c ON c.email = t.primary_client_email
-        WHERE t.trip_id = ?
-      `).bind(targetTrip.trip_id).first();
-      
-      if (!tripData) {
+      if (!targetTrip) {
+        return {
+          success: false,
+          error: 'trip_not_found',
+          message: 'Unable to determine which trip to continue. Provide a more specific search query.'
+        };
+      }
+
+      const tripContext = await fetchTripContext(
+        db,
+        targetTrip.trip_id,
+        selectedMatch || (fuzzyMatches.length ? fuzzyMatches[0] : undefined)
+      );
+
+      if (!tripContext) {
         return {
           success: false,
           error: 'Trip data not found',
           message: `Trip data not found for ID ${targetTrip.trip_id}`
         };
       }
-      
-      // Get workflow state
-      const workflowState = tripData.workflow_state ? JSON.parse(tripData.workflow_state) : null;
+
+      const tripData = tripContext.trip;
+      const workflowState = tripContext.workflow_state ?? null;
       
       // Get recent activities for this trip
-      const recentActivities = await db.prepare(`
+      const recentActivitiesResult = await db.prepare(`
         SELECT *
         FROM ActivityLog
         WHERE trip_id = ?
         ORDER BY created_at DESC
         LIMIT 10
       `).bind(targetTrip.trip_id).all();
+      const recentActivities = (recentActivitiesResult as any).results || [];
       
       // Calculate time since last activity
       const lastActivityDate = new Date(targetTrip.created_at);
@@ -419,6 +810,54 @@ export const continueTripTool = {
       const timeSinceLastActivity = daysDiff > 0 ? `${daysDiff} days ago` : 'today';
       
       // Create comprehensive context
+  let clientNames: string[] = [];
+  if (tripData.clients) {
+    try {
+      const parsedClients = Array.isArray(tripData.clients)
+        ? tripData.clients
+        : JSON.parse(tripData.clients);
+      if (Array.isArray(parsedClients)) {
+        clientNames = parsedClients
+          .map((client: any) => (typeof client?.full_name === 'string' ? client.full_name.trim() : ''))
+          .filter(Boolean);
+      }
+    } catch {
+      clientNames = [];
+    }
+  }
+
+      const facts = tripContext.facts || {};
+      const metrics: string[] = [];
+      if (typeof facts.total_nights === 'number') {
+        metrics.push(`Total Nights: ${facts.total_nights}`);
+      }
+      if (typeof facts.total_hotels === 'number') {
+        metrics.push(`Hotels Booked: ${facts.total_hotels}`);
+      }
+      if (typeof facts.total_activities === 'number' && facts.total_activities > 0) {
+        metrics.push(`Total Activities: ${facts.total_activities}`);
+      }
+      if (typeof facts.total_cost === 'number' && facts.total_cost > 0) {
+        metrics.push(`Estimated Cost: $${Number(facts.total_cost).toLocaleString()}`);
+      }
+      if (typeof facts.transit_minutes === 'number' && facts.transit_minutes > 0) {
+        const hours = Math.round((facts.transit_minutes / 60) * 10) / 10;
+        metrics.push(`Transit Time: ${hours} hrs`);
+      }
+
+      const suggestionPayload = fuzzyMatches
+        .filter((match) => match.trip_id !== tripData.trip_id)
+        .slice(0, 4)
+        .map((match) => buildTripSuggestionFromMatch(match));
+
+      const selectedTripPayload = selectedMatch ? toSelectedTrip(selectedMatch) : undefined;
+      if (selectedTripPayload) {
+        selectedTripPayload.traveler_emails = tripContext.travelers
+          .map((traveler) => traveler.email)
+          .filter((email): email is string => Boolean(email));
+        selectedTripPayload.traveler_count = tripContext.travelers.length;
+      }
+
       const contextSummary = {
         trip_name: tripData.trip_name,
         trip_id: tripData.trip_id,
@@ -429,16 +868,18 @@ export const continueTripTool = {
         dates: `${tripData.start_date} to ${tripData.end_date}`,
         last_activity: targetTrip.activity_type,
         last_activity_date: timeSinceLastActivity,
-        workflow_phase: workflowState?.current_phase || 'Not set',
-        step: workflowState?.current_step || 1,
-        total_cost: tripData.total_cost || 0,
-        clients: tripData.client_names ? tripData.client_names.split(',') : [],
-        progress_percentage: calculateProgressPercentage(workflowState),
-        days_until_departure: calculateDaysUntil(tripData.start_date)
+        workflow_phase: tripContext.workflow_phase || 'Not set',
+        step: tripContext.workflow_step || 1,
+        total_cost: tripData.total_cost ?? facts.total_cost ?? 0,
+        clients: clientNames,
+        progress_percentage: tripContext.progress_percentage,
+        days_until_departure: tripContext.days_until_departure,
+        travelers: tripContext.travelers,
+        traveler_count: tripContext.travelers.length
       };
       
       // Generate next action recommendation
-      const nextAction = generateNextAction(workflowState, tripData, recentActivities.results);
+      const nextAction = generateNextAction(workflowState, tripData, recentActivities);
       
       // Update session context
       await db.prepare(`
@@ -450,10 +891,6 @@ export const continueTripTool = {
           created_at,
           updated_at
         ) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-        ON CONFLICT(session_id) DO UPDATE SET
-          memory_context = excluded.memory_context,
-          active_entities = excluded.active_entities,
-          updated_at = CURRENT_TIMESTAMP
       `).bind(
         sessionId,
         `Continuing work on trip: ${tripData.trip_name}`,
@@ -478,6 +915,12 @@ export const continueTripTool = {
         sessionId
       );
       
+      const travelerBlock = formatTravelerLines(tripContext.travelers);
+      const metricsBlock = metrics.length ? `\n**Key Metrics**\n${metrics.map((item) => `• ${item}`).join('\n')}` : '';
+      const matchBlock = selectedMatch
+        ? `\n_Source: trip search surface score ${selectedMatch.score.toFixed(1)}_`
+        : '';
+
       return {
         success: true,
         message: `✅ **CONTINUING WORK ON**: ${tripData.trip_name}
@@ -489,11 +932,16 @@ export const continueTripTool = {
 • **Status**: ${contextSummary.status}
 • **Total Cost**: $${contextSummary.total_cost.toLocaleString()}
 
+**👥 TRAVELERS:**
+${travelerBlock}
+
 **🔄 WORKFLOW STATUS:**
 • **Current Phase**: ${contextSummary.workflow_phase}
 • **Step**: ${contextSummary.step}
 • **Progress**: ${contextSummary.progress_percentage}%
 • **Days Until Departure**: ${contextSummary.days_until_departure}
+
+${metricsBlock}
 
 **📅 RECENT ACTIVITY:**
 • **Last Action**: ${targetTrip.activity_type} (${timeSinceLastActivity})
@@ -502,11 +950,14 @@ export const continueTripTool = {
 **🎯 RECOMMENDED NEXT ACTION:**
 ${nextAction}
 
-**🔗 Context loaded for session**: ${sessionId}`,
+**🔗 Context loaded for session**: ${sessionId}${matchBlock}`,
         context: contextSummary,
         session_id: sessionId,
         next_action: nextAction,
-        recent_activities: recentActivities.results?.slice(0, 5) || []
+        recent_activities: recentActivities.results?.slice(0, 5) || [],
+        travelers: tripContext.travelers,
+        suggestions: suggestionPayload,
+        selected_match: selectedTripPayload
       };
       
     } catch (error: any) {

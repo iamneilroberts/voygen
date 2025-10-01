@@ -42,3 +42,34 @@
 ## Agent-Specific Instructions (MCP)
 - Local agents: add under `mcp-local-servers/<agent-name>` with README and tests; run `npm run test:mcp`.
 - Remote agents: place under `remote-mcp-servers/`; deploy via `npm run deploy:mcp` (see package scripts).
+
+## Handoff Workflow (for Codex / Agents)
+- Purpose: keep `HANDOFF.md` always current so a fresh session can resume seamlessly.
+- Command:
+  - Quick entry: `npm run handoff -- --status "<short status>" --next "<next steps>" --notes "<optional notes>"`
+  - Example: `npm run handoff -- --status "Deploying" --next "Verify login & MCP" --notes "Domains verified; ALLOWED_ORIGINS updated"`
+- Behavior: updates `HANDOFF.md` under the `## Handoff Log` section with timestamp, status, next steps, and latest commit (including `.cache-voygent-hosted` if present).
+- Variant (done): `npm run handoff:done -- --status "<final status>" --next "<handoff next>" --notes "<notes>"`
+  - Also updates the `## Current Status` section by inserting/updating a `- Current status: <text> (<timestamp>)` bullet.
+- Convention: when the user types `/handoff ...` in chat, the agent should reflect that by running the command above with the provided text. If the user types `/handoff done ...`, use `npm run handoff:done` instead.
+
+### Chat Commands
+- `/handoff status="..." next="..." notes="..."`
+  - Run: `npm run handoff -- --status "..." --next "..." --notes "..."`
+- `/handoff done status="..." next="..." notes="..."`
+  - Run: `npm run handoff:done -- --status "..." --next "..." --notes "..."`
+  - Effect: updates both the Handoff Log and the Current Status bullet.
+
+## Changelog Workflow
+- Purpose: capture significant changes over time in `CHANGELOG.md` using a simple, consistent flow.
+- File: `CHANGELOG.md` (Keep a Changelog style with Unreleased → Added/Changed/Fixed).
+- Command:
+  - `npm run changelog:add -- --type feat|fix|docs|chore --scope "<area>" --summary "<short description>"`
+  - Example: `npm run changelog:add -- --type feat --scope "handoff" --summary "Add \"handoff:done\" to update Current Status"`
+- Behavior: appends a bullet under the appropriate Unreleased section with a date stamp.
+
+## Git Hooks (Changelog Reminder)
+- Purpose: nudge contributors to update `CHANGELOG.md` when committing code changes.
+- Install: `npm run setup:hooks` (or re-run `npm run setup` after cloning).
+- Behavior: a local `commit-msg` hook prints a friendly reminder if `CHANGELOG.md` isn’t staged while code/ops files changed.
+- Opt-out: set env `SKIP_CHANGELOG_CHECK=1` for a commit if needed.

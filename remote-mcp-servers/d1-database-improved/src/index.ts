@@ -14,7 +14,7 @@ import { Env } from './types';
 import { DatabaseManager } from './database/manager';
 import { SchemaValidator } from './database/validation';
 import { ErrorLogger } from './database/errors';
-import { FactTableManager } from './database/facts';
+import { FactTableManager, TripFactsSummary } from './database/facts';
 import { TriggerManager } from './database/triggers';
 import { llmOptimizedTools } from './tools/llm-optimized-tools';
 import { generateSlugFromTripData, ensureUniqueSlug } from './utils/slug-generator';
@@ -561,10 +561,103 @@ async function handleUpdateActivityLogClients(dbManager: DatabaseManager, errorL
   }
 }
 
-async function handleRefreshTripFacts(facts: FactTableManager, args: { limit?: number }) {
-  const n = await facts.refreshDirty(Math.max(1, Math.min(500, args?.limit ?? 50)));
+async function handleRefreshTripFacts(
+  facts: FactTableManager,
+  args: { trip_id?: string | number; limit?: number; force_refresh?: boolean }
+) {
+  const limit = Math.max(1, Math.min(500, args?.limit ?? 50));
+  const summaries: TripFactsSummary[] = [];
+  let refreshedCount = 0;
+  let errorCount = 0;
+
+  if (args?.trip_id) {
+    try {
+      const summary = await facts.refreshTripFacts(args.trip_id);
+      if (summary) {
+        summaries.push(summary);
+        refreshedCount = 1;
+        await globalEnv.DB.prepare(`DELETE FROM facts_dirty WHERE trip_id = ?`).bind(summary.trip_id).run();
+      }
+    } catch (error) {
+      errorCount = 1;
+      summaries.push({
+        trip_id: Number(args.trip_id),
+        total_nights: 0,
+        total_hotels: 0,
+        total_activities: 0,
+        total_cost: 0,
+        transit_minutes: 0,
+        traveler_count: 0,
+        traveler_names: [],
+        traveler_emails: [],
+        primary_client_email: null,
+        primary_client_name: String(error instanceof Error ? error.message : error)
+      });
+    }
+  } else {
+    let tripIds: Array<{ trip_id: number }> = [];
+    if (args?.force_refresh) {
+      const rows: any = await globalEnv.DB.prepare(`
+        SELECT trip_id
+        FROM trips_v2
+        WHERE status IS NULL OR status != 'cancelled'
+        ORDER BY updated_at DESC
+        LIMIT ?1
+      `).bind(limit).all();
+      tripIds = rows.results || rows;
+    } else {
+      const rows: any = await globalEnv.DB.prepare(`
+        SELECT DISTINCT trip_id
+        FROM facts_dirty
+        WHERE trip_id IS NOT NULL
+        ORDER BY created_at ASC
+        LIMIT ?1
+      `).bind(limit).all();
+      tripIds = rows.results || rows;
+    }
+
+    for (const row of tripIds) {
+      try {
+        const summary = await facts.refreshTripFacts(row.trip_id);
+        if (summary) {
+          summaries.push(summary);
+          refreshedCount++;
+          await globalEnv.DB.prepare(`DELETE FROM facts_dirty WHERE trip_id = ?`).bind(summary.trip_id).run();
+        }
+      } catch (error) {
+        errorCount++;
+        summaries.push({
+          trip_id: Number(row.trip_id),
+          total_nights: 0,
+          total_hotels: 0,
+          total_activities: 0,
+          total_cost: 0,
+          transit_minutes: 0,
+          traveler_count: 0,
+          traveler_names: [],
+          traveler_emails: [],
+          primary_client_email: null,
+          primary_client_name: String(error instanceof Error ? error.message : error)
+        });
+      }
+    }
+  }
+
   return {
-    content: [{ type: 'text', text: `✅ Refreshed ${n} trip(s) from facts_dirty.` }]
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(
+          {
+            refreshed_count: refreshedCount,
+            error_count: errorCount,
+            summaries
+          },
+          null,
+          2
+        )
+      }
+    ]
   };
 }
 

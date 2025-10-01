@@ -5,109 +5,128 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { Env, ToolResponse } from '../types';
+import { Env } from '../types';
 import { DatabaseManager } from '../database/manager';
 import { ErrorLogger } from '../database/errors';
-import { FactTableManager } from '../database/facts';
+import { FactTableManager, TripFactsSummary } from '../database/facts';
 
-export function registerFactManagementTools(server: McpServer, getEnv: () => Env) {
-  
-  // Tool: refresh_trip_facts
-  server.tool(
-    "refresh_trip_facts",
-    {
-      trip_id: z.string().optional().describe("Specific trip ID to refresh (optional)"),
-      limit: z.number().default(50).max(1000).describe("Maximum number of trips to refresh"),
-      force_refresh: z.boolean().default(false).describe("Force refresh even if not marked dirty")
-    },
-    async (params) => {
-      const env = getEnv();
-      const dbManager = new DatabaseManager(env);
-      const factManager = new FactTableManager(env);
-      const errorLogger = new ErrorLogger(env);
-      
-      const initialized = await dbManager.ensureInitialized();
-      if (!initialized) {
-        return dbManager.createInitFailedResponse();
-      }
+const refreshTripFactsSchema = z.object({
+  trip_id: z.string().optional().describe("Specific trip ID to refresh (optional)"),
+  limit: z.number().max(1000).default(50).describe("Maximum number of trips to refresh"),
+  force_refresh: z.boolean().default(false).describe("Force refresh even if not marked dirty")
+});
 
+type RefreshTripFactsInput = z.infer<typeof refreshTripFactsSchema>;
+
+async function executeRefreshTripFacts(env: Env, params: RefreshTripFactsInput) {
+  const dbManager = new DatabaseManager(env);
+  const factManager = new FactTableManager(env);
+  const errorLogger = new ErrorLogger(env);
+
+  const initialized = await dbManager.ensureInitialized();
+  if (!initialized) {
+    console.warn('refresh_trip_facts proceeding despite initialization check failure');
+  }
+
+  try {
+    let refreshedCount = 0;
+    let errorCount = 0;
+    const errors: string[] = [];
+    const summaries: TripFactsSummary[] = [];
+
+    if (params.trip_id) {
       try {
-        let refreshedCount = 0;
-        let errorCount = 0;
-        const errors: string[] = [];
-
-        if (params.trip_id) {
-          // Refresh specific trip
-          try {
-            await factManager.refreshTripFacts(params.trip_id);
-            refreshedCount = 1;
-          } catch (error) {
-            errorCount = 1;
-            errors.push(`Failed to refresh trip ${params.trip_id}: ${error instanceof Error ? error.message : String(error)}`);
-          }
-        } else {
-          // Refresh dirty trips or all if force_refresh
-          let query: string;
-          if (params.force_refresh) {
-            query = `
+        const summary = await factManager.refreshTripFacts(params.trip_id);
+        if (summary) {
+          summaries.push(summary);
+          await env.DB.prepare(`DELETE FROM facts_dirty WHERE trip_id = ?`).bind(summary.trip_id).run();
+        }
+        refreshedCount = summary ? 1 : 0;
+      } catch (error) {
+        errorCount = 1;
+        errors.push(
+          `Failed to refresh trip ${params.trip_id}: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+    } else {
+      let query: string;
+      if (params.force_refresh) {
+        query = `
               SELECT t.trip_id 
               FROM trips_v2 t 
               WHERE t.status != 'cancelled' 
               ORDER BY t.updated_at DESC 
               LIMIT ?
             `;
-          } else {
-            query = `
+      } else {
+        query = `
               SELECT DISTINCT CAST(fd.trip_id AS INTEGER) as trip_id
               FROM facts_dirty fd
               JOIN trips_v2 t ON CAST(fd.trip_id AS INTEGER) = t.trip_id
               WHERE t.status != 'cancelled'
               LIMIT ?
             `;
-          }
-
-          const tripsToRefresh = await env.DB.prepare(query).bind(params.limit).all();
-          
-          for (const trip of tripsToRefresh.results || []) {
-            try {
-              // Convert trip_id to string for compatibility with FactTableManager
-              const tripIdStr = String(trip.trip_id);
-              await factManager.refreshTripFacts(tripIdStr);
-              refreshedCount++;
-              
-              // Remove from dirty list - use string version for facts_dirty query
-              await env.DB.prepare(`
-                DELETE FROM facts_dirty WHERE trip_id = ?
-              `).bind(tripIdStr).run();
-              
-            } catch (error) {
-              errorCount++;
-              const errorMsg = `Failed to refresh trip ${trip.trip_id}: ${error instanceof Error ? error.message : String(error)}`;
-              errors.push(errorMsg);
-              console.error(errorMsg);
-            }
-          }
-        }
-
-        return {
-          success: true,
-          message: `Trip facts refresh completed`,
-          results: {
-            refreshed_count: refreshedCount,
-            error_count: errorCount,
-            error_details: errors.length > 0 ? errors : undefined,
-            refresh_type: params.trip_id ? 'single_trip' : (params.force_refresh ? 'force_all' : 'dirty_only')
-          }
-        };
-
-      } catch (error) {
-        const errorMsg = `Trip facts refresh failed: ${error instanceof Error ? error.message : String(error)}`;
-        await errorLogger.logError('refresh_trip_facts', errorMsg, { trip_id: params.trip_id });
-        return {
-          success: false,
-          error: errorMsg
-        };
       }
+
+      const tripsToRefresh = await env.DB.prepare(query).bind(params.limit).all();
+
+      for (const trip of tripsToRefresh.results || []) {
+        try {
+          const tripIdStr = String(trip.trip_id);
+          const summary = await factManager.refreshTripFacts(tripIdStr);
+          if (summary) {
+            summaries.push(summary);
+            refreshedCount++;
+            await env.DB.prepare(`DELETE FROM facts_dirty WHERE trip_id = ?`).bind(summary.trip_id).run();
+          }
+        } catch (error) {
+          errorCount++;
+          const errorMsg = `Failed to refresh trip ${trip.trip_id}: ${error instanceof Error ? error.message : String(error)}`;
+          errors.push(errorMsg);
+          console.error(errorMsg);
+        }
+      }
+    }
+
+    return {
+      success: true,
+      message: `Trip facts refresh completed`,
+      results: {
+        refreshed_count: refreshedCount,
+        error_count: errorCount,
+        error_details: errors.length > 0 ? errors : undefined,
+        refresh_type: params.trip_id ? 'single_trip' : params.force_refresh ? 'force_all' : 'dirty_only',
+        summaries
+      }
+    };
+  } catch (error) {
+    const errorMsg = `Trip facts refresh failed: ${error instanceof Error ? error.message : String(error)}`;
+    await errorLogger.logError('refresh_trip_facts', errorMsg, { trip_id: params.trip_id });
+    return {
+      success: false,
+      error: errorMsg
+    };
+  }
+}
+
+export const refreshTripFactsTool = {
+  name: "refresh_trip_facts",
+  description: "Refresh trip facts for dirty trips or specific trip IDs",
+  inputSchema: refreshTripFactsSchema,
+  handler: async (params: RefreshTripFactsInput, db: any) => {
+    const env: Env = { DB: db, MCP_AUTH_KEY: '' };
+    return executeRefreshTripFacts(env, refreshTripFactsSchema.parse(params || {}));
+  }
+};
+
+export function registerFactManagementTools(server: McpServer, getEnv: () => Env) {
+  // Tool: refresh_trip_facts
+  server.tool(
+    "refresh_trip_facts",
+    refreshTripFactsSchema,
+    async (params) => {
+      const env = getEnv();
+      return executeRefreshTripFacts(env, params);
     }
   );
 

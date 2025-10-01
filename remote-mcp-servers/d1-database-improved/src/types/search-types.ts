@@ -10,6 +10,27 @@ export interface SearchResult {
   raw_data?: string;
 }
 
+export interface TripSuggestion {
+  trip_id: number;
+  trip_name: string;
+  trip_slug?: string | null;
+  status?: string | null;
+  destinations?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  primary_client_name?: string | null;
+  primary_client_email?: string | null;
+  traveler_preview?: string[];
+  score?: number;
+}
+
+export interface TripSelection extends TripSuggestion {
+  traveler_emails?: string[];
+  traveler_count?: number;
+  matched_tokens?: string[];
+  match_reasons?: string[];
+}
+
 export interface QueryPerformanceMetrics {
   queryType: string;
   duration: number;
@@ -37,6 +58,8 @@ export interface SearchResponse {
   context_type?: string;
   natural_key?: string;
   suggestions?: SearchResult[];
+  trip_suggestions?: TripSuggestion[];
+  selected_trip?: TripSelection;
   search_terms?: string[];
   error?: string;
   performance?: QueryPerformanceMetrics;

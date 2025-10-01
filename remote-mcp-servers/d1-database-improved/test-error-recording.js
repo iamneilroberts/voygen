@@ -78,11 +78,11 @@ async function testErrorRecording() {
     // Test 4: Try error analysis tools (may not be available in MCP interface)
     console.log('\n📋 Test 4: Error Analysis Tools');
     try {
-      const errorAnalysis = await callMCPTool('analyze_recent_errors', { hours: 1 });
+      const errorAnalysis = await callMCPTool('analyze_recent_errors', {});
       console.log('✅ Error analysis working:');
       const analysisResult = JSON.parse(errorAnalysis.content[0].text);
-      console.log('   Total errors:', analysisResult.total_errors);
-      console.log('   Unique patterns:', analysisResult.unique_patterns);
+      console.log('   Analysis period:', analysisResult.analysis_period || 'n/a');
+      console.log('   Total patterns:', analysisResult.total_error_patterns);
     } catch (error) {
       console.log('⚠️  Error analysis tool not available via MCP interface yet');
       console.log('   Error:', error.message.substring(0, 100));

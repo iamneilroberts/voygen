@@ -29,6 +29,18 @@ export class TriggerManager {
     CREATE TRIGGER IF NOT EXISTS trg_tripdays_ad_dirty
     AFTER DELETE ON TripDays BEGIN
       INSERT INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'tripday_delete');
+    END;
+    CREATE TRIGGER IF NOT EXISTS trg_trip_client_assignments_ai_facts
+    AFTER INSERT ON trip_client_assignments BEGIN
+      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'traveler_insert');
+    END;
+    CREATE TRIGGER IF NOT EXISTS trg_trip_client_assignments_au_facts
+    AFTER UPDATE ON trip_client_assignments BEGIN
+      INSERT INTO facts_dirty(trip_id, reason) VALUES (NEW.trip_id, 'traveler_update');
+    END;
+    CREATE TRIGGER IF NOT EXISTS trg_trip_client_assignments_ad_facts
+    AFTER DELETE ON trip_client_assignments BEGIN
+      INSERT INTO facts_dirty(trip_id, reason) VALUES (OLD.trip_id, 'traveler_delete');
     END;`;
 
     for (const stmt of sql.split(/;\s*\n/).map(s => s.trim()).filter(Boolean)) {
@@ -43,4 +55,3 @@ export class TriggerManager {
     return (rows.results || rows) as { name: string }[];
   }
 }
-

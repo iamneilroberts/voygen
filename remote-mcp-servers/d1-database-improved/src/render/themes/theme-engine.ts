@@ -196,14 +196,29 @@ export class ThemeEngine {
     layoutStyles: number;
     totalCombinations: number;
     cacheSize: number;
+    availableThemes: {
+      colorSchemes: string[];
+      typographyStyles: string[];
+      decorativeStyles: string[];
+      layoutStyles: string[];
+    };
   } {
+    // Accurate theme counts based on actual implementations
+    const availableThemes = {
+      colorSchemes: ['professional-blue', 'luxury-gold', 'minimal-gray'],
+      typographyStyles: ['corporate', 'elegant'],
+      decorativeStyles: ['none', 'minimal-emoji'],
+      layoutStyles: ['compact', 'spacious']
+    };
+
     return {
-      colorSchemes: 5,
-      typographyStyles: 4,
-      decorativeStyles: 4,
-      layoutStyles: 4,
-      totalCombinations: 5 * 4 * 4 * 4, // 320 combinations
-      cacheSize: this.cssCache.size
+      colorSchemes: availableThemes.colorSchemes.length,
+      typographyStyles: availableThemes.typographyStyles.length,
+      decorativeStyles: availableThemes.decorativeStyles.length,
+      layoutStyles: availableThemes.layoutStyles.length,
+      totalCombinations: availableThemes.colorSchemes.length * availableThemes.typographyStyles.length * availableThemes.decorativeStyles.length * availableThemes.layoutStyles.length,
+      cacheSize: this.cssCache.size,
+      availableThemes
     };
   }
   

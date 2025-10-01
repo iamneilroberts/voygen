@@ -1,13 +1,5 @@
 {
   "mcpServers": {
-    "mcp-chrome": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "http://127.0.0.1:12306/mcp"
-      ]
-    },
     "d1-database": {
       "command": "npx",
       "args": [
@@ -31,22 +23,6 @@
         "mcp-remote",
         "https://github-mcp-cta.somotravel.workers.dev/sse"
       ]
-    },
-    "mcp-anchor-browser": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://mcp-anchor-browser-production.somotravel.workers.dev/sse"
-      ]
-    },
-    "zen": {
-      "command": "zen-mcp-server/zen-mcp-server.disabled",
-      "args": [],
-      "env": {
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
-        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
-      }
     }
   }
 }

@@ -23,6 +23,7 @@ import { registerHotelManagementTools } from './tools/hotel-management';
 import { registerFactManagementTools } from './tools/fact-management';
 import { registerCommissionEngineTools } from './tools/commission-engine';
 import { registerDatabaseRepairTools } from './tools/database-repair';
+import { registerBillingTools } from './tools/billing-tools';
 import { 
   generateProposalSchema,
   previewProposalSchema,
@@ -64,6 +65,7 @@ function registerTools() {
   registerFactManagementTools(server, () => globalEnv);
   registerCommissionEngineTools(server, () => globalEnv);
   registerDatabaseRepairTools(server, () => globalEnv);
+  registerBillingTools(server, () => globalEnv);
   
   // Register proposal tools
   server.tool('generate_proposal', generateProposalSchema, 
@@ -183,6 +185,16 @@ export default {
                     name: 'list_templates',
                     description: 'List available proposal templates and generation capabilities',
                     inputSchema: zodToJsonSchema(listTemplatesSchema)
+                  },
+                  {
+                    name: 'record_usage_event',
+                    description: 'Record a usage event (trip_created, trip_published, ai_request) and update monthly rollups',
+                    inputSchema: zodToJsonSchema((await import('./tools/billing-tools')).recordUsageSchema ?? z.any())
+                  },
+                  {
+                    name: 'check_entitlement',
+                    description: 'Check plan entitlements for an advisor and action, returning allowed and remaining counts',
+                    inputSchema: zodToJsonSchema((await import('./tools/billing-tools')).checkEntitlementSchema ?? z.any())
                   }
                 ];
                 
@@ -243,6 +255,16 @@ export default {
                     case 'list_templates':
                       result = await handleListTemplates(toolArgs, globalEnv);
                       break;
+                    case 'record_usage_event': {
+                      const mod = await import('./tools/billing-tools');
+                      result = await mod.handleRecordUsageEvent(toolArgs, globalEnv);
+                      break;
+                    }
+                    case 'check_entitlement': {
+                      const mod = await import('./tools/billing-tools');
+                      result = await mod.handleCheckEntitlement(toolArgs, globalEnv);
+                      break;
+                    }
                     default:
                       const errorResponse = {
                         jsonrpc: '2.0',

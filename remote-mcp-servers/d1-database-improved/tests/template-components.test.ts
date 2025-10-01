@@ -352,9 +352,9 @@ describe('Template Components Tests', () => {
 
   describe('Component Theme Integration', () => {
     const themes: ThemeRemix[] = [
-      { colorScheme: 'professional', typography: 'modern', decorative: 'minimal', layout: 'standard' },
+      { colorScheme: 'professional-blue', typography: 'corporate', decorative: 'minimal-emoji', layout: 'spacious' },
       { colorScheme: 'luxury', typography: 'elegant', decorative: 'rich', layout: 'immersive' },
-      { colorScheme: 'executive', typography: 'clean', decorative: 'minimal', layout: 'efficient' },
+      { colorScheme: 'luxury-gold', typography: 'elegant', decorative: 'minimal-emoji', layout: 'compact' },
       { colorScheme: 'friendly', typography: 'relaxed', decorative: 'moderate', layout: 'comfortable' }
     ];
 

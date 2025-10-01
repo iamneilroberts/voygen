@@ -118,7 +118,7 @@ async function run() {
     await typeAndSend(rpc, 'travel_agent_start');
     await wait(1500);
     let page = await getPageText(rpc);
-    const greetingDetected = /System Ready|Travel Agent System Ready|startup-core/i.test(page);
+    const greetingDetected = /(Voygent Travel Assistant is active|System Ready|Travel Agent System Ready|startup-core)/i.test(page);
     record('travel_agent_start', greetingDetected, greetingDetected ? 'greeting visible' : 'not detected');
 
     // DB health
@@ -164,4 +164,3 @@ async function run() {
 }
 
 run();
-

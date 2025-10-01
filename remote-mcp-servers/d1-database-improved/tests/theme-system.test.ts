@@ -19,21 +19,21 @@ describe('Theme System Tests', () => {
   describe('Theme Configuration', () => {
     const validThemes: ThemeRemix[] = [
       {
-        colorScheme: 'professional',
-        typography: 'modern',
-        decorative: 'minimal',
-        layout: 'standard'
+        colorScheme: 'professional-blue',
+        typography: 'corporate',
+        decorative: 'minimal-emoji',
+        layout: 'spacious'
       },
       {
-        colorScheme: 'luxury',
+        colorScheme: 'luxury-gold',
         typography: 'elegant',
-        decorative: 'rich',
+        decorative: 'none',
         layout: 'immersive'
       },
       {
         colorScheme: 'executive',
         typography: 'clean',
-        decorative: 'minimal',
+        decorative: 'minimal-emoji',
         layout: 'efficient'
       },
       {
@@ -70,10 +70,10 @@ describe('Theme System Tests', () => {
 
   describe('CSS Generation', () => {
     const testTheme: ThemeRemix = {
-      colorScheme: 'professional',
-      typography: 'modern',
-      decorative: 'minimal', 
-      layout: 'standard'
+      colorScheme: 'professional-blue',
+      typography: 'corporate',
+      decorative: 'minimal-emoji', 
+      layout: 'spacious'
     };
 
     it('should generate CSS variables for color scheme', () => {
@@ -105,9 +105,9 @@ describe('Theme System Tests', () => {
 
     it('should include decorative elements', () => {
       const luxuryTheme: ThemeRemix = {
-        colorScheme: 'luxury',
+        colorScheme: 'luxury-gold',
         typography: 'elegant',
-        decorative: 'rich',
+        decorative: 'none',
         layout: 'immersive'
       };
 
@@ -131,16 +131,16 @@ describe('Theme System Tests', () => {
 
     it('should generate unique CSS for different combinations', () => {
       const theme1: ThemeRemix = {
-        colorScheme: 'professional',
-        typography: 'modern',
-        decorative: 'minimal',
-        layout: 'standard'
+        colorScheme: 'professional-blue',
+        typography: 'corporate',
+        decorative: 'minimal-emoji',
+        layout: 'spacious'
       };
 
       const theme2: ThemeRemix = {
-        colorScheme: 'luxury',
+        colorScheme: 'luxury-gold',
         typography: 'elegant', 
-        decorative: 'rich',
+        decorative: 'none',
         layout: 'immersive'
       };
 
@@ -154,10 +154,10 @@ describe('Theme System Tests', () => {
   describe('Responsive Theme Support', () => {
     it('should generate mobile-responsive theme CSS', () => {
       const theme: ThemeRemix = {
-        colorScheme: 'professional',
-        typography: 'modern',
-        decorative: 'minimal',
-        layout: 'standard'
+        colorScheme: 'professional-blue',
+        typography: 'corporate',
+        decorative: 'minimal-emoji',
+        layout: 'spacious'
       };
 
       const css = themeEngine.generateThemeCSS(theme, { responsive: true });
@@ -168,10 +168,10 @@ describe('Theme System Tests', () => {
 
     it('should adjust typography for mobile', () => {
       const theme: ThemeRemix = {
-        colorScheme: 'professional',
-        typography: 'modern',
-        decorative: 'minimal',
-        layout: 'standard'
+        colorScheme: 'professional-blue',
+        typography: 'corporate',
+        decorative: 'minimal-emoji',
+        layout: 'spacious'
       };
 
       const css = themeEngine.generateThemeCSS(theme, { responsive: true });
@@ -185,9 +185,9 @@ describe('Theme System Tests', () => {
     it('should reject invalid color schemes', () => {
       const invalidTheme = {
         colorScheme: 'invalid_color',
-        typography: 'modern',
-        decorative: 'minimal',
-        layout: 'standard'
+        typography: 'corporate',
+        decorative: 'minimal-emoji',
+        layout: 'spacious'
       } as ThemeRemix;
 
       const validation = themeEngine.validateTheme(invalidTheme);
@@ -197,10 +197,10 @@ describe('Theme System Tests', () => {
 
     it('should reject invalid typography', () => {
       const invalidTheme = {
-        colorScheme: 'professional',
+        colorScheme: 'professional-blue',
         typography: 'invalid_typography',
-        decorative: 'minimal',
-        layout: 'standard'
+        decorative: 'minimal-emoji',
+        layout: 'spacious'
       } as ThemeRemix;
 
       const validation = themeEngine.validateTheme(invalidTheme);
@@ -210,10 +210,10 @@ describe('Theme System Tests', () => {
 
     it('should reject invalid decorative style', () => {
       const invalidTheme = {
-        colorScheme: 'professional',
-        typography: 'modern',
+        colorScheme: 'professional-blue',
+        typography: 'corporate',
         decorative: 'invalid_decorative',
-        layout: 'standard'
+        layout: 'spacious'
       } as ThemeRemix;
 
       const validation = themeEngine.validateTheme(invalidTheme);
@@ -223,9 +223,9 @@ describe('Theme System Tests', () => {
 
     it('should reject invalid layout', () => {
       const invalidTheme = {
-        colorScheme: 'professional',
-        typography: 'modern',
-        decorative: 'minimal',
+        colorScheme: 'professional-blue',
+        typography: 'corporate',
+        decorative: 'minimal-emoji',
         layout: 'invalid_layout'
       } as ThemeRemix;
 
@@ -259,10 +259,10 @@ describe('Theme System Tests', () => {
   describe('Dark Mode Support', () => {
     it('should generate dark mode variants', () => {
       const theme: ThemeRemix = {
-        colorScheme: 'professional',
-        typography: 'modern',
-        decorative: 'minimal',
-        layout: 'standard'
+        colorScheme: 'professional-blue',
+        typography: 'corporate',
+        decorative: 'minimal-emoji',
+        layout: 'spacious'
       };
 
       const css = themeEngine.generateThemeCSS(theme, { darkMode: true });
@@ -276,10 +276,10 @@ describe('Theme System Tests', () => {
   describe('Print-Friendly Styles', () => {
     it('should generate print-optimized CSS', () => {
       const theme: ThemeRemix = {
-        colorScheme: 'professional',
-        typography: 'modern',
-        decorative: 'minimal',
-        layout: 'standard'
+        colorScheme: 'professional-blue',
+        typography: 'corporate',
+        decorative: 'minimal-emoji',
+        layout: 'spacious'
       };
 
       const css = themeEngine.generateThemeCSS(theme, { printOptimized: true });
