@@ -1,0 +1,120 @@
+/**
+ * StatusBar Styles
+ * Feature: 002-librechat-interface-modifications
+ *
+ * Pill-style status indicator in bottom-right corner.
+ * Reference: research.md section 2
+ */
+
+.statusPill {
+  /* Positioning: Fixed bottom-right corner */
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 999;
+
+  /* Layout */
+  max-width: 520px;
+  padding: 6px 12px;
+
+  /* Visual styling */
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 9999px; /* Fully rounded pill */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  /* Backdrop blur for glassmorphism effect */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  /* Smooth transitions */
+  transition: all 0.2s ease;
+}
+
+.statusPill:hover {
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.statusText {
+  /* Typography */
+  font-size: 0.75rem;  /* 12px - mobile friendly */
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* Layout */
+  display: block;
+  line-height: 1.5;
+}
+
+/* Responsive: Larger text on desktop */
+@media (min-width: 768px) {
+  .statusText {
+    font-size: 0.875rem;  /* 14px */
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .statusPill {
+    background-color: rgba(26, 26, 26, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .statusPill:hover {
+    background-color: rgba(26, 26, 26, 0.95);
+  }
+
+  .statusText {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* Dark mode via class (LibreChat convention) */
+.dark .statusPill {
+  background-color: rgba(26, 26, 26, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .statusPill:hover {
+  background-color: rgba(26, 26, 26, 0.95);
+}
+
+.dark .statusText {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Animation: Fade in when mounted */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.statusPill {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Mobile: Smaller padding and positioning */
+@media (max-width: 640px) {
+  .statusPill {
+    right: 8px;
+    bottom: 8px;
+    padding: 4px 10px;
+    max-width: 90vw;
+  }
+}
+
+/* Ensure visibility over other elements */
+.statusPill {
+  pointer-events: auto;
+}

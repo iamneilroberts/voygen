@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/home/neil/dev/travelops.ai/librechat-source/logs/.3c8d288782388dc4c3b04c33c1f1046c75358f9b-audit.json",
+    "files": [
+        {
+            "date": 1756473044556,
+            "name": "/home/neil/dev/travelops.ai/librechat-source/logs/debug-2025-08-29.log",
+            "hash": "5da4c50b839101e41ea2aff3cf875901077b0bf5b8b1616b50555da4ec1430d5"
+        }
+    ],
+    "hashType": "sha256"
+}

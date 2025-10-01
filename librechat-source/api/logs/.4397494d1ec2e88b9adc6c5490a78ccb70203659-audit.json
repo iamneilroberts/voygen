@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/home/neil/dev/voygen/librechat-source/api/logs/.4397494d1ec2e88b9adc6c5490a78ccb70203659-audit.json",
+    "files": [
+        {
+            "date": 1756491014451,
+            "name": "/home/neil/dev/voygen/librechat-source/api/logs/error-2025-08-29.log",
+            "hash": "b9ec8bb526dc688b5e18e4e4ecd3f8ba3b4939741bd68b2d644710306c45d8ec"
+        },
+        {
+            "date": 1757198879958,
+            "name": "/home/neil/dev/voygen/librechat-source/api/logs/error-2025-09-06.log",
+            "hash": "83229f00b832f947977b986fcc5f1ff39fbfebaa3f61964be6e536229aa0d5b2"
+        }
+    ],
+    "hashType": "sha256"
+}

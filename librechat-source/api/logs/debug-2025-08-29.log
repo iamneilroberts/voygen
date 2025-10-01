@@ -1,0 +1,228 @@
+2025-08-29T13:36:04.724Z debug: [spendTokens] conversationId: afba1169-cb4b-4788-89a0-40762b2399e9 | Context: message | Token usage:
+{
+  promptTokens: 10,
+  completionTokens: 4,
+}
+2025-08-29T13:36:04.760Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T13:40:44.785Z debug: [spendTokens] conversationId: afba1169-cb4b-4788-89a0-40762b2399e9 | Context: message | Token usage:
+{
+  promptTokens: 10,
+  completionTokens: 345,
+}
+2025-08-29T13:40:44.790Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T13:41:31.377Z debug: [spendTokens] conversationId: afba1169-cb4b-4788-89a0-40762b2399e9 | Context: message | Token usage:
+{
+  promptTokens: 369,
+  completionTokens: 228,
+}
+2025-08-29T13:41:31.383Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T13:50:42.978Z debug: [spendTokens] conversationId: afba1169-cb4b-4788-89a0-40762b2399e9 | Context: message | Token usage:
+{
+  promptTokens: 609,
+  completionTokens: 815,
+}
+2025-08-29T13:50:42.984Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T13:51:23.468Z debug: [spendTokens] conversationId: afba1169-cb4b-4788-89a0-40762b2399e9 | Context: message | Token usage:
+{
+  promptTokens: 1438,
+  completionTokens: 895,
+}
+2025-08-29T13:51:23.475Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T14:13:06.599Z debug: [spendTokens] conversationId: 99b94427-c178-4ebc-b1c0-6c2d8e858224 | Context: message | Token usage:
+{
+  promptTokens: 10,
+  completionTokens: 304,
+}
+2025-08-29T14:13:06.609Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T14:13:07.555Z debug: [spendTokens] conversationId: 99b94427-c178-4ebc-b1c0-6c2d8e858224 | Context: title | Token usage:
+{
+  promptTokens: 161,
+  completionTokens: 8,
+}
+2025-08-29T14:13:07.564Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T14:15:19.125Z debug: [spendTokens] conversationId: 99b94427-c178-4ebc-b1c0-6c2d8e858224 | Context: message | Token usage:
+{
+  promptTokens: 324,
+  completionTokens: 943,
+}
+2025-08-29T14:15:19.131Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T14:31:58.657Z debug: [spendTokens] conversationId: 99b94427-c178-4ebc-b1c0-6c2d8e858224 | Context: message | Token usage:
+{
+  promptTokens: 325,
+  completionTokens: 1321,
+}
+2025-08-29T14:31:58.666Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T14:33:11.892Z debug: [spendTokens] conversationId: 99b94427-c178-4ebc-b1c0-6c2d8e858224 | Context: message | Token usage:
+{
+  promptTokens: 1653,
+  completionTokens: 1242,
+}
+2025-08-29T14:33:11.897Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T14:34:18.397Z debug: [spendTokens] conversationId: 99b94427-c178-4ebc-b1c0-6c2d8e858224 | Context: message | Token usage:
+{
+  promptTokens: 2907,
+  completionTokens: 1359,
+}
+2025-08-29T14:34:18.403Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T14:43:13.236Z debug: [spendTokens] conversationId: 99b94427-c178-4ebc-b1c0-6c2d8e858224 | Context: message | Token usage:
+{
+  promptTokens: 4385,
+  completionTokens: 172,
+}
+2025-08-29T14:43:13.245Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T14:45:45.662Z debug: [spendTokens] conversationId: 8ca23afb-d70b-477a-b59e-407c667e1b81 | Context: message | Token usage:
+{
+  promptTokens: 10,
+  completionTokens: 262,
+}
+2025-08-29T14:45:45.670Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T14:45:46.599Z debug: [spendTokens] conversationId: 8ca23afb-d70b-477a-b59e-407c667e1b81 | Context: title | Token usage:
+{
+  promptTokens: 115,
+  completionTokens: 8,
+}
+2025-08-29T14:45:46.607Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T14:46:59.392Z debug: [spendTokens] conversationId: 8ca23afb-d70b-477a-b59e-407c667e1b81 | Context: message | Token usage:
+{
+  promptTokens: 471,
+  completionTokens: 780,
+}
+2025-08-29T14:46:59.397Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:10:03.972Z debug: [spendTokens] conversationId: a1132841-7622-43f0-940d-625e4f1c5e2f | Context: message | Token usage:
+{
+  promptTokens: 10,
+  completionTokens: 340,
+}
+2025-08-29T15:10:03.976Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:10:04.908Z debug: [spendTokens] conversationId: a1132841-7622-43f0-940d-625e4f1c5e2f | Context: title | Token usage:
+{
+  promptTokens: 205,
+  completionTokens: 7,
+}
+2025-08-29T15:10:04.916Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:10:36.259Z debug: [spendTokens] conversationId: a1132841-7622-43f0-940d-625e4f1c5e2f | Context: message | Token usage:
+{
+  promptTokens: 361,
+  completionTokens: 900,
+}
+2025-08-29T15:10:36.263Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:11:02.665Z debug: [spendTokens] conversationId: a1132841-7622-43f0-940d-625e4f1c5e2f | Context: message | Token usage:
+{
+  promptTokens: 1268,
+  completionTokens: 666,
+}
+2025-08-29T15:11:02.671Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:13:46.099Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: message | Token usage:
+{
+  promptTokens: 11,
+  completionTokens: 283,
+}
+2025-08-29T15:13:46.106Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:13:46.920Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: title | Token usage:
+{
+  promptTokens: 137,
+  completionTokens: 8,
+}
+2025-08-29T15:13:46.927Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:16:45.700Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: message | Token usage:
+{
+  promptTokens: 309,
+  completionTokens: 935,
+}
+2025-08-29T15:16:45.705Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:30:47.832Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: message | Token usage:
+{
+  promptTokens: 1260,
+  completionTokens: 1982,
+}
+2025-08-29T15:30:47.838Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:31:39.896Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: message | Token usage:
+{
+  promptTokens: 3257,
+  completionTokens: 4589,
+}
+2025-08-29T15:31:39.903Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:32:42.510Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: message | Token usage:
+{
+  promptTokens: 7862,
+  completionTokens: 3999,
+}
+2025-08-29T15:32:42.518Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:43:04.892Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: message | Token usage:
+{
+  promptTokens: 11874,
+  completionTokens: 4387,
+}
+2025-08-29T15:43:04.899Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:57:16.604Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: message | Token usage:
+{
+  promptTokens: 16274,
+  completionTokens: 88,
+}
+2025-08-29T15:57:16.610Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:57:43.356Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: message | Token usage:
+{
+  promptTokens: 16367,
+  completionTokens: 308,
+}
+2025-08-29T15:57:43.362Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T15:59:49.788Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: message | Token usage:
+{
+  promptTokens: 16725,
+  completionTokens: 2448,
+}
+2025-08-29T15:59:49.794Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T17:08:04.025Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: message | Token usage:
+{
+  promptTokens: 11,
+  completionTokens: 262,
+}
+2025-08-29T17:08:04.049Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T17:08:57.791Z debug: [spendTokens] conversationId: 78bf277d-2eab-4fae-b61e-df5d3c50bedf | Context: message | Token usage:
+{
+  promptTokens: 289,
+  completionTokens: 2193,
+}
+2025-08-29T17:08:57.799Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T18:20:01.834Z debug: [spendTokens] conversationId: af5c1b74-ced9-4860-9284-35571cb7e68e | Context: message | Token usage:
+{
+  promptTokens: 10,
+  completionTokens: 1453,
+}
+2025-08-29T18:20:01.846Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T18:20:02.816Z debug: [spendTokens] conversationId: af5c1b74-ced9-4860-9284-35571cb7e68e | Context: title | Token usage:
+{
+  promptTokens: 1798,
+  completionTokens: 7,
+}
+2025-08-29T18:20:02.824Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T18:24:18.544Z debug: [spendTokens] conversationId: eae637ad-ba39-464e-a686-f12bdefd2dc2 | Context: message | Token usage:
+{
+  promptTokens: 10,
+  completionTokens: 324,
+}
+2025-08-29T18:24:18.560Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T18:24:19.446Z debug: [spendTokens] conversationId: eae637ad-ba39-464e-a686-f12bdefd2dc2 | Context: title | Token usage:
+{
+  promptTokens: 436,
+  completionTokens: 7,
+}
+2025-08-29T18:24:19.459Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T18:24:49.691Z debug: [spendTokens] conversationId: ce9edad8-0a28-455a-bd74-61e48fc46f91 | Context: message | Token usage:
+{
+  promptTokens: 10,
+  completionTokens: 319,
+}
+2025-08-29T18:24:49.696Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T18:24:50.477Z debug: [spendTokens] conversationId: ce9edad8-0a28-455a-bd74-61e48fc46f91 | Context: title | Token usage:
+{
+  promptTokens: 179,
+  completionTokens: 7,
+}
+2025-08-29T18:24:50.485Z debug: [spendTokens] No transactions incurred against balance
+2025-08-29T18:25:19.408Z debug: [spendTokens] conversationId: ce9edad8-0a28-455a-bd74-61e48fc46f91 | Context: message | Token usage:
+{
+  promptTokens: 340,
+  completionTokens: 922,
+}
+2025-08-29T18:25:19.412Z debug: [spendTokens] No transactions incurred against balance

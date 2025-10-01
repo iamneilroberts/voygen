@@ -1,0 +1,9 @@
+2025-09-06T22:48:08.491Z info: Mongo Connection options
+2025-09-06T22:48:08.494Z info: {
+  "bufferCommands": false,
+  "autoIndex": false,
+  "autoCreate": false
+}
+2025-09-06T22:48:08.599Z info: Connected to MongoDB
+2025-09-06T22:48:08.601Z info: [indexSync] Starting index synchronization check...
+2025-09-06T22:48:08.681Z error: There was an uncaught error: command find requires authentication

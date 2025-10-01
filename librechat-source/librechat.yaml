@@ -1,0 +1,154 @@
+version: 1.0.0
+cache: true
+
+# Default endpoint for new conversations
+defaultEndpoint: "Claude Sonnet (Premium)"
+
+# Travel Agent Multi-Model Configuration
+endpoints:
+  custom:
+    # Haiku for cost-effective operations  
+    - name: "Claude Haiku (Cost Effective)"
+      apiKey: "${ANTHROPIC_API_KEY}"
+      baseURL: "https://api.anthropic.com/v1"
+      models:
+        default: ["claude-3-5-haiku-20241022"]
+      modelDisplayLabel: "💰 Haiku - Economical ($0.25/1M tokens)"
+      titleConvo: true
+      titleModel: "claude-3-5-haiku-20241022"
+      
+    # Sonnet for complex planning
+    - name: "Claude Sonnet (Premium)"
+      apiKey: "${ANTHROPIC_API_KEY}"
+      baseURL: "https://api.anthropic.com/v1"
+      models:
+        default: ["claude-3-5-sonnet-20241022"]
+      modelDisplayLabel: "⭐ Sonnet - Premium Planning ($3.00/1M tokens)"
+      titleConvo: true
+      titleModel: "claude-3-5-sonnet-20241022"
+      default: true
+      systemPrompt: |
+        You are Voygent, an expert AI travel planning assistant.
+
+        Your role is to help travel agents create exceptional travel experiences by:
+        - Understanding client preferences and requirements
+        - Researching destinations and creating detailed itineraries
+        - Finding and comparing hotels, activities, and transportation
+        - Calculating costs and providing budget recommendations
+        - Generating professional travel proposals for clients
+
+        You have access to MCP tools for database operations, document generation, and web research.
+        Always use trip_id when available for database operations to reduce ambiguity.
+        Track trip progress through the workflow phases: Research → Hotels → Activities → Booking → Finalization.
+
+        Be professional, detail-oriented, and focus on creating memorable travel experiences.
+      
+    # GPT-4 as fallback
+    - name: "GPT-4 (Fallback)"
+      apiKey: "${OPENAI_API_KEY}"
+      baseURL: "https://api.openai.com/v1"
+      models:
+        default: ["gpt-4-turbo-preview"]
+      modelDisplayLabel: "🔄 GPT-4 - Fallback ($10.00/1M tokens)"
+      titleConvo: true
+
+# Travel Planning Agent with MCP Tools (commented out - not supported in this version)
+# agents:
+#   - name: "Travel Planning Assistant"
+
+# MCP Server Configuration
+mcpServers:
+  mcp-chrome:
+    command: "node"
+    args: ["../mcp-local-servers/mcp-chrome/app/native-server/dist/index.js"]
+    timeout: 30000
+    env: {}
+    description: "Browser automation and web content extraction"
+    serverInstructions: |
+      Browser automation capabilities:
+      - Use this server for real-time web interaction and content extraction:
+        • Navigate to travel websites and extract live pricing data
+        • Take screenshots for visual confirmation
+        • Fill forms and interact with booking interfaces
+        • Monitor network requests for API data
+      - Ideal for dynamic content that requires JavaScript execution
+      - Best for real-time price verification and availability checks
+
+  d1-database:
+    command: "npx"
+    args: 
+      - "-y"
+      - "mcp-remote" 
+      - "https://d1-database-improved.somotravel.workers.dev/sse"
+    timeout: 30000
+    env: {}
+    description: "Access to client and trip database with comprehensive travel data"
+    serverInstructions: |
+      Tool selection guidance:
+      - Use this server for data lookups and persistence:
+        • get_anything: broad search for clients, trips, bookings
+        • find_* and list_*: targeted DB queries
+      - Do not use this server to drive conversational workflow progression.
+      - If both servers expose a tool named `continue_trip`, prefer `continue_trip` from `prompt-instructions` for resuming trip context; this server's tools should not be chosen for `/continue` intents.
+      - Prefer identifiers over names: when both are available, pass `trip_id` instead of long textual identifiers (e.g., `trip_identifier`, `trip_name`).
+    
+  prompt-instructions:
+    command: "npx"
+    args:
+      - "-y" 
+      - "mcp-remote"
+      - "https://prompt-instructions-d1-mcp.somotravel.workers.dev/sse"
+    timeout: 30000
+    env: {}
+    description: "Travel planning workflows, instructions, and structured processes"
+    serverInstructions: |
+      Tool selection guidance:
+      - Use this server to manage workflow state and conversation flow.
+        • travel_agent_start: initialize startup-core instructions
+        • continue_trip: resume work on an existing trip (/continue ...)
+      - Do not use this server for database-wide queries; instead, call `get_anything` on `d1-database`.
+      - When the user types `/continue ...`, select `continue_trip` from `prompt-instructions`.
+      - When referencing specific trips, include `trip_id` when available (IDs reduce ambiguity and extra DB lookups).
+
+  template-document:
+    command: "npx"
+    args:
+      - "-y"
+      - "mcp-remote"
+      - "https://template-document-mcp.somotravel.workers.dev/sse"
+    timeout: 30000
+    env: {}
+    description: "Travel document template rendering and publishing system"
+    serverInstructions: |
+      Document publishing capabilities:
+      - Use this server for creating professional travel documents:
+        • render_template: Generate HTML documents from trip data
+        • publish_travel_document: Publish documents to GitHub Pages
+        • list_templates: View available document templates
+      - Ideal for client proposals, itineraries, and travel confirmations
+      - Publishes to somotravel.us and voygen.app websites
+      - Use `/publish` command to create and publish travel documents
+
+# Interface customization for travel agents
+interface:
+  privacyPolicy:
+    externalUrl: "https://voygen.app/privacy"
+  termsOfService:
+    externalUrl: "https://voygen.app/terms"
+
+# Web Search configuration
+webSearch:
+  searchProvider: serper
+  scraperType: firecrawl
+  rerankerType: jina
+  scraperTimeout: 20000
+  firecrawlApiKey: "${FIRECRAWL_API_KEY}"
+  firecrawlApiUrl: "${FIRECRAWL_API_URL}"
+  firecrawlOptions:
+    timeout: 20000
+  # Custom guidance for backend + prompt
+  allowedDomains:
+    - wikipedia.org
+    - nationalrail.co.uk
+    - crosscountrytrains.co.uk
+  maxScrapes: 3

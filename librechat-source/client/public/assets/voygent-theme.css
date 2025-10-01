@@ -1,0 +1,375 @@
+/**
+ * Voygent Custom Theme
+ * Feature: 002-librechat-interface-modifications (Phase 5, T025)
+ *
+ * Custom theme overrides for Voygent branding
+ * Integrates with LibreChat's existing theme system
+ */
+
+@import url('./voygent-colors.css');
+
+/* === GLOBAL OVERRIDES === */
+
+/* Primary brand color for buttons, links, accents */
+:root {
+  --brand-primary: var(--voygent-primary);
+  --brand-primary-hover: var(--voygent-primary-hover);
+  --brand-secondary: var(--voygent-secondary);
+  --brand-secondary-hover: var(--voygent-secondary-hover);
+}
+
+/* === HEADER CUSTOMIZATION === */
+
+/* Header background with subtle gradient */
+.header,
+header[class*="Header"] {
+  background: linear-gradient(
+    90deg,
+    var(--voygent-primary) 0%,
+    var(--voygent-primary-hover) 100%
+  );
+  border-bottom: 2px solid var(--voygent-primary-dark);
+}
+
+/* Header logo container */
+.header-logo,
+.nav-logo,
+[class*="HeaderLogo"] {
+  display: flex;
+  align-items: center;
+  gap: var(--voygent-space-2);
+}
+
+/* === SIDEBAR CUSTOMIZATION === */
+
+/* Sidebar background */
+.sidebar,
+aside[class*="Sidebar"],
+nav[class*="Nav"] {
+  background-color: var(--voygent-surface);
+  border-right: 1px solid var(--voygent-border);
+}
+
+/* Sidebar active item indicator */
+.sidebar-item.active,
+.nav-item.active,
+[class*="NavItem"][aria-current="page"] {
+  background-color: var(--voygent-primary);
+  color: white;
+  border-left: 3px solid var(--voygent-secondary);
+}
+
+/* Sidebar hover state */
+.sidebar-item:hover,
+.nav-item:hover,
+[class*="NavItem"]:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+/* === BUTTON CUSTOMIZATION === */
+
+/* Primary button */
+button.btn-primary,
+button[class*="Primary"],
+.primary-button {
+  background-color: var(--voygent-primary);
+  border-color: var(--voygent-primary);
+  color: white;
+}
+
+button.btn-primary:hover,
+button[class*="Primary"]:hover,
+.primary-button:hover {
+  background-color: var(--voygent-primary-hover);
+  border-color: var(--voygent-primary-hover);
+}
+
+/* Secondary button */
+button.btn-secondary,
+button[class*="Secondary"],
+.secondary-button {
+  background-color: var(--voygent-secondary);
+  border-color: var(--voygent-secondary);
+  color: white;
+}
+
+button.btn-secondary:hover,
+button[class*="Secondary"]:hover,
+.secondary-button:hover {
+  background-color: var(--voygent-secondary-hover);
+  border-color: var(--voygent-secondary-hover);
+}
+
+/* === LOGIN PAGE CUSTOMIZATION === */
+
+/* Login form container */
+.login-container,
+[class*="LoginContainer"],
+form[class*="Login"] {
+  background: var(--voygent-surface);
+  border-radius: var(--voygent-radius-xl);
+  box-shadow: var(--voygent-shadow-xl);
+  padding: var(--voygent-space-8);
+}
+
+/* Login page title */
+.login-title,
+.auth-title,
+[class*="LoginTitle"] {
+  color: var(--voygent-primary);
+  font-weight: 700;
+  margin-bottom: var(--voygent-space-6);
+}
+
+/* === CHAT MESSAGE CUSTOMIZATION === */
+
+/* User message bubble */
+.message-user,
+[class*="UserMessage"] {
+  background-color: var(--voygent-primary);
+  color: white;
+  border-radius: var(--voygent-radius-lg);
+}
+
+/* Assistant message bubble */
+.message-assistant,
+[class*="AssistantMessage"] {
+  background-color: var(--voygent-surface);
+  border-left: 3px solid var(--voygent-secondary);
+  border-radius: var(--voygent-radius-lg);
+}
+
+/* === PROGRESS INDICATORS === */
+
+/* Trip progress bar */
+.trip-progress-bar {
+  background: linear-gradient(
+    90deg,
+    var(--voygent-progress-research) 0%,
+    var(--voygent-progress-hotels) 20%,
+    var(--voygent-progress-activities) 40%,
+    var(--voygent-progress-booking) 60%,
+    var(--voygent-progress-finalization) 80%,
+    var(--voygent-success) 100%
+  );
+  height: 4px;
+  border-radius: var(--voygent-radius-pill);
+  transition: width 0.3s ease;
+}
+
+/* === STATUSBAR (already has custom styles, this ensures consistency) === */
+
+.statusPill {
+  background-color: var(--voygent-glass-bg);
+  backdrop-filter: var(--voygent-glass-blur);
+  border: 1px solid var(--voygent-glass-border);
+  box-shadow: var(--voygent-shadow-lg);
+}
+
+/* === LINKS === */
+
+a,
+a[class*="Link"] {
+  color: var(--voygent-primary);
+  text-decoration: none;
+}
+
+a:hover,
+a[class*="Link"]:hover {
+  color: var(--voygent-primary-hover);
+  text-decoration: underline;
+}
+
+/* === BADGES & TAGS === */
+
+.badge-primary,
+.tag-primary {
+  background-color: var(--voygent-primary);
+  color: white;
+  border-radius: var(--voygent-radius-md);
+  padding: var(--voygent-space-1) var(--voygent-space-2);
+}
+
+.badge-success,
+.tag-success {
+  background-color: var(--voygent-success);
+  color: white;
+}
+
+.badge-warning,
+.tag-warning {
+  background-color: var(--voygent-warning);
+  color: white;
+}
+
+.badge-error,
+.tag-error {
+  background-color: var(--voygent-error);
+  color: white;
+}
+
+/* === CARDS & PANELS === */
+
+.card,
+.panel,
+[class*="Card"],
+[class*="Panel"] {
+  background-color: var(--voygent-surface);
+  border: 1px solid var(--voygent-border);
+  border-radius: var(--voygent-radius-lg);
+  box-shadow: var(--voygent-shadow-sm);
+  padding: var(--voygent-space-4);
+}
+
+.card:hover,
+.panel:hover {
+  box-shadow: var(--voygent-shadow-md);
+}
+
+/* === FORMS === */
+
+input,
+textarea,
+select {
+  border-color: var(--voygent-border);
+  border-radius: var(--voygent-radius-md);
+  background-color: var(--voygent-bg);
+  color: var(--voygent-text);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--voygent-primary);
+  outline: 2px solid rgba(37, 99, 235, 0.2);
+  outline-offset: 0;
+}
+
+/* === SCROLLBARS === */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--voygent-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--voygent-border);
+  border-radius: var(--voygent-radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--voygent-primary);
+}
+
+/* === TOOLTIPS === */
+
+[data-tooltip],
+.tooltip {
+  position: relative;
+}
+
+[data-tooltip]:hover::after,
+.tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--voygent-text);
+  color: var(--voygent-bg);
+  padding: var(--voygent-space-2);
+  border-radius: var(--voygent-radius-md);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  box-shadow: var(--voygent-shadow-md);
+  margin-bottom: var(--voygent-space-2);
+}
+
+/* === LOADING STATES === */
+
+.loading-spinner,
+[class*="Spinner"] {
+  border-color: var(--voygent-border);
+  border-top-color: var(--voygent-primary);
+}
+
+.loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--voygent-surface) 0%,
+    var(--voygent-border) 50%,
+    var(--voygent-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* === ANIMATIONS === */
+
+@keyframes voygent-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.voygent-fade-in {
+  animation: voygent-fade-in 0.3s ease-out;
+}
+
+/* === RESPONSIVE DESIGN === */
+
+@media (max-width: 768px) {
+  .header-logo img {
+    max-width: 120px;
+  }
+
+  .statusPill {
+    font-size: 0.75rem;
+    padding: var(--voygent-space-1) var(--voygent-space-3);
+  }
+}
+
+/* === ACCESSIBILITY === */
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--voygent-primary);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --voygent-border-light: #000000;
+    --voygent-border-dark: #ffffff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

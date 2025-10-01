@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
+  <!-- Voygent wordmark for light backgrounds -->
+  <text x="10" y="28" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="600" fill="#1a1a1a">
+    Voygent
+  </text>
+  <!-- Travel icon accent -->
+  <g transform="translate(140, 8)">
+    <!-- Airplane symbol -->
+    <path d="M12 2L4 8l4 2-4 4 2 2 6-2 4 4v-4l4-2z" fill="#2563eb" stroke="#2563eb" stroke-width="1.5"/>
+    <!-- Globe arc -->
+    <circle cx="12" cy="12" r="10" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="2,2" opacity="0.5"/>
+  </g>
+</svg>
