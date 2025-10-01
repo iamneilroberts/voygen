@@ -52,6 +52,34 @@ endpoints:
       modelDisplayLabel: "🔄 GPT-4 - Fallback ($10.00/1M tokens)"
       titleConvo: true
 
+    # z.ai GLM Models for alternative AI options
+    - name: "z.ai GLM-4.6 (Flagship)"
+      apiKey: "${Z_AI_API_KEY}"
+      baseURL: "https://api.z.ai/api/paas/v4"
+      models:
+        default: ["glm-4-6"]
+      modelDisplayLabel: "🚀 GLM-4.6 - Flagship Reasoning ($2.80/1M tokens)"
+      titleConvo: true
+      titleModel: "glm-4-6"
+
+    - name: "z.ai GLM-4.5-Air (Economical)"
+      apiKey: "${Z_AI_API_KEY}"
+      baseURL: "https://api.z.ai/api/paas/v4"
+      models:
+        default: ["glm-4-5-air"]
+      modelDisplayLabel: "💨 GLM-4.5-Air - Economical ($0.65/1M tokens)"
+      titleConvo: true
+      titleModel: "glm-4-5-air"
+
+    - name: "z.ai GLM-4.5V (Visual)"
+      apiKey: "${Z_AI_API_KEY}"
+      baseURL: "https://api.z.ai/api/paas/v4"
+      models:
+        default: ["glm-4-5v"]
+      modelDisplayLabel: "👁️ GLM-4.5V - Visual Planning ($1.20/1M tokens)"
+      titleConvo: true
+      titleModel: "glm-4-5v"
+
 # Travel Planning Agent with MCP Tools (commented out - not supported in this version)
 # agents:
 #   - name: "Travel Planning Assistant"
